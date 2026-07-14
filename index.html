@@ -465,10 +465,21 @@ const MDB={
     moves:[['ext','신전'],['flex','굴곡'],['sidebend','측굴'],['rot','회전']],
     locs:[['central','중앙'],['para','방척추'],['lat','측방'],['buttock','둔부 방사']],
     muscles:[['척추기립근',['ext'],['para','central']],['다열근',['ext','rot'],['para','central']],['요방형근',['sidebend','ext'],['lat']],['복사근',['flex','rot'],['lat']]]},
-  cervical:{
-    moves:[['flex','굴곡'],['ext','신전'],['rot','회전'],['sidebend','측굴'],['scapElev','견갑 거상']],
-    locs:[['post','후경부'],['lat','측경부'],['upperTrap','상부 어깨'],['occ','후두']],
-    muscles:[['상부승모근',['scapElev','ext','sidebend'],['upperTrap','post']],['견갑거근',['scapElev','sidebend'],['upperTrap','lat']],['사각근',['flex','sidebend'],['lat']],['흉쇄유돌근',['flex','rot'],['lat']],['후두하근',['ext'],['occ']],['판상근',['ext','rot'],['post']]]},
+  cervical:{dir:true,
+    moves:[['flex','굴곡'],['ext','신전'],['rotL','좌측 회전'],['rotR','우측 회전'],['sbL','좌측 측굴'],['sbR','우측 측굴']],
+    locs:[],
+    opp:{flex:'ext',ext:'flex',rotL:'rotR',rotR:'rotL',sbL:'sbR',sbR:'sbL'},
+    mvko:{flex:'굴곡',ext:'신전',rotL:'좌회전',rotR:'우회전',sbL:'좌측굴',sbR:'우측굴'},
+    sides:[['우측',{sbSelf:'sbR',rotSelf:'rotR',rotOther:'rotL'}],['좌측',{sbSelf:'sbL',rotSelf:'rotL',rotOther:'rotR'}]],
+    tmpl:[
+      ['흉쇄유돌근(SCM)',['flex','sbSelf','rotOther']],
+      ['사각근',['flex','sbSelf']],
+      ['견갑거근',['ext','sbSelf','rotSelf']],
+      ['상부승모근',['ext','sbSelf','rotOther']],
+      ['두·경판상근',['ext','sbSelf','rotSelf']],
+      ['후두하근',['ext','rotSelf']],
+      ['심부경부굴곡근',['flex']],
+    ]},
   thoracic:{
     moves:[['ext','신전'],['rot','회전'],['retract','견갑 후인']],
     locs:[['para','방척추'],['medScap','견갑간'],['rib','늑골']],
@@ -542,6 +553,21 @@ function muscleLoc(d){return (d.region&&MUSCLE_TESTS[d.region])?(d.muscleTests||
 function muscleCandidates(d){
   const db=d.region&&MDB[d.region];if(!db)return [];
   const mv=d.moves||[],lc=d.locs||[];if(!mv.length&&!lc.length)return [];
+  if(db.dir){ // 방향성 모델: 수축(1)·신장(1.5) + 좌우
+    if(!mv.length)return [];
+    const out=[];
+    db.sides.forEach(([sko,map])=>{
+      db.tmpl.forEach(([n,acts])=>{
+        const A=acts.map(a=>map[a]||a);let score=0;const why=[];
+        mv.forEach(m=>{
+          if(A.includes(m)){score+=1;why.push(db.mvko[m]+' 수축');}
+          else if(A.includes(db.opp[m])){score+=1.5;why.push(db.mvko[m]+' 신장');}
+        });
+        if(score>0)out.push({n:sko+' '+n,score:Math.round(score*10)/10,why});
+      });
+    });
+    return out.sort((a,b)=>b.score-a.score);
+  }
   const moveKo=Object.fromEntries(db.moves),locKo=Object.fromEntries(db.locs);
   return db.muscles.map(([n,mvs,lcs])=>{
     const mm=mvs.filter(x=>mv.includes(x)),lm=lcs.filter(x=>lc.includes(x));
