@@ -285,7 +285,7 @@ const TIMING=[['amStiffShort','아침경직 <30분','j'],['amStiffLong','아침�
 const AGGRAVATE=[['flexion','굴곡(숙일 때)','nv'],['extension','신전(젖힐 때)','j'],['rotation','회전','m'],['sidebend','측굴','m'],['liftArm','팔 올릴 때','m'],['sitToStand','앉았다 일어설 때','j'],['stairs','계단','j'],['lifting','물건 들 때','m'],['coughSneeze','기침·재채기','nv'],['prolonged','오래 앉기·서기','j']];
 const NEURO=[['sensory','피부분절 감각저하','nv'],['motor','근절 근력저하','nv'],['reflex','심부건반사 저하','nv'],['tension','신경긴장검사(SLR/Spurling/ULTT)+','nv']];
 const REDFLAGS=['야간·안정 시 심한 통증','원인불명 체중감소','발열·오한','배뇨/배변 이상','진행성 하지/상지 마비','안장부위 감각소실','고령 외상 후 통증'];
-const COMORBID=['당뇨','갑상선질환','통풍력','류마티스력','골다공증','임신','항암·약물','대상포진 이력','과음'];
+const COMORBID=['당뇨','갑상선질환','통풍력','류마티스력','골다공증','임신','항암·약물','대상포진 이력','과음','건선'];
 const DERM_LOWER=[['L2_3','대퇴 전면(L2-3)'],['L4','무릎 내측·정강이 내측(L4)'],['L5','정강이 외측·족배·무지(L5)'],['S1','종아리 후면·발바닥·외측(S1)']];
 const DERM_UPPER=[['C5','어깨·외측 상완(C5)'],['C6','엄지·요측 전완(C6)'],['C7','중지·후면(C7)'],['C8','소지·척측(C8)'],['T1','내측 상완(T1)']];
 
@@ -413,7 +413,7 @@ const TESTS={
 };
 
 /* ───────── 특수 조건 감별 ───────── */
-const SPECIAL_CATS=['자가면역·염증','탈수초·신경','퇴행성','대사·기타','성장기'];
+const SPECIAL_CATS=['자가면역·염증','탈수초·신경','국소 연부조직·과사용','퇴행성','대사·기타','성장기'];
 function specialDx(d){
   const out=[],age=d.age,sex=d.sex,bmi=d.bmi,cm=d.comorbid||[],tm=d.timing||[],q=d.quality||[],ag=d.aggravate||[],nu=d.neuro||[],rf=d.redflags||[];
   const spine=['lumbar','sij','thoracic','cervical'].includes(d.region);
@@ -455,6 +455,33 @@ function specialDx(d){
 
   // ── 성장기 ──
   if(age>0&&age<19&&['knee','ankle','hip'].includes(d.region))P('성장기','성장기 골단증/견인성 골단염','참고','성장기·Osgood-Schlatter(무릎)/Sever(발뒤꿈치) 등 고려');
+
+  // ── 세분화: 부위별 고빈도 질환 ──
+  const R=d.region,overuse=d.onsetTrigger==='overuse',acute=d.onsetTime==='acute';
+  // 자가면역 추가
+  if(cm.includes('건선')&&['elbowwrist','knee','ankle','sij'].includes(R))P('자가면역·염증','건선성 관절염','중등','건선 이력·말초/축성 관절 → 지염(dactylitis)·손발톱 변화');
+  // 신경 포착
+  if(R==='sij'&&(d.radiate==='lower'||ag.includes('prolonged')))P('탈수초·신경','이상근 증후군','참고','둔부·좌골신경 자극·앉을 때 악화 → FAIR·이상근 신장');
+  if((R==='cervical'||R==='shoulder')&&d.radiate==='upper')P('탈수초·신경','흉곽출구증후군(TOS)','참고','상지 저림·자세 연관 → Adson/Roos, 사각근·소흉근');
+  if(R==='elbowwrist'&&q.includes('numb'))P('탈수초·신경','척골신경병증(주관절터널)','참고','팔꿈치 내측·소지 저림 → 척골신경 Tinel(주관)');
+  if(R==='hip'&&q.includes('numb')&&bmi>=25)P('탈수초·신경','감각이상성 대퇴신경통','참고','대퇴 외측 저림·비만/벨트 압박 → 외측대퇴피신경 포착');
+  if(R==='ankle'&&numbBurn)P('탈수초·신경','지간신경종(Morton)/족근관','참고','전족부·발바닥 저림·작열 → Mulder/후경골신경 Tinel');
+  // 국소 연부조직·과사용
+  if(R==='elbowwrist'&&(overuse||d.cyriax==='contract'))P('국소 연부조직·과사용','상과염(테니스/골퍼 엘보)','중등','과사용·저항 신전/굴곡통 → 외측/내측 상과');
+  if(R==='elbowwrist'&&(sex==='female'||cm.includes('임신')))P('국소 연부조직·과사용','드퀘르뱅 건초염','참고','엄지 손목 요측·Finkelstein');
+  if(R==='elbowwrist'&&cm.includes('당뇨'))P('국소 연부조직·과사용','방아쇠수지','참고','손가락 걸림·당뇨 연관 → 굴곡건 협착');
+  if(R==='shoulder'&&age>=40&&age<=65&&d.cyriax==='artic')P('국소 연부조직·과사용','유착성 관절낭염(동결견)','중등','전 방향 ROM 제한·당뇨 연관');
+  if(R==='shoulder'&&acute&&q.includes('sharp'))P('국소 연부조직·과사용','석회성 건염','참고','급성 심한 어깨통 → X-ray 석회');
+  if(R==='ankle'&&(tm.includes('amStiffShort')||ag.includes('prolonged')))P('국소 연부조직·과사용','족저근막염','중등','발뒤꿈치·아침 첫 발 통증');
+  if(R==='ankle'&&overuse)P('국소 연부조직·과사용','아킬레스 건병증','참고','뒤꿈치 위 건 통증·과사용');
+  if(R==='knee'&&age<40&&ag.includes('stairs'))P('국소 연부조직·과사용','슬개대퇴 통증증후군','중등','젊은층·계단/쪼그림 앞무릎');
+  if(R==='knee'&&overuse)P('국소 연부조직·과사용','장경인대 증후군','참고','무릎 외측·러너 마찰');
+  if(R==='knee'&&d.tender==='yes')P('국소 연부조직·과사용','거위발 건염/점액낭염','참고','무릎 내측 하방 압통');
+  if(R==='knee'&&age>=45)P('국소 연부조직·과사용','퇴행성 반월판 파열','참고','중년+·회전 부하 → McMurray');
+  if(R==='hip'&&d.tender==='yes')P('국소 연부조직·과사용','대전자 점액낭염','참고','고관절 외측 압통');
+  // 대사·기타 추가
+  if(age>=60&&acute&&['knee','elbowwrist'].includes(R))P('대사·기타','가성통풍(CPPD)','참고','고령·급성 무릎/손목 → 연골석회화');
+  if(sex==='female'&&age>=30&&age<=60&&d.progression==='spread'&&d.onsetTime==='chronic')P('대사·기타','섬유근통','참고','중년 여성·광범위 만성 통증·피로 → 압통점');
 
   return out;
 }
