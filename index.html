@@ -415,75 +415,91 @@ const MUSCLE_TESTS={
   ],
 };
 // 근육 기능·통증위치 DB: [근육, [동작id], [위치id]]
+const SP_MOVES=[['flex','굴곡'],['ext','신전'],['rotL','좌측 회전'],['rotR','우측 회전'],['sbL','좌측 측굴'],['sbR','우측 측굴']];
+const SP_OPP={flex:'ext',ext:'flex',rotL:'rotR',rotR:'rotL',sbL:'sbR',sbR:'sbL'};
+const SP_MVKO={flex:'굴곡',ext:'신전',rotL:'좌회전',rotR:'우회전',sbL:'좌측굴',sbR:'우측굴'};
+const SP_SIDES=[['우측',{sbSelf:'sbR',rotSelf:'rotR',rotOther:'rotL'}],['좌측',{sbSelf:'sbL',rotSelf:'rotL',rotOther:'rotR'}]];
+const ONE=[['',{}]];
 const MDB={
-  shoulder:{
-    moves:[['abd','상완 외전'],['add','상완 내전'],['flex','상완 굴곡'],['ext','상완 신전'],['er','상완 외회전'],['ir','상완 내회전'],['scapRet','견갑 후인'],['scapElev','견갑 거상'],['scapDep','견갑 하강'],['scapPro','견갑 전인']],
-    locs:[['ant','전방'],['post','후방(회전근개 후방)'],['lat','외측'],['supAcr','상부·견봉'],['medScap','견갑간·내측'],['infScap','견갑 하각·하부'],['upperNeck','상부 견갑·경견']],
-    muscles:[
+  shoulder:{dir:true,sides:ONE,
+    moves:[['flex','굴곡'],['ext','신전'],['abd','외전'],['add','내전'],['er','외회전'],['ir','내회전'],['hadd','수평 내전'],['scapRet','견갑 후인'],['scapPro','견갑 전인'],['scapElev','견갑 거상'],['scapDep','견갑 하강']],
+    opp:{flex:'ext',ext:'flex',abd:'add',add:'abd',er:'ir',ir:'er',hadd:'habd',scapRet:'scapPro',scapPro:'scapRet',scapElev:'scapDep',scapDep:'scapElev'},
+    mvko:{flex:'굴곡',ext:'신전',abd:'외전',add:'내전',er:'외회전',ir:'내회전',hadd:'수평내전',scapRet:'견갑후인',scapPro:'견갑전인',scapElev:'견갑거상',scapDep:'견갑하강'},
+    locs:[['ant','전방'],['post','후방(회전근개 후방)'],['lat','외측'],['supAcr','상부·견봉'],['medScap','견갑간·내측'],['infScap','견갑 하각']],
+    tmpl:[
       ['극상근',['abd'],['supAcr','lat']],['극하근',['er'],['post']],['소원근',['er'],['post']],
       ['견갑하근',['ir','add'],['ant']],['대원근',['add','ir','ext'],['post','infScap']],['광배근',['add','ir','ext'],['post','infScap']],
-      ['대흉근',['add','ir','flex'],['ant']],['삼각근(전)',['flex','abd'],['ant','lat']],['삼각근(중)',['abd'],['lat']],['삼각근(후)',['ext','er'],['post','lat']],
-      ['상완이두',['flex'],['ant']],['삼두(장두)',['ext'],['post']],
+      ['대흉근',['add','ir','flex','hadd'],['ant']],['삼각근(전)',['flex','abd','hadd'],['ant','lat']],['삼각근(중)',['abd'],['lat']],['삼각근(후)',['ext','er'],['post','lat']],
+      ['상완이두',['flex'],['ant']],['삼두(장두)',['ext','add'],['post']],
       ['능형근',['scapRet','scapElev'],['medScap']],['중부승모근',['scapRet'],['medScap']],['하부승모근',['scapDep','scapRet'],['medScap','infScap']],
-      ['상부승모근',['scapElev'],['upperNeck','supAcr']],['견갑거근',['scapElev'],['upperNeck','medScap']],['전거근',['scapPro'],['infScap','lat']],['소흉근',['scapPro','scapDep'],['ant']],
+      ['상부승모근',['scapElev'],['supAcr']],['견갑거근',['scapElev'],['medScap']],['전거근',['scapPro'],['infScap','lat']],['소흉근',['scapPro','scapDep'],['ant']],
     ]},
-  hip:{
-    moves:[['flex','고관절 굴곡'],['ext','신전'],['abd','외전'],['add','내전'],['er','외회전'],['ir','내회전']],
+  elbowwrist:{dir:true,sides:ONE,
+    moves:[['wristExt','손목 신전'],['wristFlex','손목 굴곡'],['elbowFlex','팔꿈치 굴곡'],['elbowExt','팔꿈치 신전'],['sup','회외'],['pron','회내']],
+    opp:{wristExt:'wristFlex',wristFlex:'wristExt',elbowFlex:'elbowExt',elbowExt:'elbowFlex',sup:'pron',pron:'sup'},
+    mvko:{wristExt:'손목신전',wristFlex:'손목굴곡',elbowFlex:'팔꿈치굴곡',elbowExt:'팔꿈치신전',sup:'회외',pron:'회내'},
+    locs:[['latEpi','외측상과'],['medEpi','내측상과'],['ant','전방'],['post','후방'],['wrist','손목']],
+    tmpl:[
+      ['손목신전근군',['wristExt'],['latEpi','wrist']],['손목굴곡근군',['wristFlex'],['medEpi','wrist']],
+      ['상완이두',['elbowFlex','sup'],['ant']],['상완근',['elbowFlex'],['ant']],['상완삼두',['elbowExt'],['post']],
+      ['회외근',['sup'],['latEpi']],['원회내근',['pron'],['ant','medEpi']],
+    ]},
+  hip:{dir:true,sides:ONE,
+    moves:[['flex','굴곡'],['ext','신전'],['abd','외전'],['add','내전'],['er','외회전'],['ir','내회전']],
+    opp:{flex:'ext',ext:'flex',abd:'add',add:'abd',er:'ir',ir:'er'},
+    mvko:{flex:'굴곡',ext:'신전',abd:'외전',add:'내전',er:'외회전',ir:'내회전'},
     locs:[['ant','전방·서혜부'],['lat','외측·대전자'],['post','둔부·후방'],['groin','서혜부 깊이']],
-    muscles:[
+    tmpl:[
       ['장요근',['flex'],['ant','groin']],['대퇴직근',['flex'],['ant']],['봉공근',['flex','abd','er'],['ant']],
       ['내전근군',['add'],['groin','ant']],['중둔근',['abd','ir'],['lat']],['대퇴근막장근',['abd','flex','ir'],['lat']],
       ['대둔근',['ext','er'],['post']],['햄스트링',['ext'],['post']],['이상근·심부외회전근',['er'],['post']],
     ]},
-  knee:{
-    moves:[['ext','무릎 신전'],['flex','굴곡'],['ir','경골 내회전']],
+  knee:{dir:true,sides:ONE,
+    moves:[['ext','신전'],['flex','굴곡'],['tir','경골 내회전'],['ter','경골 외회전']],
+    opp:{ext:'flex',flex:'ext',tir:'ter',ter:'tir'},
+    mvko:{ext:'신전',flex:'굴곡',tir:'경골내회전',ter:'경골외회전'},
     locs:[['ant','앞무릎'],['med','내측'],['lat','외측'],['post','뒤·슬와']],
-    muscles:[
-      ['대퇴사두',['ext'],['ant']],['슬개건·슬개대퇴',['ext'],['ant']],['햄스트링',['flex'],['post']],
-      ['비복근',['flex'],['post']],['거위발건(봉공·박·반건)',['flex'],['med']],['슬와근',['flex','ir'],['post']],['장경인대',['ext'],['lat']],
-    ]},
-  ankle:{
-    moves:[['pf','족저굴(까치발)'],['df','족배굴'],['inv','내번'],['ev','외번']],
-    locs:[['post','뒤꿈치·아킬레스'],['plantar','발바닥'],['med','내측'],['lat','외측'],['ant','전방']],
-    muscles:[
-      ['비복근·가자미근',['pf'],['post']],['아킬레스건',['pf'],['post']],['후경골근',['inv','pf'],['med']],
-      ['전경골근',['df','inv'],['ant']],['비골근',['ev'],['lat']],['족저근막·내재근',['pf'],['plantar']],['장무지굴근',['pf'],['plantar','med']],
-    ]},
-  elbowwrist:{
-    moves:[['wristExt','손목 신전'],['wristFlex','손목 굴곡'],['elbowFlex','팔꿈치 굴곡'],['sup','회외'],['pron','회내'],['grip','엄지·파지']],
-    locs:[['latEpi','외측상과'],['medEpi','내측상과'],['ant','전방'],['wrist','손목']],
-    muscles:[
-      ['손목신전근군(총신전건)',['wristExt'],['latEpi']],['손목굴곡근군(총굴곡건)',['wristFlex'],['medEpi']],
-      ['상완이두',['elbowFlex','sup'],['ant']],['상완근',['elbowFlex'],['ant']],['회외근',['sup'],['latEpi']],['원회내근',['pron'],['ant','medEpi']],
-      ['무지 외전·신전근(드퀘르뱅)',['grip'],['wrist']],
-    ]},
-  sij:{
-    moves:[['hipExt','고관절 신전'],['abd','외전'],['er','외회전']],
-    locs:[['buttock','둔부'],['sij','천장'],['ischial','좌골']],
-    muscles:[['대둔근',['hipExt'],['buttock']],['중둔근',['abd'],['buttock']],['이상근',['er'],['buttock','sij']],['햄스트링 기시부',['hipExt'],['ischial']]]},
-  lumbar:{
-    moves:[['ext','신전'],['flex','굴곡'],['sidebend','측굴'],['rot','회전']],
-    locs:[['central','중앙'],['para','방척추'],['lat','측방'],['buttock','둔부 방사']],
-    muscles:[['척추기립근',['ext'],['para','central']],['다열근',['ext','rot'],['para','central']],['요방형근',['sidebend','ext'],['lat']],['복사근',['flex','rot'],['lat']]]},
-  cervical:{dir:true,
-    moves:[['flex','굴곡'],['ext','신전'],['rotL','좌측 회전'],['rotR','우측 회전'],['sbL','좌측 측굴'],['sbR','우측 측굴']],
-    locs:[],
-    opp:{flex:'ext',ext:'flex',rotL:'rotR',rotR:'rotL',sbL:'sbR',sbR:'sbL'},
-    mvko:{flex:'굴곡',ext:'신전',rotL:'좌회전',rotR:'우회전',sbL:'좌측굴',sbR:'우측굴'},
-    sides:[['우측',{sbSelf:'sbR',rotSelf:'rotR',rotOther:'rotL'}],['좌측',{sbSelf:'sbL',rotSelf:'rotL',rotOther:'rotR'}]],
     tmpl:[
-      ['흉쇄유돌근(SCM)',['flex','sbSelf','rotOther']],
-      ['사각근',['flex','sbSelf']],
-      ['견갑거근',['ext','sbSelf','rotSelf']],
-      ['상부승모근',['ext','sbSelf','rotOther']],
-      ['두·경판상근',['ext','sbSelf','rotSelf']],
-      ['후두하근',['ext','rotSelf']],
-      ['심부경부굴곡근',['flex']],
+      ['대퇴사두',['ext'],['ant']],['슬개건',['ext'],['ant']],['햄스트링',['flex'],['post']],
+      ['비복근',['flex'],['post']],['거위발건',['flex','tir'],['med']],['슬와근',['flex','tir'],['post']],
+      ['장경인대',['ext','ter'],['lat']],['대퇴이두',['flex','ter'],['post','lat']],
     ]},
-  thoracic:{
-    moves:[['ext','신전'],['rot','회전'],['retract','견갑 후인']],
-    locs:[['para','방척추'],['medScap','견갑간'],['rib','늑골']],
-    muscles:[['흉추 기립근',['ext'],['para']],['능형근',['retract'],['medScap']],['중부승모근',['retract'],['medScap']],['늑간근',['rot'],['rib']]]},
+  ankle:{dir:true,sides:ONE,
+    moves:[['pf','족저굴'],['df','족배굴'],['inv','내번'],['ev','외번']],
+    opp:{pf:'df',df:'pf',inv:'ev',ev:'inv'},
+    mvko:{pf:'족저굴',df:'족배굴',inv:'내번',ev:'외번'},
+    locs:[['post','뒤꿈치·아킬레스'],['plantar','발바닥'],['med','내측'],['lat','외측'],['ant','전방']],
+    tmpl:[
+      ['비복근·가자미근',['pf'],['post']],['아킬레스건',['pf'],['post']],['후경골근',['inv','pf'],['med']],
+      ['전경골근',['df','inv'],['ant']],['장·단비골근',['ev','pf'],['lat']],['족저근막·내재근',['pf'],['plantar']],['장무지굴근',['pf','inv'],['plantar','med']],
+    ]},
+  sij:{dir:true,sides:ONE,
+    moves:[['hipExt','고관절 신전'],['hipFlex','고관절 굴곡'],['abd','외전'],['add','내전'],['er','외회전'],['ir','내회전']],
+    opp:{hipExt:'hipFlex',hipFlex:'hipExt',abd:'add',add:'abd',er:'ir',ir:'er'},
+    mvko:{hipExt:'고관절신전',hipFlex:'고관절굴곡',abd:'외전',add:'내전',er:'외회전',ir:'내회전'},
+    locs:[['buttock','둔부'],['sij','천장'],['ischial','좌골'],['lat','외측']],
+    tmpl:[
+      ['대둔근',['hipExt','er'],['buttock']],['중둔근',['abd','ir'],['buttock','lat']],['이상근',['er','abd'],['buttock','sij']],
+      ['햄스트링 기시부',['hipExt'],['ischial']],['요방형근',[],['lat']],['다열근(요천추)',[],['sij']],
+    ]},
+  lumbar:{dir:true,sides:SP_SIDES,moves:SP_MOVES,opp:SP_OPP,mvko:SP_MVKO,
+    locs:[['central','중앙'],['para','방척추'],['lat','측방'],['buttock','둔부 방사']],
+    tmpl:[
+      ['척추기립근',['ext','sbSelf'],['para','central']],['다열근·회선근',['ext','rotOther'],['para']],
+      ['요방형근',['sbSelf','ext'],['lat']],['복사근',['flex','sbSelf'],['lat']],['복직근',['flex'],['central']],['장요근',['flex'],['lat']],
+    ]},
+  cervical:{dir:true,sides:SP_SIDES,moves:SP_MOVES,opp:SP_OPP,mvko:SP_MVKO,locs:[],
+    tmpl:[
+      ['흉쇄유돌근(SCM)',['flex','sbSelf','rotOther']],['사각근',['flex','sbSelf']],
+      ['견갑거근',['ext','sbSelf','rotSelf']],['상부승모근',['ext','sbSelf','rotOther']],
+      ['두·경판상근',['ext','sbSelf','rotSelf']],['후두하근',['ext','rotSelf']],['심부경부굴곡근',['flex']],
+    ]},
+  thoracic:{dir:true,sides:SP_SIDES,moves:SP_MOVES,opp:SP_OPP,mvko:SP_MVKO,
+    locs:[['para','방척추'],['medScap','견갑간'],['rib','늑골·호흡']],
+    tmpl:[
+      ['흉추 기립근',['ext','sbSelf'],['para']],['다열근·회선근',['ext','rotOther'],['para']],['반극근',['ext'],['para']],
+      ['늑간근·늑골거근',['rotSelf','sbSelf'],['rib']],['능형근·중부승모근',[],['medScap']],['전거근(후하)',[],['rib']],
+    ]},
 };
 
 function fillOpts(id,arr,name){const box=document.getElementById(id);box.setAttribute('data-key',name||id);arr.forEach(o=>{const[v,l,cat]=o;const lb=document.createElement('label');lb.className='opt'+(cat?' '+cat:'');lb.innerHTML=`<input type="checkbox" value="${v}">${l}`;box.appendChild(lb);});}
@@ -553,17 +569,17 @@ function muscleLoc(d){return (d.region&&MUSCLE_TESTS[d.region])?(d.muscleTests||
 function muscleCandidates(d){
   const db=d.region&&MDB[d.region];if(!db)return [];
   const mv=d.moves||[],lc=d.locs||[];if(!mv.length&&!lc.length)return [];
-  if(db.dir){ // 방향성 모델: 수축(1)·신장(1.5) + 좌우
-    if(!mv.length)return [];
-    const out=[];
+  if(db.dir){ // 방향성 모델: 수축(1)·신장(1.5) + 위치(1) + 좌우
+    const locko=Object.fromEntries(db.locs||[]);const out=[];
     db.sides.forEach(([sko,map])=>{
-      db.tmpl.forEach(([n,acts])=>{
-        const A=acts.map(a=>map[a]||a);let score=0;const why=[];
+      db.tmpl.forEach(([n,acts,mlocs])=>{
+        const A=(acts||[]).map(a=>map[a]||a);let score=0;const why=[];
         mv.forEach(m=>{
           if(A.includes(m)){score+=1;why.push(db.mvko[m]+' 수축');}
           else if(A.includes(db.opp[m])){score+=1.5;why.push(db.mvko[m]+' 신장');}
         });
-        if(score>0)out.push({n:sko+' '+n,score:Math.round(score*10)/10,why});
+        (mlocs||[]).forEach(L=>{if(lc.includes(L)){score+=1;why.push(locko[L]);}});
+        if(score>0)out.push({n:sko?sko+' '+n:n,score:Math.round(score*10)/10,why});
       });
     });
     return out.sort((a,b)=>b.score-a.score);
