@@ -254,9 +254,16 @@
         </div>
       </div>
 
-      <!-- 6 레드플래그 -->
+      <!-- 7 근육·구조 국소 -->
       <div class="card">
-        <h2><span class="n">7</span> 경고 소견</h2>
+        <h2><span class="n">7</span> 근육·구조 국소</h2>
+        <p class="hint">동작·저항·통증호 검사 → 어느 근육/구조인지 (부위 선택 시 표시)</p>
+        <div class="field"><div class="opts grid4" id="muscleTests"><p class="empty">먼저 통증 부위를 선택하세요.</p></div></div>
+      </div>
+
+      <!-- 8 레드플래그 -->
+      <div class="card">
+        <h2><span class="n">8</span> 경고 소견</h2>
         <div class="field"><div class="opts grid4" id="redflags"></div></div>
       </div>
 
@@ -279,6 +286,7 @@
     <div id="r-level"></div>
     <div class="sec"><h3>🔎 해석</h3><ul id="r-interp"></ul></div>
     <div class="sec" id="r-special-sec" style="display:none"><h3>🧬 특수 조건 감별 가능성</h3><div id="r-special"></div></div>
+    <div class="sec" id="r-muscle-sec" style="display:none"><h3>🎯 국소 근육·구조 (동작 검사)</h3><div id="r-muscle"></div></div>
     <div class="sec"><h3>🎯 우선 감별 대상 구조</h3><div id="r-struct"></div></div>
     <div class="sec"><h3>🧪 추천 확인 검사</h3><ul id="r-tests"></ul></div>
     <div class="sec" id="r-recovery-sec" style="display:none"><h3>⏳ 예상 회복 경향</h3><div id="r-recovery"></div></div>
@@ -300,6 +308,63 @@ const REDFLAGS=['야간·안정 시 심한 통증','원인불명 체중감소','
 const COMORBID=['당뇨','갑상선질환','통풍력','류마티스력','골다공증','임신','항암·약물','대상포진 이력','과음','건선'];
 const DERM_LOWER=[['L2_3','대퇴 전면(L2-3)'],['L4','무릎 내측·정강이 내측(L4)'],['L5','정강이 외측·족배·무지(L5)'],['S1','종아리 후면·발바닥·외측(S1)']];
 const DERM_UPPER=[['C5','어깨·외측 상완(C5)'],['C6','엄지·요측 전완(C6)'],['C7','중지·후면(C7)'],['C8','소지·척측(C8)'],['T1','내측 상완(T1)']];
+const MUSCLE_TESTS={
+  shoulder:[
+    {id:'arc',label:'통증호 60~120° 외전(중간만 아픔)',dx:'극상근·견봉하 충돌',cat:'m'},
+    {id:'arcHigh',label:'170~180° 최대거상 통증',dx:'견쇄(AC) 관절',cat:'j'},
+    {id:'rAbd',label:'저항 외전 통증',dx:'극상근',cat:'m'},
+    {id:'rER',label:'저항 외회전 통증',dx:'극하근·소원근',cat:'m'},
+    {id:'rIR',label:'저항 내회전 통증',dx:'견갑하근',cat:'m'},
+    {id:'biceps',label:'저항 굴곡·회외(Speed/Yergason)',dx:'상완이두 장두건',cat:'m'},
+    {id:'capsular',label:'능동·수동 전방향 제한(통증호 없음)',dx:'관절낭(동결견)',cat:'j'},
+    {id:'droparm',label:'Drop arm(팔 못 내림)',dx:'극상근 전층 파열',cat:'struct'},
+  ],
+  elbowwrist:[
+    {id:'cozen',label:'저항 손목 신전(Cozen)',dx:'외측상과(테니스엘보)',cat:'m'},
+    {id:'golfer',label:'저항 손목 굴곡',dx:'내측상과(골퍼엘보)',cat:'m'},
+    {id:'rBiceps',label:'저항 팔꿈치 굴곡',dx:'상완이두',cat:'m'},
+    {id:'finkel',label:'엄지 신장(Finkelstein)',dx:'드퀘르뱅(장무지외전·단무지신전)',cat:'m'},
+    {id:'phalen',label:'손목 배굴 저림(Phalen/Tinel)',dx:'정중신경(수근관)',cat:'nv'},
+    {id:'ulnar',label:'팔꿈치 내측·소지 저림',dx:'척골신경(주관절터널)',cat:'nv'},
+  ],
+  hip:[
+    {id:'rFlex',label:'저항 고관절 굴곡',dx:'장요근',cat:'m'},
+    {id:'rAdd',label:'저항 내전',dx:'내전근',cat:'m'},
+    {id:'rAbd',label:'저항 외전/Trendelenburg',dx:'중둔근',cat:'m'},
+    {id:'faber',label:'FABER 통증',dx:'천장·고관절',cat:'j'},
+    {id:'ober',label:'장경인대 단축(Ober)',dx:'대퇴근막장근·ITB',cat:'m'},
+  ],
+  knee:[
+    {id:'rExt',label:'저항 신전 통증',dx:'대퇴사두·슬개건',cat:'m'},
+    {id:'pf',label:'계단·쪼그림 앞무릎(슬개골 압박)',dx:'슬개대퇴·슬개건',cat:'m'},
+    {id:'pes',label:'내측 관절선 아래 압통',dx:'거위발건',cat:'m'},
+    {id:'itb',label:'무릎 외측 통증',dx:'장경인대(ITB)',cat:'m'},
+    {id:'rFlex',label:'저항 굴곡 통증',dx:'슬굴곡근(햄스트링)',cat:'m'},
+    {id:'mcmurray',label:'McMurray 양성',dx:'반월판',cat:'struct'},
+  ],
+  ankle:[
+    {id:'plantar',label:'저항 족저굴/까치발 통증',dx:'아킬레스·비복근',cat:'m'},
+    {id:'fascia',label:'아침 첫 발 뒤꿈치',dx:'족저근막',cat:'m'},
+    {id:'inv',label:'저항 내번',dx:'후경골근',cat:'m'},
+    {id:'ev',label:'저항 외번',dx:'비골근',cat:'m'},
+  ],
+  sij:[
+    {id:'piri',label:'앉을 때·좌골 방사(FAIR)',dx:'이상근',cat:'m'},
+    {id:'glut',label:'저항 외전·둔부 압통',dx:'둔근',cat:'m'},
+  ],
+  lumbar:[
+    {id:'ql',label:'측굴·기침 시 측방 요통',dx:'요방형근',cat:'m'},
+    {id:'erector',label:'신전·기립 시 방척추 통증',dx:'척추기립근·다열근',cat:'m'},
+  ],
+  cervical:[
+    {id:'uppertrap',label:'상부 어깨·거상 시 압통',dx:'상부 승모근',cat:'m'},
+    {id:'levator',label:'견갑 상내측·회전 제한',dx:'견갑거근',cat:'m'},
+    {id:'scalene',label:'사각근·상지 저림',dx:'사각근(흉곽출구)',cat:'m'},
+  ],
+  thoracic:[
+    {id:'rhomboid',label:'견갑간 통증·후인',dx:'능형근·중부승모근',cat:'m'},
+  ],
+};
 
 function fillOpts(id,arr,name){const box=document.getElementById(id);box.setAttribute('data-key',name||id);arr.forEach(o=>{const[v,l,cat]=o;const lb=document.createElement('label');lb.className='opt'+(cat?' '+cat:'');lb.innerHTML=`<input type="checkbox" value="${v}">${l}`;box.appendChild(lb);});}
 fillOpts('quality',QUALITY);fillOpts('timing',TIMING);fillOpts('aggravate',AGGRAVATE);fillOpts('neuro',NEURO);
@@ -317,6 +382,15 @@ radRadios.forEach(r=>r.addEventListener('change',()=>{
     (v==='lower'?DERM_LOWER:DERM_UPPER).forEach(([val,l])=>{const lb=document.createElement('label');lb.className='opt nv';lb.innerHTML=`<input type="radio" name="derm" value="${val}">${l}`;o.appendChild(lb);});
   }else{f.style.display='none';o.innerHTML='';}
 }));
+
+/* 부위 → 근육·구조 국소 검사 */
+function populateMuscleTests(){
+  const R=document.querySelector('input[name="region"]:checked')?.value;
+  const box=document.getElementById('muscleTests');const tests=MUSCLE_TESTS[R];
+  if(!R||!tests){box.innerHTML='<p class="empty">먼저 통증 부위를 선택하세요.</p>';return;}
+  box.innerHTML=tests.map(t=>`<label class="opt m"><input type="checkbox" value="${t.id}">${t.label}</label>`).join('');
+}
+document.querySelectorAll('input[name="region"]').forEach(r=>r.addEventListener('change',populateMuscleTests));
 
 /* 하이라이트 + filled */
 function updateFilled(card){card.classList.toggle('filled',!!card.querySelector('input:checked'));}
@@ -347,8 +421,10 @@ function collect(){const height=nv0('height'),weight=nv0('weight');return{
   onsetTime:rv('onsetTime'),onsetTrigger:rv('onsetTrigger'),progression:rv('progression'),
   quality:cv('quality'),timing:cv('timing'),aggravate:cv('aggravate'),
   cyriax:rv('cyriax'),tender:rv('tender'),neuro:cv('neuro'),
+  muscleTests:[...document.querySelectorAll('#muscleTests input:checked')].map(i=>i.value),
   redflags:cv('redflags'),
 };}
+function muscleLoc(d){return (d.region&&MUSCLE_TESTS[d.region])?(d.muscleTests||[]).map(id=>MUSCLE_TESTS[d.region].find(x=>x.id===id)).filter(Boolean):[];}
 
 /* ───────── 감별 엔진 ───────── */
 function analyze(d){
@@ -372,6 +448,8 @@ function analyze(d){
   if(CYR)add(CYR[0],CYR[1]);
   if(d.tender==='yes')add('m',2);
   d.neuro.forEach(n=>add('nv',n==='tension'?3:2));
+  // 근육·구조 국소 검사(강한 국소 증거)
+  muscleLoc(d).forEach(t=>add(t.cat==='struct'?'j':t.cat,t.cat==='struct'?1.5:2.5));
 
   const sum=m+j+nv;
   const pct=x=>sum>0?Math.round(x/sum*100):33;
@@ -512,7 +590,7 @@ function render(a){
   const R=document.getElementById('result');R.classList.add('show');
   const d=a.d;
   if(a.sum===0){document.getElementById('r-title').textContent='입력 부족';document.getElementById('r-sub').innerHTML='<span class="muted">문진·진찰 항목을 채워주세요.</span>';
-    document.getElementById('r-bars').innerHTML='';document.getElementById('r-interp').innerHTML='';document.getElementById('r-struct').innerHTML='';document.getElementById('r-tests').innerHTML='';document.getElementById('r-level').innerHTML='';document.getElementById('r-chips').innerHTML='';document.getElementById('r-redflag-wrap').innerHTML='';document.getElementById('r-special-sec').style.display='none';document.getElementById('r-recovery-sec').style.display='none';return;}
+    document.getElementById('r-bars').innerHTML='';document.getElementById('r-interp').innerHTML='';document.getElementById('r-struct').innerHTML='';document.getElementById('r-tests').innerHTML='';document.getElementById('r-level').innerHTML='';document.getElementById('r-chips').innerHTML='';document.getElementById('r-redflag-wrap').innerHTML='';document.getElementById('r-special-sec').style.display='none';document.getElementById('r-recovery-sec').style.display='none';document.getElementById('r-muscle-sec').style.display='none';return;}
   const domKo=CATKO[a.dominant];
   let lvl='';
   if(a.dominant==='nv'&&d.derm)lvl=' — '+LEVELKO[d.derm]+' 시사';
@@ -549,6 +627,10 @@ function render(a){
   if(a.mixed)I.push('상위 두 원인 점수 접근 — 확진 검사로 좁히세요');
   document.getElementById('r-interp').innerHTML=I.map(x=>`<li>${x}</li>`).join('')||'<li class="muted">부위·소견을 더 입력하면 정밀해집니다.</li>';
 
+  // 국소 근육·구조(동작 검사)
+  const mloc=muscleLoc(d);const ms=document.getElementById('r-muscle-sec');
+  if(mloc.length){ms.style.display='';document.getElementById('r-muscle').innerHTML='<ul>'+mloc.map(t=>`<li><b>${t.dx}</b> <span class="muted" style="font-size:12px">— ${t.label}</span></li>`).join('')+'</ul>';}
+  else ms.style.display='none';
   // 구조 지목
   const st=d.region?STRUCT[d.region]:null;
   document.getElementById('r-struct').innerHTML=st
@@ -584,7 +666,7 @@ function showResult(){document.getElementById('inputScreen').style.display='none
 function showInput(){document.getElementById('result').classList.remove('show');document.getElementById('inputScreen').style.display='';window.scrollTo({top:0,behavior:'smooth'});}
 document.getElementById('run').onclick=()=>{render(analyze(collect()));showResult();};
 document.getElementById('back').onclick=showInput;document.getElementById('back2').onclick=showInput;
-document.getElementById('reset').onclick=()=>{document.querySelectorAll('input').forEach(i=>{if(i.type==='number')i.value='';else i.checked=false;});document.querySelectorAll('.opt.on').forEach(o=>o.classList.remove('on'));document.querySelectorAll('.card.filled').forEach(c=>c.classList.remove('filled'));document.getElementById('dermField').style.display='none';showInput();};
+document.getElementById('reset').onclick=()=>{document.querySelectorAll('input').forEach(i=>{if(i.type==='number')i.value='';else i.checked=false;});document.querySelectorAll('.opt.on').forEach(o=>o.classList.remove('on'));document.querySelectorAll('.card.filled').forEach(c=>c.classList.remove('filled'));document.getElementById('dermField').style.display='none';populateMuscleTests();showInput();};
 document.getElementById('print').onclick=()=>window.print();
 </script>
 </body>
