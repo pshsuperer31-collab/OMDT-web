@@ -771,6 +771,14 @@ function lumbagoDx(d){
     out.push({w:'높음',n:'추간판 탈출·수핵 탈출(신경근 압박)',t:'하지 저림/방사 + 굴곡·기침 악화 + 신경학적 소견 — 신경근 압박. SLR·피부분절 확인, 진행성 마비·마미 배제. 약침·침으로 염증 관리 가능'});
   if(d.radiate==='tlj')
     out.push({w:'참고',n:'흉요추 이행부 증후군(TLJ·Maigne)',t:'T12–L1 유래 — 천장관절·장골능 외측·서혜부 방사통. TLJ 후관절·피부분지 확인, 국소 치료(하부 요추와 감별)'});
+  if(ag.includes('sidebend')&&!legRad)
+    out.push({w:'참고',n:'요방형근성 요통(QL)',t:'측방·장골능 상방 통증, 측굴·기립 악화·기침 시 통증(호흡보조근), 짝다리·다리길이차 연관 — 가장 흔히 놓치는 근육성 원인. QL 이완·신장'});
+  if(ext&&!flex&&!legRad)
+    out.push({w:'참고',n:'요추 후관절 증후군(facet)',t:'신전·회전 시 국소 통증, 둔부·대퇴 연관(무릎 이하 방사 드묾) — 후관절 부하 감소·가동, 만성 시 협착 감별'});
+  if((d.region==='sij'||ag.includes('sitToStand')||ag.includes('stairs')||ag.includes('prolonged'))&&!neuroSign&&!legRad)
+    out.push({w:'참고',n:'천장관절 기능장애(SIJ)',t:'좌골신경통 유사·하중 시 악화(보행·계단·기립·앉기)·굽힘/비틀기 유발, PSIS 하방 — 천장 유발검사 3종+'});
+  if(d.radiate==='tlj')
+    out.push({w:'참고',n:'상둔피신경 포착(SCN)',t:'장골능 후방(정중 7cm 외측) 압통·둔부/후외측 대퇴 방사, 비피부분절 — SIJ·TLJ와 감별. 국소 이완·신경차단'});
   return out;
 }
 
