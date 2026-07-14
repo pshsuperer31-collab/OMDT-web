@@ -78,6 +78,13 @@
   .lvlbox b{color:var(--nerve)}
   .redflag{background:#fbeef1;border:1px solid #f0cdd6;border-radius:12px;padding:13px 15px;color:#8a2e44;font-size:13.5px;margin-top:8px}
   .redflag b{color:var(--warn)}
+  .sdx{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:13.5px}
+  .sdx .wb{flex:0 0 auto;font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;margin-top:1px}
+  .sdx .wb.high{background:#fbeef1;color:var(--warn)}
+  .sdx .wb.mid{background:#fff4e0;color:#a15c00}
+  .sdx .wb.ref{background:#eef0f5;color:var(--muted)}
+  .recbox{background:#f0f9f4;border-left:4px solid var(--muscle);border-radius:0 12px 12px 0;padding:11px 15px;font-size:13.5px}
+  .recbox b{color:var(--muscle)}
   .chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:12px}
   .chip{font-size:12px;font-weight:700;padding:4px 11px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--muted)}
   .muted{color:var(--muted)} .empty{color:var(--muted);font-size:13px;text-align:center}
@@ -96,9 +103,36 @@
   <div id="inputScreen">
     <div class="inputcol">
 
-      <!-- 1 부위 -->
+      <!-- 1 환자 정보 -->
       <div class="card">
-        <h2><span class="n">1</span> 통증 부위</h2>
+        <h2><span class="n">1</span> 환자 정보</h2>
+        <p class="hint">키·체중·나이·성별 → 체형·연령 보정 및 특수 조건 감별</p>
+        <div class="field">
+          <div class="q">나이 · 성별</div>
+          <div style="display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap">
+            <input type="number" name="age" min="0" max="120" placeholder="나이" style="width:90px;padding:9px;border:1.5px solid var(--line);border-radius:10px;text-align:center;font-size:14px;font-family:inherit;color:var(--navy)">
+            <div class="opts" data-key="sex" style="margin:0">
+              <label class="opt"><input type="radio" name="sex" value="male">남</label>
+              <label class="opt"><input type="radio" name="sex" value="female">여</label>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="q">키 · 체중 <span class="sub">— BMI 산출</span></div>
+          <div style="display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap">
+            <input type="number" name="height" min="0" max="230" placeholder="키(cm)" style="width:104px;padding:9px;border:1.5px solid var(--line);border-radius:10px;text-align:center;font-size:14px;font-family:inherit;color:var(--navy)">
+            <input type="number" name="weight" min="0" max="300" placeholder="체중(kg)" style="width:114px;padding:9px;border:1.5px solid var(--line);border-radius:10px;text-align:center;font-size:14px;font-family:inherit;color:var(--navy)">
+          </div>
+        </div>
+        <div class="field">
+          <div class="q">동반 질환·특수 조건 <span class="sub">— 복수 선택</span></div>
+          <div class="opts grid4" id="comorbid"></div>
+        </div>
+      </div>
+
+      <!-- 2 부위 -->
+      <div class="card">
+        <h2><span class="n">2</span> 통증 부위</h2>
         <div class="field">
           <div class="q">주 통증 부위 <span class="sub">— 가장 불편한 곳</span></div>
           <div class="opts grid4" data-key="region">
@@ -130,7 +164,7 @@
 
       <!-- 2 발병·경과 -->
       <div class="card">
-        <h2><span class="n">2</span> 발병 · 경과</h2>
+        <h2><span class="n">3</span> 발병 · 경과</h2>
         <div class="field">
           <div class="q">최초 발병 시기</div>
           <div class="opts" data-key="onsetTime">
@@ -162,7 +196,7 @@
 
       <!-- 3 통증 양상 -->
       <div class="card">
-        <h2><span class="n">3</span> 통증 양상</h2>
+        <h2><span class="n">4</span> 통증 양상</h2>
         <div class="field">
           <div class="q">통증 성질 <span class="sub">— 복수 선택</span></div>
           <div class="opts grid4" id="quality"></div>
@@ -175,14 +209,14 @@
 
       <!-- 4 악화 동작 -->
       <div class="card">
-        <h2><span class="n">4</span> 악화 동작</h2>
+        <h2><span class="n">5</span> 악화 동작</h2>
         <p class="hint">어떤 동작·자세에서 불편한지 — 복수 선택</p>
         <div class="field"><div class="opts grid4" id="aggravate"></div></div>
       </div>
 
       <!-- 5 진찰 -->
       <div class="card">
-        <h2><span class="n">5</span> 진찰 소견 <span class="serif" style="font-weight:400;font-size:12px;color:var(--muted)">선택</span></h2>
+        <h2><span class="n">6</span> 진찰 소견 <span class="serif" style="font-weight:400;font-size:12px;color:var(--muted)">선택</span></h2>
         <div class="field">
           <div class="q">Cyriax 선택적 긴장검사 <span class="sub">— 능동·수동·저항 비교</span></div>
           <div class="opts grid4" data-key="cyriax">
@@ -208,7 +242,7 @@
 
       <!-- 6 레드플래그 -->
       <div class="card">
-        <h2><span class="n">6</span> 경고 소견</h2>
+        <h2><span class="n">7</span> 경고 소견</h2>
         <div class="field"><div class="opts grid4" id="redflags"></div></div>
       </div>
 
@@ -230,8 +264,10 @@
     <div class="bars" id="r-bars"></div>
     <div id="r-level"></div>
     <div class="sec"><h3>🔎 해석</h3><ul id="r-interp"></ul></div>
+    <div class="sec" id="r-special-sec" style="display:none"><h3>🧬 특수 조건 감별 가능성</h3><div id="r-special"></div></div>
     <div class="sec"><h3>🎯 우선 감별 대상 구조</h3><div id="r-struct"></div></div>
     <div class="sec"><h3>🧪 추천 확인 검사</h3><ul id="r-tests"></ul></div>
+    <div class="sec" id="r-recovery-sec" style="display:none"><h3>⏳ 예상 회복 경향</h3><div id="r-recovery"></div></div>
     <div id="r-redflag-wrap"></div>
     <div class="actions"><button class="btn ghost" id="print">🖨 인쇄</button><button class="btn ghost" id="back2">← 다시 입력</button></div>
   </div>
@@ -247,6 +283,7 @@ const TIMING=[['amStiffShort','아침경직 <30분','j'],['amStiffLong','아침�
 const AGGRAVATE=[['flexion','굴곡(숙일 때)','nv'],['extension','신전(젖힐 때)','j'],['rotation','회전','m'],['sidebend','측굴','m'],['liftArm','팔 올릴 때','m'],['sitToStand','앉았다 일어설 때','j'],['stairs','계단','j'],['lifting','물건 들 때','m'],['coughSneeze','기침·재채기','nv'],['prolonged','오래 앉기·서기','j']];
 const NEURO=[['sensory','피부분절 감각저하','nv'],['motor','근절 근력저하','nv'],['reflex','심부건반사 저하','nv'],['tension','신경긴장검사(SLR/Spurling/ULTT)+','nv']];
 const REDFLAGS=['야간·안정 시 심한 통증','원인불명 체중감소','발열·오한','배뇨/배변 이상','진행성 하지/상지 마비','안장부위 감각소실','고령 외상 후 통증'];
+const COMORBID=['당뇨','갑상선질환','통풍력','류마티스력','골다공증','임신','항암·약물','대상포진 이력','과음'];
 const DERM_LOWER=[['L2_3','대퇴 전면(L2-3)'],['L4','무릎 내측·정강이 내측(L4)'],['L5','정강이 외측·족배·무지(L5)'],['S1','종아리 후면·발바닥·외측(S1)']];
 const DERM_UPPER=[['C5','어깨·외측 상완(C5)'],['C6','엄지·요측 전완(C6)'],['C7','중지·후면(C7)'],['C8','소지·척측(C8)'],['T1','내측 상완(T1)']];
 
@@ -254,6 +291,8 @@ function fillOpts(id,arr,name){const box=document.getElementById(id);box.setAttr
 fillOpts('quality',QUALITY);fillOpts('timing',TIMING);fillOpts('aggravate',AGGRAVATE);fillOpts('neuro',NEURO);
 document.getElementById('redflags').setAttribute('data-key','redflags');
 REDFLAGS.forEach(t=>{const lb=document.createElement('label');lb.className='opt';lb.innerHTML=`<input type="checkbox" value="${t}">${t}`;document.getElementById('redflags').appendChild(lb);});
+document.getElementById('comorbid').setAttribute('data-key','comorbid');
+COMORBID.forEach(t=>{const lb=document.createElement('label');lb.className='opt';lb.innerHTML=`<input type="checkbox" value="${t}">${t}`;document.getElementById('comorbid').appendChild(lb);});
 
 /* 방사 → 피부분절 옵션 */
 const radRadios=document.querySelectorAll('input[name="radiate"]');
@@ -287,7 +326,9 @@ document.body.addEventListener('change',e=>{const label=e.target.closest('.opt')
 /* ───────── 수집 ───────── */
 function rv(n){return document.querySelector(`input[name="${n}"]:checked`)?.value||null;}
 function cv(id){return [...document.querySelectorAll(`#${id} input:checked`)].map(i=>i.value);}
-function collect(){return{
+function nv0(n){return Number((document.querySelector(`input[name="${n}"]`)||{value:0}).value)||0;}
+function collect(){const height=nv0('height'),weight=nv0('weight');return{
+  age:nv0('age'),sex:rv('sex'),height,weight,bmi:(height>0&&weight>0)?Math.round(weight/Math.pow(height/100,2)*10)/10:0,comorbid:cv('comorbid'),
   region:rv('region'),radiate:rv('radiate'),derm:rv('derm'),
   onsetTime:rv('onsetTime'),onsetTrigger:rv('onsetTrigger'),progression:rv('progression'),
   quality:cv('quality'),timing:cv('timing'),aggravate:cv('aggravate'),
@@ -369,12 +410,49 @@ const TESTS={
   elbowwrist:{m:'Cozen(외상과)·저항 신전, Finkelstein',j:'주관절·수근 ROM',nv:'Tinel/Phalen(수근관), 척골신경'},
 };
 
+/* ───────── 특수 조건 감별 ───────── */
+function specialDx(d){
+  const out=[],age=d.age,sex=d.sex,bmi=d.bmi,cm=d.comorbid||[],tm=d.timing||[],q=d.quality||[],ag=d.aggravate||[];
+  const spine=['lumbar','sij','thoracic','cervical'].includes(d.region);
+  const inflam=tm.includes('amStiffLong')||tm.includes('restNight');
+  if(spine&&age>=15&&age<=45&&inflam)
+    out.push({n:'강직성 척추염(AS)',w:sex==='male'?'높음':'중등',t:`젊은 나이·염증성 요통(아침경직 30분+·야간통·활동 시 호전)${sex==='male'?'·남성 호발':''} → HLA-B27, 천장관절 X-ray/MRI 고려`});
+  if((d.region==='lumbar'||d.region==='sij')&&age>=60&&ag.includes('extension'))
+    out.push({n:'척추관 협착증',w:'중등',t:'고령·신전 시 악화·신경인성 파행 → 보행거리·MRI 확인'});
+  if(spine&&age>=60&&sex==='female'&&(d.onsetTrigger==='trauma'||(bmi>0&&bmi<19)))
+    out.push({n:'골다공증성 압박골절',w:'중등',t:'폐경 후 여성·저체중·경미 외상 → 척추 X-ray·골밀도'});
+  if(d.region==='elbowwrist'&&(sex==='female'||cm.includes('임신')||bmi>=25))
+    out.push({n:'수근관 증후군',w:'중등',t:'여성·임신·비만 소인 → 정중신경(Tinel/Phalen)'});
+  if(cm.includes('당뇨')&&(q.includes('numb')||q.includes('burning')))
+    out.push({n:'당뇨병성 말초신경병증',w:'높음',t:'당뇨·저림/작열감 → 대칭성 양말장갑형 확인, 혈당·신경전도'});
+  if(cm.includes('대상포진 이력')&&q.includes('burning'))
+    out.push({n:'대상포진후 신경통',w:'중등',t:'피부분절 작열통·과거 수포 → 신경병증성 통증 관리'});
+  if((cm.includes('갑상선질환')||cm.includes('과음')||cm.includes('항암·약물'))&&(q.includes('numb')||q.includes('burning')))
+    out.push({n:'대사·독성 말초신경병증',w:'참고',t:'갑상선/음주/약물 + 저림 → 대사성 신경병증 감별'});
+  if(cm.includes('통풍력')&&d.onsetTime==='acute')
+    out.push({n:'통풍 발작',w:'중등',t:'급성·기왕력 → 관절 열감·요산 확인'});
+  if(cm.includes('류마티스력')&&tm.includes('amStiffLong'))
+    out.push({n:'염증성(류마티스) 관절염',w:'중등',t:'아침경직 30분+·기왕력 → 다발성·염증표지자 확인'});
+  if(bmi>=30&&['knee','hip','lumbar','ankle'].includes(d.region))
+    out.push({n:'체중부하 관절 과부하',w:'참고',t:`비만(BMI ${bmi}) → 하중 관절 부하, 체중 관리 병행`});
+  return out;
+}
+/* ───────── 나이 보정 회복 경향 ───────── */
+function recoveryNote(dominant,age){
+  let mult=1,band='연령 미입력(청년 기준)';
+  if(age>0){if(age<20){mult=0.6;band=`소아·청소년(${age}세)`;}else if(age<40){mult=1;band=`청년(${age}세)`;}else if(age<60){mult=1.5;band=`중년(${age}세)`;}else{mult=2.2;band=`노년(${age}세)`;}}
+  const base={m:[2,4],j:[6,12],nv:[8,24]}[dominant];
+  const label={m:'근·근막 — 혈류 풍부, 빠른 회복',j:'관절·관절낭/연부조직 — 지연~완고',nv:'신경근 — 재생 느림, 원인(디스크) 완고 가능'}[dominant];
+  const fmt=(lo,hi)=>{lo*=mult;hi*=mult;return hi<=10?`${Math.round(lo)}~${Math.round(hi)}주`:`${Math.max(1,Math.round(lo/4.345))}~${Math.round(hi/4.345)}개월`;};
+  return {band,mult,label,range:fmt(base[0],base[1])};
+}
+
 /* ───────── 렌더 ───────── */
 function render(a){
   const R=document.getElementById('result');R.classList.add('show');
   const d=a.d;
   if(a.sum===0){document.getElementById('r-title').textContent='입력 부족';document.getElementById('r-sub').innerHTML='<span class="muted">문진·진찰 항목을 채워주세요.</span>';
-    document.getElementById('r-bars').innerHTML='';document.getElementById('r-interp').innerHTML='';document.getElementById('r-struct').innerHTML='';document.getElementById('r-tests').innerHTML='';document.getElementById('r-level').innerHTML='';document.getElementById('r-chips').innerHTML='';document.getElementById('r-redflag-wrap').innerHTML='';return;}
+    document.getElementById('r-bars').innerHTML='';document.getElementById('r-interp').innerHTML='';document.getElementById('r-struct').innerHTML='';document.getElementById('r-tests').innerHTML='';document.getElementById('r-level').innerHTML='';document.getElementById('r-chips').innerHTML='';document.getElementById('r-redflag-wrap').innerHTML='';document.getElementById('r-special-sec').style.display='none';document.getElementById('r-recovery-sec').style.display='none';return;}
   const domKo=CATKO[a.dominant];
   let lvl='';
   if(a.dominant==='nv'&&d.derm)lvl=' — '+LEVELKO[d.derm]+' 시사';
@@ -384,6 +462,8 @@ function render(a){
   // chips
   const chips=[];
   const REGKO={cervical:'경추',shoulder:'어깨',thoracic:'등',lumbar:'요추',sij:'천장',hip:'고관절',knee:'무릎',ankle:'발목',elbowwrist:'팔꿈치·손목'};
+  if(d.age>0)chips.push(`<span class="chip">${d.age}세${d.sex==='male'?'·남':d.sex==='female'?'·여':''}</span>`);
+  if(d.bmi>0)chips.push(`<span class="chip">BMI ${d.bmi}</span>`);
   if(d.region)chips.push(`<span class="chip">${REGKO[d.region]}</span>`);
   if(d.derm)chips.push(`<span class="chip" style="color:var(--nerve)">${LEVELKO[d.derm]}</span>`);
   if(a.mixed)chips.push(`<span class="chip">혼재</span>`);
@@ -422,6 +502,15 @@ function render(a){
   if(!T.length)T.push('부위를 선택하면 우세 원인별 확인 검사를 추천합니다.');
   document.getElementById('r-tests').innerHTML=T.map(x=>`<li>${x}</li>`).join('');
 
+  // 특수 조건 감별 가능성
+  const sp=specialDx(d);const ss=document.getElementById('r-special-sec');
+  if(sp.length){ss.style.display='';document.getElementById('r-special').innerHTML=sp.map(s=>{const cls=s.w==='높음'?'high':s.w==='중등'?'mid':'ref';return `<div class="sdx"><span class="wb ${cls}">${s.w}</span><span><b>${s.n}</b> — ${s.t}</span></div>`;}).join('');}
+  else ss.style.display='none';
+  // 예상 회복 경향(조직·연령 매트릭스)
+  const rec=recoveryNote(a.dominant,d.age);const rs=document.getElementById('r-recovery-sec');
+  rs.style.display='';
+  document.getElementById('r-recovery').innerHTML=`<div class="recbox"><b>${rec.label}</b><br>예상 회복 <b>${rec.range}</b> · ${rec.band}${rec.mult!==1?' ×'+rec.mult:''}</div><p class="muted" style="font-size:12px;margin-top:6px">※ 조직·연령 매트릭스 기반 일반 범위(중등도). 손상 조직·병기·개인차로 달라집니다.</p>`;
+
   // 레드플래그
   const rf=d.redflags;
   document.getElementById('r-redflag-wrap').innerHTML=rf.length
@@ -432,7 +521,7 @@ function showResult(){document.getElementById('inputScreen').style.display='none
 function showInput(){document.getElementById('result').classList.remove('show');document.getElementById('inputScreen').style.display='';window.scrollTo({top:0,behavior:'smooth'});}
 document.getElementById('run').onclick=()=>{render(analyze(collect()));showResult();};
 document.getElementById('back').onclick=showInput;document.getElementById('back2').onclick=showInput;
-document.getElementById('reset').onclick=()=>{document.querySelectorAll('input').forEach(i=>i.checked=false);document.querySelectorAll('.opt.on').forEach(o=>o.classList.remove('on'));document.querySelectorAll('.card.filled').forEach(c=>c.classList.remove('filled'));document.getElementById('dermField').style.display='none';showInput();};
+document.getElementById('reset').onclick=()=>{document.querySelectorAll('input').forEach(i=>{if(i.type==='number')i.value='';else i.checked=false;});document.querySelectorAll('.opt.on').forEach(o=>o.classList.remove('on'));document.querySelectorAll('.card.filled').forEach(c=>c.classList.remove('filled'));document.getElementById('dermField').style.display='none';showInput();};
 document.getElementById('print').onclick=()=>window.print();
 </script>
 </body>
