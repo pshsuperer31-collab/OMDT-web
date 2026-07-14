@@ -257,8 +257,10 @@
       <!-- 7 근육·구조 국소 -->
       <div class="card">
         <h2><span class="n">7</span> 근육·구조 국소</h2>
-        <p class="hint">동작·저항·통증호 검사 → 어느 근육/구조인지 (부위 선택 시 표시)</p>
-        <div class="field"><div class="opts grid4" id="muscleTests"><p class="empty">먼저 통증 부위를 선택하세요.</p></div></div>
+        <p class="hint">유발 동작 + 통증 위치 → 관여 근육 후보를 나열 (부위 선택 시 표시)</p>
+        <div class="field"><div class="q">유발·통증 동작 <span class="sub">— 복수</span></div><div class="opts grid4" id="moveOpts"><p class="empty">먼저 통증 부위를 선택하세요.</p></div></div>
+        <div class="field"><div class="q">통증 위치 <span class="sub">— 복수</span></div><div class="opts grid4" id="locOpts"></div></div>
+        <div class="field"><div class="q">정밀 검사(선택) <span class="sub">— 특정 구조 확진</span></div><div class="opts grid4" id="muscleTests"></div></div>
       </div>
 
       <!-- 8 레드플래그 -->
@@ -412,6 +414,66 @@ const MUSCLE_TESTS={
     {id:'intercostal',label:'늑간 따라 방사·작열',dx:'늑간신경',cat:'nv'},
   ],
 };
+// 근육 기능·통증위치 DB: [근육, [동작id], [위치id]]
+const MDB={
+  shoulder:{
+    moves:[['abd','상완 외전'],['add','상완 내전'],['flex','상완 굴곡'],['ext','상완 신전'],['er','상완 외회전'],['ir','상완 내회전'],['scapRet','견갑 후인'],['scapElev','견갑 거상'],['scapDep','견갑 하강'],['scapPro','견갑 전인']],
+    locs:[['ant','전방'],['post','후방(회전근개 후방)'],['lat','외측'],['supAcr','상부·견봉'],['medScap','견갑간·내측'],['infScap','견갑 하각·하부'],['upperNeck','상부 견갑·경견']],
+    muscles:[
+      ['극상근',['abd'],['supAcr','lat']],['극하근',['er'],['post']],['소원근',['er'],['post']],
+      ['견갑하근',['ir','add'],['ant']],['대원근',['add','ir','ext'],['post','infScap']],['광배근',['add','ir','ext'],['post','infScap']],
+      ['대흉근',['add','ir','flex'],['ant']],['삼각근(전)',['flex','abd'],['ant','lat']],['삼각근(중)',['abd'],['lat']],['삼각근(후)',['ext','er'],['post','lat']],
+      ['상완이두',['flex'],['ant']],['삼두(장두)',['ext'],['post']],
+      ['능형근',['scapRet','scapElev'],['medScap']],['중부승모근',['scapRet'],['medScap']],['하부승모근',['scapDep','scapRet'],['medScap','infScap']],
+      ['상부승모근',['scapElev'],['upperNeck','supAcr']],['견갑거근',['scapElev'],['upperNeck','medScap']],['전거근',['scapPro'],['infScap','lat']],['소흉근',['scapPro','scapDep'],['ant']],
+    ]},
+  hip:{
+    moves:[['flex','고관절 굴곡'],['ext','신전'],['abd','외전'],['add','내전'],['er','외회전'],['ir','내회전']],
+    locs:[['ant','전방·서혜부'],['lat','외측·대전자'],['post','둔부·후방'],['groin','서혜부 깊이']],
+    muscles:[
+      ['장요근',['flex'],['ant','groin']],['대퇴직근',['flex'],['ant']],['봉공근',['flex','abd','er'],['ant']],
+      ['내전근군',['add'],['groin','ant']],['중둔근',['abd','ir'],['lat']],['대퇴근막장근',['abd','flex','ir'],['lat']],
+      ['대둔근',['ext','er'],['post']],['햄스트링',['ext'],['post']],['이상근·심부외회전근',['er'],['post']],
+    ]},
+  knee:{
+    moves:[['ext','무릎 신전'],['flex','굴곡'],['ir','경골 내회전']],
+    locs:[['ant','앞무릎'],['med','내측'],['lat','외측'],['post','뒤·슬와']],
+    muscles:[
+      ['대퇴사두',['ext'],['ant']],['슬개건·슬개대퇴',['ext'],['ant']],['햄스트링',['flex'],['post']],
+      ['비복근',['flex'],['post']],['거위발건(봉공·박·반건)',['flex'],['med']],['슬와근',['flex','ir'],['post']],['장경인대',['ext'],['lat']],
+    ]},
+  ankle:{
+    moves:[['pf','족저굴(까치발)'],['df','족배굴'],['inv','내번'],['ev','외번']],
+    locs:[['post','뒤꿈치·아킬레스'],['plantar','발바닥'],['med','내측'],['lat','외측'],['ant','전방']],
+    muscles:[
+      ['비복근·가자미근',['pf'],['post']],['아킬레스건',['pf'],['post']],['후경골근',['inv','pf'],['med']],
+      ['전경골근',['df','inv'],['ant']],['비골근',['ev'],['lat']],['족저근막·내재근',['pf'],['plantar']],['장무지굴근',['pf'],['plantar','med']],
+    ]},
+  elbowwrist:{
+    moves:[['wristExt','손목 신전'],['wristFlex','손목 굴곡'],['elbowFlex','팔꿈치 굴곡'],['sup','회외'],['pron','회내'],['grip','엄지·파지']],
+    locs:[['latEpi','외측상과'],['medEpi','내측상과'],['ant','전방'],['wrist','손목']],
+    muscles:[
+      ['손목신전근군(총신전건)',['wristExt'],['latEpi']],['손목굴곡근군(총굴곡건)',['wristFlex'],['medEpi']],
+      ['상완이두',['elbowFlex','sup'],['ant']],['상완근',['elbowFlex'],['ant']],['회외근',['sup'],['latEpi']],['원회내근',['pron'],['ant','medEpi']],
+      ['무지 외전·신전근(드퀘르뱅)',['grip'],['wrist']],
+    ]},
+  sij:{
+    moves:[['hipExt','고관절 신전'],['abd','외전'],['er','외회전']],
+    locs:[['buttock','둔부'],['sij','천장'],['ischial','좌골']],
+    muscles:[['대둔근',['hipExt'],['buttock']],['중둔근',['abd'],['buttock']],['이상근',['er'],['buttock','sij']],['햄스트링 기시부',['hipExt'],['ischial']]]},
+  lumbar:{
+    moves:[['ext','신전'],['flex','굴곡'],['sidebend','측굴'],['rot','회전']],
+    locs:[['central','중앙'],['para','방척추'],['lat','측방'],['buttock','둔부 방사']],
+    muscles:[['척추기립근',['ext'],['para','central']],['다열근',['ext','rot'],['para','central']],['요방형근',['sidebend','ext'],['lat']],['복사근',['flex','rot'],['lat']]]},
+  cervical:{
+    moves:[['flex','굴곡'],['ext','신전'],['rot','회전'],['sidebend','측굴'],['scapElev','견갑 거상']],
+    locs:[['post','후경부'],['lat','측경부'],['upperTrap','상부 어깨'],['occ','후두']],
+    muscles:[['상부승모근',['scapElev','ext','sidebend'],['upperTrap','post']],['견갑거근',['scapElev','sidebend'],['upperTrap','lat']],['사각근',['flex','sidebend'],['lat']],['흉쇄유돌근',['flex','rot'],['lat']],['후두하근',['ext'],['occ']],['판상근',['ext','rot'],['post']]]},
+  thoracic:{
+    moves:[['ext','신전'],['rot','회전'],['retract','견갑 후인']],
+    locs:[['para','방척추'],['medScap','견갑간'],['rib','늑골']],
+    muscles:[['흉추 기립근',['ext'],['para']],['능형근',['retract'],['medScap']],['중부승모근',['retract'],['medScap']],['늑간근',['rot'],['rib']]]},
+};
 
 function fillOpts(id,arr,name){const box=document.getElementById(id);box.setAttribute('data-key',name||id);arr.forEach(o=>{const[v,l,cat]=o;const lb=document.createElement('label');lb.className='opt'+(cat?' '+cat:'');lb.innerHTML=`<input type="checkbox" value="${v}">${l}`;box.appendChild(lb);});}
 fillOpts('quality',QUALITY);fillOpts('timing',TIMING);fillOpts('aggravate',AGGRAVATE);fillOpts('neuro',NEURO);
@@ -433,9 +495,12 @@ radRadios.forEach(r=>r.addEventListener('change',()=>{
 /* 부위 → 근육·구조 국소 검사 */
 function populateMuscleTests(){
   const R=document.querySelector('input[name="region"]:checked')?.value;
-  const box=document.getElementById('muscleTests');const tests=MUSCLE_TESTS[R];
-  if(!R||!tests){box.innerHTML='<p class="empty">먼저 통증 부위를 선택하세요.</p>';return;}
-  box.innerHTML=tests.map(t=>`<label class="opt m"><input type="checkbox" value="${t.id}">${t.label}</label>`).join('');
+  const db=MDB[R],tests=MUSCLE_TESTS[R];
+  const mo=document.getElementById('moveOpts'),lo=document.getElementById('locOpts'),mt=document.getElementById('muscleTests');
+  if(!R){mo.innerHTML='<p class="empty">먼저 통증 부위를 선택하세요.</p>';lo.innerHTML='';mt.innerHTML='';return;}
+  mo.innerHTML=db?db.moves.map(([id,l])=>`<label class="opt m"><input type="checkbox" data-mv value="${id}">${l}</label>`).join(''):'<p class="empty">-</p>';
+  lo.innerHTML=db?db.locs.map(([id,l])=>`<label class="opt m"><input type="checkbox" data-lc value="${id}">${l}</label>`).join(''):'';
+  mt.innerHTML=tests?tests.map(t=>`<label class="opt m"><input type="checkbox" value="${t.id}">${t.label}</label>`).join(''):'';
 }
 document.querySelectorAll('input[name="region"]').forEach(r=>r.addEventListener('change',populateMuscleTests));
 
@@ -468,10 +533,21 @@ function collect(){const height=nv0('height'),weight=nv0('weight');return{
   onsetTime:rv('onsetTime'),onsetTrigger:rv('onsetTrigger'),progression:rv('progression'),
   quality:cv('quality'),timing:cv('timing'),aggravate:cv('aggravate'),
   cyriax:rv('cyriax'),tender:rv('tender'),neuro:cv('neuro'),
+  moves:[...document.querySelectorAll('#moveOpts input:checked')].map(i=>i.value),
+  locs:[...document.querySelectorAll('#locOpts input:checked')].map(i=>i.value),
   muscleTests:[...document.querySelectorAll('#muscleTests input:checked')].map(i=>i.value),
   redflags:cv('redflags'),
 };}
 function muscleLoc(d){return (d.region&&MUSCLE_TESTS[d.region])?(d.muscleTests||[]).map(id=>MUSCLE_TESTS[d.region].find(x=>x.id===id)).filter(Boolean):[];}
+function muscleCandidates(d){
+  const db=d.region&&MDB[d.region];if(!db)return [];
+  const mv=d.moves||[],lc=d.locs||[];if(!mv.length&&!lc.length)return [];
+  const moveKo=Object.fromEntries(db.moves),locKo=Object.fromEntries(db.locs);
+  return db.muscles.map(([n,mvs,lcs])=>{
+    const mm=mvs.filter(x=>mv.includes(x)),lm=lcs.filter(x=>lc.includes(x));
+    return {n,score:mm.length+lm.length,why:[...mm.map(x=>moveKo[x]),...lm.map(x=>locKo[x])]};
+  }).filter(m=>m.score>0).sort((a,b)=>b.score-a.score);
+}
 
 /* ───────── 감별 엔진 ───────── */
 function analyze(d){
@@ -497,6 +573,7 @@ function analyze(d){
   d.neuro.forEach(n=>add('nv',n==='tension'?3:2));
   // 근육·구조 국소 검사(강한 국소 증거)
   muscleLoc(d).forEach(t=>add(t.cat==='struct'?'j':t.cat,t.cat==='struct'?1.5:2.5));
+  if((d.moves||[]).length||(d.locs||[]).length)add('m',2);
 
   const sum=m+j+nv;
   const pct=x=>sum>0?Math.round(x/sum*100):33;
@@ -674,10 +751,14 @@ function render(a){
   if(a.mixed)I.push('상위 두 원인 점수 접근 — 확진 검사로 좁히세요');
   document.getElementById('r-interp').innerHTML=I.map(x=>`<li>${x}</li>`).join('')||'<li class="muted">부위·소견을 더 입력하면 정밀해집니다.</li>';
 
-  // 국소 근육·구조(동작 검사)
-  const mloc=muscleLoc(d);const ms=document.getElementById('r-muscle-sec');
-  if(mloc.length){ms.style.display='';document.getElementById('r-muscle').innerHTML='<ul>'+mloc.map(t=>`<li><b>${t.dx}</b> <span class="muted" style="font-size:12px">— ${t.label}</span></li>`).join('')+'</ul>';}
-  else ms.style.display='none';
+  // 국소 근육·구조(동작·위치 → 근육 후보 + 정밀검사)
+  const cands=muscleCandidates(d),mloc=muscleLoc(d);const ms=document.getElementById('r-muscle-sec');
+  if(cands.length||mloc.length){ms.style.display='';let mh='';
+    if(cands.length){const mx=cands[0].score;
+      mh+='<div style="font-weight:800;color:var(--navy-soft);font-size:12px;margin-bottom:6px">관여 근육 후보 (동작·위치 매칭)</div><ul>'+cands.map(c=>`<li><b>${c.n}</b>${c.score===mx?' <span style="color:var(--muscle);font-size:11px;font-weight:700">★</span>':''} <span class="muted" style="font-size:12px">— ${c.why.join(', ')}</span></li>`).join('')+'</ul>';}
+    if(mloc.length)mh+='<div style="font-weight:800;color:var(--navy-soft);font-size:12px;margin:10px 0 6px">정밀 검사 소견</div><ul>'+mloc.map(t=>`<li><b>${t.dx}</b> <span class="muted" style="font-size:12px">— ${t.label}</span></li>`).join('')+'</ul>';
+    document.getElementById('r-muscle').innerHTML=mh;
+  }else ms.style.display='none';
   // 구조 지목
   const st=d.region?STRUCT[d.region]:null;
   document.getElementById('r-struct').innerHTML=st
