@@ -78,6 +78,8 @@
   .lvlbox b{color:var(--nerve)}
   .redflag{background:#fbeef1;border:1px solid #f0cdd6;border-radius:12px;padding:13px 15px;color:#8a2e44;font-size:13.5px;margin-top:8px}
   .redflag b{color:var(--warn)}
+  .catgrp{margin-bottom:12px}
+  .cathd{font-size:12px;font-weight:800;color:var(--navy-soft);letter-spacing:.03em;margin:0 0 6px;padding-bottom:3px;border-bottom:1px solid var(--line)}
   .sdx{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:13.5px}
   .sdx .wb{flex:0 0 auto;font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;margin-top:1px}
   .sdx .wb.high{background:#fbeef1;color:var(--warn)}
@@ -411,30 +413,49 @@ const TESTS={
 };
 
 /* ───────── 특수 조건 감별 ───────── */
+const SPECIAL_CATS=['자가면역·염증','탈수초·신경','퇴행성','대사·기타','성장기'];
 function specialDx(d){
-  const out=[],age=d.age,sex=d.sex,bmi=d.bmi,cm=d.comorbid||[],tm=d.timing||[],q=d.quality||[],ag=d.aggravate||[];
+  const out=[],age=d.age,sex=d.sex,bmi=d.bmi,cm=d.comorbid||[],tm=d.timing||[],q=d.quality||[],ag=d.aggravate||[],nu=d.neuro||[],rf=d.redflags||[];
   const spine=['lumbar','sij','thoracic','cervical'].includes(d.region);
   const inflam=tm.includes('amStiffLong')||tm.includes('restNight');
-  if(spine&&age>=15&&age<=45&&inflam)
-    out.push({n:'강직성 척추염(AS)',w:sex==='male'?'높음':'중등',t:`젊은 나이·염증성 요통(아침경직 30분+·야간통·활동 시 호전)${sex==='male'?'·남성 호발':''} → HLA-B27, 천장관절 X-ray/MRI 고려`});
-  if((d.region==='lumbar'||d.region==='sij')&&age>=60&&ag.includes('extension'))
-    out.push({n:'척추관 협착증',w:'중등',t:'고령·신전 시 악화·신경인성 파행 → 보행거리·MRI 확인'});
-  if(spine&&age>=60&&sex==='female'&&(d.onsetTrigger==='trauma'||(bmi>0&&bmi<19)))
-    out.push({n:'골다공증성 압박골절',w:'중등',t:'폐경 후 여성·저체중·경미 외상 → 척추 X-ray·골밀도'});
-  if(d.region==='elbowwrist'&&(sex==='female'||cm.includes('임신')||bmi>=25))
-    out.push({n:'수근관 증후군',w:'중등',t:'여성·임신·비만 소인 → 정중신경(Tinel/Phalen)'});
-  if(cm.includes('당뇨')&&(q.includes('numb')||q.includes('burning')))
-    out.push({n:'당뇨병성 말초신경병증',w:'높음',t:'당뇨·저림/작열감 → 대칭성 양말장갑형 확인, 혈당·신경전도'});
-  if(cm.includes('대상포진 이력')&&q.includes('burning'))
-    out.push({n:'대상포진후 신경통',w:'중등',t:'피부분절 작열통·과거 수포 → 신경병증성 통증 관리'});
-  if((cm.includes('갑상선질환')||cm.includes('과음')||cm.includes('항암·약물'))&&(q.includes('numb')||q.includes('burning')))
-    out.push({n:'대사·독성 말초신경병증',w:'참고',t:'갑상선/음주/약물 + 저림 → 대사성 신경병증 감별'});
-  if(cm.includes('통풍력')&&d.onsetTime==='acute')
-    out.push({n:'통풍 발작',w:'중등',t:'급성·기왕력 → 관절 열감·요산 확인'});
-  if(cm.includes('류마티스력')&&tm.includes('amStiffLong'))
-    out.push({n:'염증성(류마티스) 관절염',w:'중등',t:'아침경직 30분+·기왕력 → 다발성·염증표지자 확인'});
-  if(bmi>=30&&['knee','hip','lumbar','ankle'].includes(d.region))
-    out.push({n:'체중부하 관절 과부하',w:'참고',t:`비만(BMI ${bmi}) → 하중 관절 부하, 체중 관리 병행`});
+  const motor=nu.includes('motor'),sensory=nu.includes('sensory');
+  const progressive=d.progression==='spread'||d.progression==='radiating';
+  const numbBurn=q.includes('numb')||q.includes('burning');
+  const P=(cat,n,w,t)=>out.push({cat,n,w,t});
+
+  // ── 자가면역·염증 (젊은~중년 호발) ──
+  if(spine&&age>=15&&age<=45&&inflam)P('자가면역·염증','강직성 척추염(AS)',sex==='male'?'높음':'중등',`젊은 나이·염증성 요통(아침경직 30분+·야간통·활동 시 호전)${sex==='male'?'·남성 호발':''} → HLA-B27, 천장관절 MRI`);
+  if(age>=30&&age<=60&&sex==='female'&&tm.includes('amStiffLong')&&['elbowwrist','shoulder'].includes(d.region))P('자가면역·염증','류마티스 관절염','중등','40~60대 여성·아침경직 30분+·소관절 → 대칭성, 류마티스인자/항CCP·염증표지자');
+  if(cm.includes('류마티스력')&&tm.includes('amStiffLong'))P('자가면역·염증','염증성(류마티스) 관절염 재발','중등','기왕력·아침경직 30분+ → 다발성·염증표지자 확인');
+  if(age>=50&&['shoulder','hip','sij','cervical'].includes(d.region)&&tm.includes('amStiffLong'))P('자가면역·염증','류마티스성 다발근통(PMR)','중등','50세+·견갑/골반대 근육통·아침경직 → ESR/CRP↑, 스테로이드 반응');
+  if(age>0&&age<16&&(inflam||d.cyriax==='artic'))P('자가면역·염증','소아 특발성 관절염(JIA)','참고','소아·관절 염증 소견 → 소아류마티스 평가');
+  if(age>=15&&age<=45&&sex==='female'&&(rf.includes('발열·오한')||rf.includes('원인불명 체중감소')))P('자가면역·염증','전신 결합조직질환(SLE 등)','참고','젊은 여성·전신증상 동반 → 항핵항체 등 자가면역 검사');
+
+  // ── 탈수초·신경 ──
+  if(age>=20&&age<=45&&sensory&&numbBurn&&progressive)P('탈수초·신경','다발성 경화증(MS)','중등','20~40대(여성 호발)·다부위 감각이상·재발완화 → 뇌·척수 MRI, 신경과');
+  if(progressive&&motor&&rf.includes('진행성 하지/상지 마비'))P('탈수초·신경','급성 탈수초(길랑-바레)','높음','상행성·대칭성 진행성 근력저하 → 응급 신경과(호흡근 주의)');
+  if(d.onsetTime==='chronic'&&motor&&sensory)P('탈수초·신경','만성 탈수초 다발신경병증(CIDP)','참고','만성·대칭성 운동감각 저하 → 신경전도·신경과');
+  if(age>=45&&motor&&progressive&&!sensory)P('탈수초·신경','운동신경원병(ALS)','중등','감각 정상+진행성 근위축·섬유속성연축 → 신경과·근전도');
+  if(age>=55&&d.region==='cervical'&&(motor||sensory))P('탈수초·신경','경추 척수증','중등','고령·경추·보행장애/손 정교함 저하·병적반사(Hoffman) 확인');
+  if(cm.includes('당뇨')&&numbBurn)P('탈수초·신경','당뇨병성 말초신경병증','높음','당뇨·저림/작열감 → 대칭성 양말장갑형, 혈당·신경전도');
+  if(cm.includes('대상포진 이력')&&q.includes('burning'))P('탈수초·신경','대상포진후 신경통','중등','피부분절 작열통·과거 수포 → 신경병증성 통증 관리');
+  if((cm.includes('갑상선질환')||cm.includes('과음')||cm.includes('항암·약물'))&&numbBurn)P('탈수초·신경','대사·독성 말초신경병증','참고','갑상선/음주/약물 + 저림 → 대사성 신경병증 감별');
+  if(d.region==='elbowwrist'&&(sex==='female'||cm.includes('임신')||bmi>=25))P('탈수초·신경','수근관 증후군','중등','여성·임신·비만 소인 → 정중신경(Tinel/Phalen)');
+
+  // ── 퇴행성 (중년~노년 호발) ──
+  if((d.region==='lumbar'||d.region==='sij')&&age>=60&&ag.includes('extension'))P('퇴행성','척추관 협착증','중등','고령·신전 악화·신경인성 파행 → 보행거리·MRI');
+  if(age>=50&&['knee','hip'].includes(d.region)&&(tm.includes('amStiffShort')||tm.includes('activity')))P('퇴행성','골관절염(OA)','중등','50세+·하중 관절·활동 시 악화·짧은 아침경직 → 관절 X-ray');
+  if(age>=50&&spine&&d.onsetTime==='chronic')P('퇴행성','척추증(퇴행성 변화)','참고','50세+·만성 척추통 → 퇴행성 디스크·후관절 변화');
+  if(age>=50&&d.region==='shoulder'&&d.cyriax==='contract')P('퇴행성','회전근개 퇴행성 병변','참고','50세+·저항통 → 퇴행성 건병증/부분파열 감별');
+
+  // ── 대사·기타 ──
+  if(spine&&age>=60&&sex==='female'&&(d.onsetTrigger==='trauma'||(bmi>0&&bmi<19)))P('대사·기타','골다공증성 압박골절','중등','폐경 여성·저체중·경미 외상 → 척추 X-ray·골밀도');
+  if(cm.includes('통풍력')&&d.onsetTime==='acute')P('대사·기타','통풍 발작','중등','급성·기왕력 → 관절 열감·요산');
+  if(bmi>=30&&['knee','hip','lumbar','ankle'].includes(d.region))P('대사·기타','체중부하 관절 과부하','참고',`비만(BMI ${bmi}) → 하중 관절 부하, 체중 관리 병행`);
+
+  // ── 성장기 ──
+  if(age>0&&age<19&&['knee','ankle','hip'].includes(d.region))P('성장기','성장기 골단증/견인성 골단염','참고','성장기·Osgood-Schlatter(무릎)/Sever(발뒤꿈치) 등 고려');
+
   return out;
 }
 /* ───────── 나이 보정 회복 경향 ───────── */
@@ -504,8 +525,11 @@ function render(a){
 
   // 특수 조건 감별 가능성
   const sp=specialDx(d);const ss=document.getElementById('r-special-sec');
-  if(sp.length){ss.style.display='';document.getElementById('r-special').innerHTML=sp.map(s=>{const cls=s.w==='높음'?'high':s.w==='중등'?'mid':'ref';return `<div class="sdx"><span class="wb ${cls}">${s.w}</span><span><b>${s.n}</b> — ${s.t}</span></div>`;}).join('');}
-  else ss.style.display='none';
+  if(sp.length){ss.style.display='';let sh='';
+    SPECIAL_CATS.forEach(cat=>{const items=sp.filter(s=>s.cat===cat);if(!items.length)return;
+      sh+=`<div class="catgrp"><div class="cathd">${cat}</div>`+items.map(s=>{const cls=s.w==='높음'?'high':s.w==='중등'?'mid':'ref';return `<div class="sdx"><span class="wb ${cls}">${s.w}</span><span><b>${s.n}</b> — ${s.t}</span></div>`;}).join('')+`</div>`;});
+    document.getElementById('r-special').innerHTML=sh+`<p class="muted" style="font-size:12px;margin-top:4px">※ 연령·조건 호발 경향의 감별 가능성입니다(확진 아님). MS·ALS·길랑-바레 등 중대 신경질환 의심 시 신경과 의뢰.</p>`;
+  }else ss.style.display='none';
   // 예상 회복 경향(조직·연령 매트릭스)
   const rec=recoveryNote(a.dominant,d.age);const rs=document.getElementById('r-recovery-sec');
   rs.style.display='';
