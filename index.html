@@ -78,6 +78,8 @@
   .lvlbox b{color:var(--nerve)}
   .redflag{background:#fbeef1;border:1px solid #f0cdd6;border-radius:12px;padding:13px 15px;color:#8a2e44;font-size:13.5px;margin-top:8px}
   .redflag b{color:var(--warn)}
+  .triage{background:#fbeef1;border:1px solid #f0cdd6;border-left:4px solid var(--warn);border-radius:0 12px 12px 0;padding:12px 15px;color:#8a2e44;font-size:13.5px;margin-bottom:14px}
+  .triage b{color:var(--warn)}
   .catgrp{margin-bottom:12px}
   .cathd{font-size:12px;font-weight:800;color:var(--navy-soft);letter-spacing:.03em;margin:0 0 6px;padding-bottom:3px;border-bottom:1px solid var(--line)}
   .sdx{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:13.5px}
@@ -285,6 +287,7 @@
       <div class="sub" id="r-sub"></div>
       <div class="chips" id="r-chips"></div>
     </div>
+    <div id="r-triage"></div>
     <div class="bars" id="r-bars"></div>
     <div id="r-level"></div>
     <div class="sec" id="r-lumbago-sec" style="display:none"><h3>🔻 요통 세부 감별</h3><div id="r-lumbago"></div></div>
@@ -779,6 +782,12 @@ function lumbagoDx(d){
     out.push({w:'참고',n:'천장관절 기능장애(SIJ)',t:'좌골신경통 유사·하중 시 악화(보행·계단·기립·앉기)·굽힘/비틀기 유발, PSIS 하방 — 천장 유발검사 3종+'});
   if(d.radiate==='tlj')
     out.push({w:'참고',n:'상둔피신경 포착(SCN)',t:'장골능 후방(정중 7cm 외측) 압통·둔부/후외측 대퇴 방사, 비피부분절 — SIJ·TLJ와 감별. 국소 이완·신경차단'});
+  if(ext&&posChange&&!legRad)
+    out.push({w:'참고',n:'척추 분리·전방전위증(가능)',t:'신전 악화·불안정성(자세 변경 시 걸림) — 젊은 운동선수(협부결손)/노년 퇴행, 협착·방사 동반 가능. 기립 굴신 X-ray'});
+  if(d.tender==='yes'&&!legRad)
+    out.push({w:'참고',n:'근막통증증후군(트리거포인트)',t:'국소 압통점·연관통(QL·둔근·이상근 등), 저항/신장 시 재현 — 침·약침·이완'});
+  if((d.timing||[]).includes('restNight')&&!flex&&!ext&&!ag.includes('sidebend'))
+    out.push({w:'중등',n:'내장성·비기계적 요통 감별',t:'자세·동작 무관·야간 지속 → 신장(결석·신우신염 CVA압통)·부인과·후복막·복부 대동맥류(박동성·고령흡연) 배제'});
   return out;
 }
 
@@ -786,6 +795,7 @@ function lumbagoDx(d){
 function render(a){
   const R=document.getElementById('result');R.classList.add('show');
   const d=a.d;
+  document.getElementById('r-triage').innerHTML=(d.redflags||[]).length?`<div class="triage"><b>⚠ 진단 triage:</b> 레드플래그 ${d.redflags.length}건 — 근골격 감별에 앞서 <b>특이적 척추병변(감염·종양·골절·마미증후군)</b> 배제를 우선하세요.</div>`:'';
   if(a.sum===0){document.getElementById('r-title').textContent='입력 부족';document.getElementById('r-sub').innerHTML='<span class="muted">문진·진찰 항목을 채워주세요.</span>';
     document.getElementById('r-bars').innerHTML='';document.getElementById('r-interp').innerHTML='';document.getElementById('r-struct').innerHTML='';document.getElementById('r-tests').innerHTML='';document.getElementById('r-level').innerHTML='';document.getElementById('r-chips').innerHTML='';document.getElementById('r-redflag-wrap').innerHTML='';document.getElementById('r-special-sec').style.display='none';document.getElementById('r-recovery-sec').style.display='none';document.getElementById('r-muscle-sec').style.display='none';document.getElementById('r-lumbago-sec').style.display='none';return;}
   const domKo=CATKO[a.dominant];
