@@ -98,6 +98,16 @@
   .sdx .wb.ref{background:#eef0f5;color:var(--muted)}
   .recbox{background:#f0f9f4;border-left:4px solid var(--muscle);border-radius:0 12px 12px 0;padding:11px 15px;font-size:13.5px}
   .recbox b{color:var(--muscle)}
+  .thermbox{border-radius:0 12px 12px 0;padding:12px 15px;font-size:13.5px}
+  .thermbox .hd{font-weight:800;font-size:14.5px;margin-bottom:7px}
+  .thermbox .rowk{display:block;margin-top:6px}
+  .thermbox .rowk b{display:inline-block;min-width:34px;font-weight:800}
+  .thermbox.cold{background:#eef7fc;border:1px solid #cfe6f5;border-left:4px solid #2b7fb8;color:#123f5e}
+  .thermbox.cold .hd,.thermbox.cold .rowk b{color:#1d6b9e}
+  .thermbox.heat{background:#fff3ea;border:1px solid #f6ddc8;border-left:4px solid #c2703a;color:#6b3a19}
+  .thermbox.heat .hd,.thermbox.heat .rowk b{color:#b05f2a}
+  .thermbox.switch{background:#f4f2fb;border:1px solid #ded8f0;border-left:4px solid #6a5aa8;color:#3b3163}
+  .thermbox.switch .hd,.thermbox.switch .rowk b{color:#5a4a98}
   .chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:12px}
   .chip{font-size:12px;font-weight:700;padding:4px 11px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--muted)}
   .muted{color:var(--muted)} .empty{color:var(--muted);font-size:13px;text-align:center}
@@ -288,6 +298,10 @@
           </div>
         </div>
         <div class="field">
+          <div class="q">국소 염증 징후 <span class="sub">— 온·냉 적용 판단</span></div>
+          <div class="opts grid4" id="inflam"></div>
+        </div>
+        <div class="field">
           <div class="q">신경학적 소견 <span class="sub">— 복수 선택</span></div>
           <div class="opts grid4" id="neuro"></div>
         </div>
@@ -333,6 +347,7 @@
     <div class="sec" id="r-muscle-sec" style="display:none"><h3>🎯 국소 근육·구조 (동작 검사)</h3><div id="r-muscle"></div></div>
     <div class="sec"><h3>🎯 우선 감별 대상 구조</h3><div id="r-struct"></div></div>
     <div class="sec"><h3>🧪 추천 확인 검사</h3><ul id="r-tests"></ul></div>
+    <div class="sec" id="r-thermal-sec" style="display:none"><h3>🌡 온·냉 적용</h3><div id="r-thermal"></div></div>
     <div class="sec" id="r-recovery-sec" style="display:none"><h3>⏳ 예상 회복 경향</h3><div id="r-recovery"></div></div>
     <div id="r-redflag-wrap"></div>
     <div class="actions"><button class="btn ghost" id="print">🖨 인쇄</button><button class="btn ghost" id="back2">← 다시 입력</button></div>
@@ -344,8 +359,11 @@
 
 <script>
 /* ───────── 옵션 ───────── */
-const QUALITY=[['dull','둔한·쑤심','m'],['sharp','예리·찌름','j'],['burning','타는듯·전기양','nv'],['numb','저림·감각이상','nv'],['stiff','뻣뻣·경직','j'],['deep','깊은·묵직','j']];
-const TIMING=[['amStiffShort','아침경직 <30분','j'],['amStiffLong','아침경직 >30분(염증성)','j'],['activity','활동 시 악화','j'],['restNight','휴식·야간 악화','nv'],['afterPosture','특정 자세 지속 후','m'],['worseEvening','저녁·사용 후 악화','m']];
+// throb·constant는 조직 무태그 — 어느 조직이냐가 아니라 병기(급성 염증)를 가리키는 신호라 온·냉 판단에만 쓴다
+const QUALITY=[['dull','둔한·쑤심','m'],['sharp','예리·쿡쿡 찌름','j'],['throb','욱씬거림·박동성'],['burning','타는듯·찌릿·전기양','nv'],['numb','저림·감각이상','nv'],['stiff','뻣뻣·경직','j'],['deep','깊은·묵직','j']];
+const TIMING=[['amStiffShort','아침경직 <30분','j'],['amStiffLong','아침경직 >30분(염증성)','j'],['activity','활동 시 악화','j'],['restNight','휴식·야간 악화','nv'],['constant','가만히 있어도 지속'],['afterPosture','특정 자세 지속 후','m'],['worseEvening','저녁·사용 후 악화','m']];
+// 염증 4징후(calor·rubor·tumor·dolor) — 온·냉 적용의 직접 근거
+const INFLAM=[['warm','열감·발적'],['swell','부종·종창'],['nightThrob','밤에 욱씬거려 깸']];
 const AGGRAVATE=[['flexion','굴곡(숙일 때)','nv'],['extension','신전(젖힐 때)','j'],['rotation','회전','m'],['sidebend','측굴','m'],['liftArm','팔 올릴 때','m'],['sitToStand','앉았다 일어설 때','j'],['stairs','계단','j'],['lifting','물건 들 때','m'],['coughSneeze','기침·재채기','nv'],['prolonged','오래 앉기·서기','j'],['posChange','자세 변경·기립 곤란','j']];
 // 완화 요인 — 악화와 짝. 방향 선호(굴곡/신전)가 협착·디스크 감별의 핵심 축
 // rest·ice·medOnly·nothing은 조직 무태그: 휴식 완화는 근·관절 공통이고 냉찜질은 조직이 아니라 병기(급성 염증) 신호 — 기계적 판정에만 쓴다
@@ -552,7 +570,7 @@ const MDB={
 };
 
 function fillOpts(id,arr,name){const box=document.getElementById(id);box.setAttribute('data-key',name||id);arr.forEach(o=>{const[v,l,cat]=o;const lb=document.createElement('label');lb.className='opt'+(cat?' '+cat:'');lb.innerHTML=`<input type="checkbox" value="${v}">${l}`;box.appendChild(lb);});}
-fillOpts('quality',QUALITY);fillOpts('timing',TIMING);fillOpts('aggravate',AGGRAVATE);fillOpts('relieve',RELIEVE);fillOpts('occupation',OCCUPATION);fillOpts('neuro',NEURO);
+fillOpts('quality',QUALITY);fillOpts('timing',TIMING);fillOpts('aggravate',AGGRAVATE);fillOpts('relieve',RELIEVE);fillOpts('occupation',OCCUPATION);fillOpts('inflam',INFLAM);fillOpts('neuro',NEURO);
 document.querySelector('input[name="nrs"]').addEventListener('input',e=>{document.getElementById('nrsVal').textContent=e.target.value;});
 document.getElementById('redflags').setAttribute('data-key','redflags');
 REDFLAGS.forEach(t=>{const lb=document.createElement('label');lb.className='opt';lb.innerHTML=`<input type="checkbox" value="${t}">${t}`;document.getElementById('redflags').appendChild(lb);});
@@ -610,7 +628,7 @@ function collect(){const height=nv0('height'),weight=nv0('weight');return{
   onsetTime:rv('onsetTime'),onsetTrigger:rv('onsetTrigger'),progression:rv('progression'),
   nrs:nv0('nrs'),trend:rv('trend'),
   quality:cv('quality'),timing:cv('timing'),aggravate:cv('aggravate'),relieve:cv('relieve'),
-  cyriax:rv('cyriax'),tender:rv('tender'),neuro:cv('neuro'),
+  cyriax:rv('cyriax'),tender:rv('tender'),inflam:cv('inflam'),neuro:cv('neuro'),
   moves:[...document.querySelectorAll('#moveOpts input:checked')].map(i=>i.value),
   locs:[...document.querySelectorAll('#locOpts input:checked')].map(i=>i.value),
   muscleTests:[...document.querySelectorAll('#muscleTests input:checked')].map(i=>i.value),
@@ -827,12 +845,55 @@ function mechanicalCall(d){
   if(inflam)
     return {k:'infl',t:'<b>염증성 패턴</b> — 쉬면 악화되고 움직이면 완화, 아침경직이 동반됩니다. <b>기계적 통증과 정반대 축</b>이라 도수·부하 조절만으로는 잡히지 않아요. 축성 척추관절염 등 염증성 질환을 먼저 감별하세요.'};
   const noRelief=rel.includes('nothing')||(rel.includes('medOnly')&&!hasReliever);
-  if(noRelief&&!hasReliever&&(tm.includes('restNight')||d.trend==='worsening'))
+  if(noRelief&&!hasReliever&&(tm.includes('restNight')||tm.includes('constant')||d.trend==='worsening'))
     return {k:'non',t:'<b>비기계적 패턴</b> — 어떤 자세·동작으로도 통증이 변하지 않고 완화 요인이 없습니다. 근골격성으로 설명되지 않는 조합이라 <b>염증·감염·종양·내장성 원인 배제를 먼저</b> 하세요.'};
   if(ag.length&&hasReliever)
     return {k:'mech',t:'<b>기계적 패턴</b> — 특정 동작에 악화되고 특정 자세에 완화됩니다. 근골격성 원인에 부합하는 기본 조건이에요.'};
   if(ag.length&&!rel.length)
     return {k:'mech',t:'<b>기계적 패턴(부분)</b> — 악화 동작은 뚜렷한데 완화 요인이 미입력입니다. 어떤 자세에서 편해지는지 확인하면 방향 선호(굴곡/신전)로 감별이 좁혀져요.'};
+  return null;
+}
+
+/* ───────── 온·냉 적용 ───────── */
+// 원칙: 욱씬거림(박동성)·쿡쿡 찌름·찌릿한 자극이 극심하고 가만히 있어도 지속되면 = 염증 활성기 → 무조건 냉.
+// 박동성 통증은 혈관 확장·충혈의 신호라 온찜질을 얹으면 부종·박동통이 커진다.
+const COLD_PROTO='<span class="rowk"><b>적용</b> 냉찜질 15~20분 · 1~2시간 간격. 얼음 직접 접촉 금지(천 한 겹), 감각저하·순환장애 부위는 시간을 줄이세요.</span>';
+const COLD_TX='<span class="rowk"><b>치료</b> 급성 염증기 — 사혈·습부항, 항염 약침, 청열 한약(필요시 양약 병행). 강한 도수·심부 자극은 이 시기 피합니다.</span>';
+function thermalRx(d){
+  const q=d.quality||[],tm=d.timing||[],rel=d.relieve||[],inf=d.inflam||[];
+  const throb=q.includes('throb'),sharp=q.includes('sharp'),burn=q.includes('burning');
+  const irrit=[throb,sharp,burn].filter(Boolean).length; // 자극성 통증 성질 개수
+  const constant=tm.includes('constant'),night=tm.includes('restNight');
+  const severe=d.nrs>=7;
+  const warm=inf.includes('warm'),swell=inf.includes('swell'),nightThrob=inf.includes('nightThrob');
+  const inflSign=warm||swell||nightThrob;
+  const restPain=constant||nightThrob||night;
+
+  // ① 냉 우선(강) — 자극성 통증 + 안정 시 지속
+  if(irrit>=1&&restPain&&(severe||inflSign||throb)){
+    const why=[];
+    if(throb)why.push('욱씬거림(박동성)');
+    if(sharp)why.push('쿡쿡 찌름');
+    if(burn)why.push('찌릿한 자극');
+    return{k:'cold',hd:'🧊 냉 우선 — 지금 온찜질은 오히려 악화돼요',
+      t:`<span class="rowk"><b>근거</b> ${why.join('·')}${severe?` + NRS ${d.nrs}/10`:''} + ${constant?'가만히 있어도 통증 지속':nightThrob?'밤에 욱씬거려 깸':'휴식·야간 악화'}${inflSign?` + ${[warm&&'열감·발적',swell&&'부종·종창'].filter(Boolean).join('·')}`:''} → <b>염증이 활성화된 상태</b>. 박동성 통증은 혈관이 확장·충혈됐다는 신호라, 여기에 온찜질을 얹으면 부종과 욱씬거림이 더 커져요.</span>${COLD_PROTO}${COLD_TX}${(warm||swell)?'<span class="rowk"><b>검열</b> 열감·발적이 뚜렷하고 발열이 동반되면 화농성 관절염·통풍을 먼저 배제하세요.</span>':''}`};
+  }
+  // ② 냉 우선 — 염증 징후가 객관적으로 잡힐 때
+  if(warm||swell)
+    return{k:'cold',hd:'🧊 냉 우선 — 염증 징후 있음',
+      t:`<span class="rowk"><b>근거</b> ${[warm&&'열감·발적',swell&&'부종·종창'].filter(Boolean).join('·')} — 온찜질은 이 시기 부종을 키웁니다.</span>${COLD_PROTO}${COLD_TX}<span class="rowk"><b>검열</b> 발열 동반 시 화농성 관절염·통풍 배제 먼저.</span>`};
+  // ③ 냉 우선 — 급성 + 자극성 통증 다발
+  if(d.onsetTime==='acute'&&irrit>=2)
+    return{k:'cold',hd:'🧊 냉 우선 — 급성기',
+      t:`<span class="rowk"><b>근거</b> 급성(6주 이내) + 자극성 통증(${[throb&&'욱씬',sharp&&'쿡쿡',burn&&'찌릿'].filter(Boolean).join('·')}) — 염증 활성기로 봅니다.</span>${COLD_PROTO}${COLD_TX}`};
+  // ④ 온 우선 — 염증 없이 둔하고 뻣뻣
+  if(!inflSign&&!constant&&!throb&&(q.includes('dull')||q.includes('stiff'))&&(d.onsetTime==='chronic'||rel.includes('heat')))
+    return{k:'heat',hd:'♨ 온 우선',
+      t:`<span class="rowk"><b>근거</b> ${[q.includes('dull')&&'둔한 쑤심',q.includes('stiff')&&'뻣뻣·경직'].filter(Boolean).join('·')}${rel.includes('heat')?' + 온찜질에 완화됨':''}, 안정 시 지속통·염증 징후 없음 → 근긴장·혈류 저하가 우세해요.</span><span class="rowk"><b>적용</b> 온찜질 15~20분. 치료 전에 적용해 이완시킨 뒤 도수·침 자극이 효율적이에요.</span><span class="rowk"><b>치료</b> 만성기 — 보법, 온침·뜸, 순환 개선. 활동량을 점진적으로 올리세요.</span>`};
+  // ⑤ 전환기
+  if(d.onsetTime==='subacute'&&!inflSign)
+    return{k:'switch',hd:'🔄 냉 → 온 전환기',
+      t:`<span class="rowk"><b>근거</b> 아급성 — 급성 염증 징후는 잡혔지만 자극이 남아 있는 구간이에요.</span><span class="rowk"><b>적용</b> 활동 후 욱씬거리면 냉, 뻣뻣하고 굳으면 온. 통증 반응을 보고 정하세요.</span><span class="rowk"><b>원칙</b> 박동성·자극성 통증이 다시 살아나면 주저 없이 냉으로 되돌립니다.</span>`};
   return null;
 }
 
@@ -907,7 +968,7 @@ function render(a){
   const d=a.d;
   document.getElementById('r-triage').innerHTML=(d.redflags||[]).length?`<div class="triage"><b>⚠ 진단 triage:</b> 레드플래그 ${d.redflags.length}건 — 근골격 감별에 앞서 <b>특이적 척추병변(감염·종양·골절·마미증후군)</b> 배제를 우선하세요.</div>`:'';
   if(a.sum===0){document.getElementById('r-title').textContent='입력 부족';document.getElementById('r-sub').innerHTML='<span class="muted">문진·진찰 항목을 채워주세요.</span>';
-    document.getElementById('r-bars').innerHTML='';document.getElementById('r-interp').innerHTML='';document.getElementById('r-struct').innerHTML='';document.getElementById('r-tests').innerHTML='';document.getElementById('r-level').innerHTML='';document.getElementById('r-chips').innerHTML='';document.getElementById('r-mech').innerHTML='';document.getElementById('r-redflag-wrap').innerHTML='';document.getElementById('r-special-sec').style.display='none';document.getElementById('r-recovery-sec').style.display='none';document.getElementById('r-muscle-sec').style.display='none';document.getElementById('r-lumbago-sec').style.display='none';return;}
+    document.getElementById('r-bars').innerHTML='';document.getElementById('r-interp').innerHTML='';document.getElementById('r-struct').innerHTML='';document.getElementById('r-tests').innerHTML='';document.getElementById('r-level').innerHTML='';document.getElementById('r-chips').innerHTML='';document.getElementById('r-mech').innerHTML='';document.getElementById('r-redflag-wrap').innerHTML='';document.getElementById('r-special-sec').style.display='none';document.getElementById('r-recovery-sec').style.display='none';document.getElementById('r-muscle-sec').style.display='none';document.getElementById('r-lumbago-sec').style.display='none';document.getElementById('r-thermal-sec').style.display='none';return;}
   const domKo=CATKO[a.dominant];
   let lvl='';
   if(a.dominant==='nv'&&d.derm)lvl=' — '+LEVELKO[d.derm]+' 시사';
@@ -993,6 +1054,11 @@ function render(a){
       sh+=`<div class="catgrp"><div class="cathd">${cat}</div>`+items.map(s=>{const cls=s.w==='높음'?'high':s.w==='중등'?'mid':'ref';return `<div class="sdx"><span class="wb ${cls}">${s.w}</span><span><b>${s.n}</b> — ${s.t}</span></div>`;}).join('')+`</div>`;});
     document.getElementById('r-special').innerHTML=sh+`<p class="muted" style="font-size:12px;margin-top:4px">※ 연령·조건 호발 경향의 감별 가능성입니다(확진 아님). MS·ALS·길랑-바레 등 중대 신경질환 의심 시 신경과 의뢰.</p>`;
   }else ss.style.display='none';
+  // 온·냉 적용
+  const th=thermalRx(d);const ts=document.getElementById('r-thermal-sec');
+  if(th){ts.style.display='';document.getElementById('r-thermal').innerHTML=`<div class="thermbox ${th.k}"><div class="hd">${th.hd}</div>${th.t}</div>`;}
+  else{ts.style.display='none';document.getElementById('r-thermal').innerHTML='';}
+
   // 예상 회복 경향(조직·연령 매트릭스)
   const rec=recoveryNote(a.dominant,d.age,d.trend);const rs=document.getElementById('r-recovery-sec');
   rs.style.display='';
