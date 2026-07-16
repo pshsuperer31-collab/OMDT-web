@@ -32,6 +32,11 @@
   .card.collapsed .cbody{grid-template-rows:0fr}
   .cbody>div{overflow:hidden;min-height:0;padding-top:8px}
   .hint{color:var(--muted);font-size:12px;text-align:center;margin:0 0 12px}
+  .fhd{display:flex;align-items:center;justify-content:center;gap:6px;font-weight:800;font-size:12px;letter-spacing:.02em;margin:0 0 9px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+  .fhd.agg{color:var(--warn)} .fhd.rel{color:var(--muscle)}
+  .nrsrow{display:flex;gap:12px;justify-content:center;align-items:center}
+  .nrsrow input[type=range]{width:58%;accent-color:var(--navy)}
+  .nrsrow .val{font-weight:800;color:var(--navy);min-width:44px;text-align:center;font-size:15px}
   .field{margin-bottom:14px}
   .field>.q{display:block;font-weight:700;font-size:13.5px;margin-bottom:7px;color:#2a3350;text-align:center}
   .q .sub{color:var(--muted);font-weight:400;font-size:11.5px}
@@ -80,6 +85,10 @@
   .redflag b{color:var(--warn)}
   .triage{background:#fbeef1;border:1px solid #f0cdd6;border-left:4px solid var(--warn);border-radius:0 12px 12px 0;padding:12px 15px;color:#8a2e44;font-size:13.5px;margin-bottom:14px}
   .triage b{color:var(--warn)}
+  .mechbox{border-radius:0 12px 12px 0;padding:12px 15px;font-size:13.5px;margin-bottom:14px}
+  .mechbox.mech{background:#eef5ff;border:1px solid #d3e3f8;border-left:4px solid var(--joint);color:#1c3a5e}
+  .mechbox.non{background:#fff6e6;border:1px solid #f3e0bd;border-left:4px solid #a15c00;color:#6b3d00}
+  .mechbox.infl{background:#fbeef1;border:1px solid #f0cdd6;border-left:4px solid var(--warn);color:#8a2e44}
   .catgrp{margin-bottom:12px}
   .cathd{font-size:12px;font-weight:800;color:var(--navy-soft);letter-spacing:.03em;margin:0 0 6px;padding-bottom:3px;border-bottom:1px solid var(--line)}
   .sdx{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:13.5px}
@@ -144,6 +153,10 @@
           <div class="q">동반 질환·특수 조건 <span class="sub">— 복수 선택</span></div>
           <div class="opts grid4" id="comorbid"></div>
         </div>
+        <div class="field">
+          <div class="q">직업·활동력 <span class="sub">— 반복 부하의 배경, 복수 선택</span></div>
+          <div class="opts grid4" id="occupation"></div>
+        </div>
       </div>
 
       <!-- 2 부위 -->
@@ -201,12 +214,12 @@
           </div>
         </div>
         <div class="field">
-          <div class="q">최근 경과 <span class="sub">— 악화 양상</span></div>
+          <div class="q">최근 경과 <span class="sub">— 부위 변화(세기 변화는 4번 강도 추세)</span></div>
           <div class="opts" data-key="progression">
             <label class="opt"><input type="radio" name="progression" value="same">같은 부위 지속</label>
             <label class="opt"><input type="radio" name="progression" value="spread">주변으로 확산</label>
             <label class="opt"><input type="radio" name="progression" value="radiating">팔·다리로 뻗기 시작</label>
-            <label class="opt"><input type="radio" name="progression" value="improving">호전 중</label>
+            <label class="opt"><input type="radio" name="progression" value="shrink">범위 좁아짐(중심화)</label>
           </div>
         </div>
       </div>
@@ -214,6 +227,22 @@
       <!-- 3 통증 양상 -->
       <div class="card">
         <h2><span class="n">4</span> 통증 양상</h2>
+        <div class="field">
+          <div class="q">통증 강도 <span class="sub">— NRS 0 없음 ~ 10 최악</span></div>
+          <div class="nrsrow">
+            <input type="range" name="nrs" min="0" max="10" step="1" value="0">
+            <span class="val" id="nrsVal">0</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="q">강도 추세 <span class="sub">— 시간에 따른 세기 변화</span></div>
+          <div class="opts" data-key="trend">
+            <label class="opt"><input type="radio" name="trend" value="worsening">점점 심해짐</label>
+            <label class="opt"><input type="radio" name="trend" value="plateau">비슷하게 지속</label>
+            <label class="opt"><input type="radio" name="trend" value="easing">점차 완화</label>
+            <label class="opt"><input type="radio" name="trend" value="fluctuate">기복 심함</label>
+          </div>
+        </div>
         <div class="field">
           <div class="q">통증 성질 <span class="sub">— 복수 선택</span></div>
           <div class="opts grid4" id="quality"></div>
@@ -224,11 +253,18 @@
         </div>
       </div>
 
-      <!-- 4 악화 동작 -->
+      <!-- 4 악화 · 완화 -->
       <div class="card">
-        <h2><span class="n">5</span> 악화 동작</h2>
-        <p class="hint">어떤 동작·자세에서 불편한지 — 복수 선택</p>
-        <div class="field"><div class="opts grid4" id="aggravate"></div></div>
+        <h2><span class="n">5</span> 악화 · 완화 요인</h2>
+        <p class="hint">무엇에 나빠지고 무엇에 나아지는지 — 방향 선호가 감별의 핵심</p>
+        <div class="field">
+          <div class="fhd agg">🔺 악화되는 동작 · 자세</div>
+          <div class="opts grid4" id="aggravate"></div>
+        </div>
+        <div class="field">
+          <div class="fhd rel">🔻 완화되는 자세 · 요인</div>
+          <div class="opts grid4" id="relieve"></div>
+        </div>
       </div>
 
       <!-- 5 진찰 -->
@@ -288,6 +324,7 @@
       <div class="chips" id="r-chips"></div>
     </div>
     <div id="r-triage"></div>
+    <div id="r-mech"></div>
     <div class="bars" id="r-bars"></div>
     <div id="r-level"></div>
     <div class="sec" id="r-lumbago-sec" style="display:none"><h3>🔻 요통 세부 감별</h3><div id="r-lumbago"></div></div>
@@ -310,6 +347,13 @@
 const QUALITY=[['dull','둔한·쑤심','m'],['sharp','예리·찌름','j'],['burning','타는듯·전기양','nv'],['numb','저림·감각이상','nv'],['stiff','뻣뻣·경직','j'],['deep','깊은·묵직','j']];
 const TIMING=[['amStiffShort','아침경직 <30분','j'],['amStiffLong','아침경직 >30분(염증성)','j'],['activity','활동 시 악화','j'],['restNight','휴식·야간 악화','nv'],['afterPosture','특정 자세 지속 후','m'],['worseEvening','저녁·사용 후 악화','m']];
 const AGGRAVATE=[['flexion','굴곡(숙일 때)','nv'],['extension','신전(젖힐 때)','j'],['rotation','회전','m'],['sidebend','측굴','m'],['liftArm','팔 올릴 때','m'],['sitToStand','앉았다 일어설 때','j'],['stairs','계단','j'],['lifting','물건 들 때','m'],['coughSneeze','기침·재채기','nv'],['prolonged','오래 앉기·서기','j'],['posChange','자세 변경·기립 곤란','j']];
+// 완화 요인 — 악화와 짝. 방향 선호(굴곡/신전)가 협착·디스크 감별의 핵심 축
+// rest·ice·medOnly·nothing은 조직 무태그: 휴식 완화는 근·관절 공통이고 냉찜질은 조직이 아니라 병기(급성 염증) 신호 — 기계적 판정에만 쓴다
+const RELIEVE=[['rest','휴식·누우면 완화'],['moveWarm','움직이면 완화(아침 지나면)','j'],['flexRelief','숙이거나 앉으면 완화','j'],['extRelief','펴거나 엎드리면 완화','nv'],['traction','팔 올리면·견인 시 완화','nv'],['heat','온찜질·따뜻하면 완화','m'],['ice','냉찜질 완화'],['posShift','자세 바꾸면 잠깐 완화','m'],['medOnly','진통제로만 완화'],['nothing','완화 요인 없음']];
+// 강도 추세 — progression(부위 변화)과 다른 축: 시간에 따른 세기 변화
+const TREND=[['worsening','점점 심해짐'],['plateau','비슷하게 지속'],['easing','점차 완화'],['fluctuate','기복 심함(좋다 나쁨)']];
+// 직업·활동력 — 배경 부하(가중치 낮게, 특수 감별에서 주로 활용). id는 oc 접두로 다른 축과 분리
+const OCCUPATION=[['ocDesk','좌식·컴퓨터 장시간','m'],['ocOverhead','머리 위 팔 작업','m'],['ocRepeat','손·팔 반복작업','m'],['ocLift','중량물 반복 취급','nv'],['ocDrive','장시간 운전·진동','nv'],['ocStand','장시간 서서 일함','j'],['ocSquat','쪼그림·무릎 꿇기','j'],['ocCarry','한쪽 어깨로 짐·가방','m'],['ocSports','규칙적 운동·스포츠','m'],['ocInactive','신체활동 거의 없음','j']];
 const NEURO=[['sensory','피부분절 감각저하','nv'],['motor','근절 근력저하','nv'],['reflex','심부건반사 저하','nv'],['tension','신경긴장검사(SLR/Spurling/ULTT)+','nv']];
 const REDFLAGS=['야간·안정 시 심한 통증','원인불명 체중감소','발열·오한','배뇨/배변 이상','진행성 하지/상지 마비','안장부위 감각소실','고령 외상 후 통증'];
 const COMORBID=['당뇨','갑상선질환','통풍력','류마티스력','골다공증','임신','항암·약물','대상포진 이력','과음','건선'];
@@ -508,7 +552,8 @@ const MDB={
 };
 
 function fillOpts(id,arr,name){const box=document.getElementById(id);box.setAttribute('data-key',name||id);arr.forEach(o=>{const[v,l,cat]=o;const lb=document.createElement('label');lb.className='opt'+(cat?' '+cat:'');lb.innerHTML=`<input type="checkbox" value="${v}">${l}`;box.appendChild(lb);});}
-fillOpts('quality',QUALITY);fillOpts('timing',TIMING);fillOpts('aggravate',AGGRAVATE);fillOpts('neuro',NEURO);
+fillOpts('quality',QUALITY);fillOpts('timing',TIMING);fillOpts('aggravate',AGGRAVATE);fillOpts('relieve',RELIEVE);fillOpts('occupation',OCCUPATION);fillOpts('neuro',NEURO);
+document.querySelector('input[name="nrs"]').addEventListener('input',e=>{document.getElementById('nrsVal').textContent=e.target.value;});
 document.getElementById('redflags').setAttribute('data-key','redflags');
 REDFLAGS.forEach(t=>{const lb=document.createElement('label');lb.className='opt';lb.innerHTML=`<input type="checkbox" value="${t}">${t}`;document.getElementById('redflags').appendChild(lb);});
 document.getElementById('comorbid').setAttribute('data-key','comorbid');
@@ -560,10 +605,11 @@ function rv(n){return document.querySelector(`input[name="${n}"]:checked`)?.valu
 function cv(id){return [...document.querySelectorAll(`#${id} input:checked`)].map(i=>i.value);}
 function nv0(n){return Number((document.querySelector(`input[name="${n}"]`)||{value:0}).value)||0;}
 function collect(){const height=nv0('height'),weight=nv0('weight');return{
-  age:nv0('age'),sex:rv('sex'),height,weight,bmi:(height>0&&weight>0)?Math.round(weight/Math.pow(height/100,2)*10)/10:0,comorbid:cv('comorbid'),
+  age:nv0('age'),sex:rv('sex'),height,weight,bmi:(height>0&&weight>0)?Math.round(weight/Math.pow(height/100,2)*10)/10:0,comorbid:cv('comorbid'),occupation:cv('occupation'),
   region:rv('region'),radiate:rv('radiate'),derm:rv('derm'),
   onsetTime:rv('onsetTime'),onsetTrigger:rv('onsetTrigger'),progression:rv('progression'),
-  quality:cv('quality'),timing:cv('timing'),aggravate:cv('aggravate'),
+  nrs:nv0('nrs'),trend:rv('trend'),
+  quality:cv('quality'),timing:cv('timing'),aggravate:cv('aggravate'),relieve:cv('relieve'),
   cyriax:rv('cyriax'),tender:rv('tender'),neuro:cv('neuro'),
   moves:[...document.querySelectorAll('#moveOpts input:checked')].map(i=>i.value),
   locs:[...document.querySelectorAll('#locOpts input:checked')].map(i=>i.value),
@@ -609,11 +655,23 @@ function analyze(d){
   if(d.radiate==='tlj')add('j',1.5);
   if(d.progression==='radiating')add('nv',2);
   if(d.progression==='spread')add('m',1);
-  // 성질/시간/동작 — 카테고리 태그 합산
-  [...d.quality,...d.timing,...d.aggravate].forEach(v=>{
-    const tag=[...QUALITY,...TIMING,...AGGRAVATE].find(o=>o[0]===v)?.[2];
+  if(d.progression==='shrink')add('nv',1); // 중심화 = 신경근 자극이 물러나는 중
+  // 성질/시간/동작/완화 — 카테고리 태그 합산
+  [...d.quality,...d.timing,...d.aggravate,...(d.relieve||[])].forEach(v=>{
+    const tag=[...QUALITY,...TIMING,...AGGRAVATE,...RELIEVE].find(o=>o[0]===v)?.[2];
     if(tag)add(tag,1.2);
   });
+  // 직업·활동 배경 부하 — 소인일 뿐이라 낮은 가중
+  (d.occupation||[]).forEach(v=>{
+    const tag=OCCUPATION.find(o=>o[0]===v)?.[2];
+    if(tag)add(tag,0.8);
+  });
+  // 악화·완화 방향 조합(단일 소견보다 특이도 높음)
+  const rel=d.relieve||[],ag=d.aggravate||[];
+  if(ag.includes('extension')&&rel.includes('flexRelief'))add('j',2);   // 협착: 신전 악화·굴곡 완화
+  if(rel.includes('extRelief')&&(d.radiate==='lower'||d.radiate==='upper'))add('nv',2); // 디스크 신전 선호
+  if(rel.includes('traction')&&d.radiate==='upper')add('nv',2);         // 견인 완화 = 경추 신경근
+  if(rel.includes('moveWarm')&&(d.timing||[]).includes('amStiffLong'))add('j',2); // 염증성 관절
   // 진찰
   const CYR={artic:['j',3],contract:['m',3],stretch:['m',2],jointplay:['j',3]}[d.cyriax];
   if(CYR)add(CYR[0],CYR[1]);
@@ -677,9 +735,9 @@ const TESTS={
 /* ───────── 특수 조건 감별 ───────── */
 const SPECIAL_CATS=['자가면역·염증','탈수초·신경','국소 연부조직·과사용','퇴행성','대사·기타','성장기'];
 function specialDx(d){
-  const out=[],age=d.age,sex=d.sex,bmi=d.bmi,cm=d.comorbid||[],tm=d.timing||[],q=d.quality||[],ag=d.aggravate||[],nu=d.neuro||[],rf=d.redflags||[];
+  const out=[],age=d.age,sex=d.sex,bmi=d.bmi,cm=d.comorbid||[],tm=d.timing||[],q=d.quality||[],ag=d.aggravate||[],nu=d.neuro||[],rf=d.redflags||[],rel=d.relieve||[],oc=d.occupation||[];
   const spine=['lumbar','sij','thoracic','cervical'].includes(d.region);
-  const inflam=tm.includes('amStiffLong')||tm.includes('restNight');
+  const inflam=tm.includes('amStiffLong')||tm.includes('restNight')||rel.includes('moveWarm');
   const motor=nu.includes('motor'),sensory=nu.includes('sensory');
   const progressive=d.progression==='spread'||d.progression==='radiating';
   const numbBurn=q.includes('numb')||q.includes('burning');
@@ -705,7 +763,7 @@ function specialDx(d){
   if(d.region==='elbowwrist'&&(sex==='female'||cm.includes('임신')||bmi>=25))P('탈수초·신경','수근관 증후군','중등','여성·임신·비만 소인 → 정중신경(Tinel/Phalen)');
 
   // ── 퇴행성 (중년~노년 호발) ──
-  if((d.region==='lumbar'||d.region==='sij')&&age>=60&&ag.includes('extension'))P('퇴행성','척추관 협착증','중등','고령·신전 악화·신경인성 파행 → 보행거리·MRI');
+  if((d.region==='lumbar'||d.region==='sij')&&age>=60&&ag.includes('extension'))P('퇴행성','척추관 협착증',rel.includes('flexRelief')?'높음':'중등',`고령·신전 악화${rel.includes('flexRelief')?' + 굴곡 완화(shopping cart sign)':''}·신경인성 파행 → 보행거리·MRI`);
   if(age>=50&&['knee','hip'].includes(d.region)&&(tm.includes('amStiffShort')||tm.includes('activity')))P('퇴행성','골관절염(OA)','중등','50세+·하중 관절·활동 시 악화·짧은 아침경직 → 관절 X-ray');
   if(age>=50&&spine&&d.onsetTime==='chronic')P('퇴행성','척추증(퇴행성 변화)','참고','50세+·만성 척추통 → 퇴행성 디스크·후관절 변화');
   if(age>=50&&d.region==='shoulder'&&d.cyriax==='contract')P('퇴행성','회전근개 퇴행성 병변','참고','50세+·저항통 → 퇴행성 건병증/부분파열 감별');
@@ -745,25 +803,76 @@ function specialDx(d){
   if(age>=60&&acute&&['knee','elbowwrist'].includes(R))P('대사·기타','가성통풍(CPPD)','참고','고령·급성 무릎/손목 → 연골석회화');
   if(sex==='female'&&age>=30&&age<=60&&d.progression==='spread'&&d.onsetTime==='chronic')P('대사·기타','섬유근통','참고','중년 여성·광범위 만성 통증·피로 → 압통점');
 
+  // ── 직업·활동 배경 부하 (재발 조건 — 치료만으로 안 끝나는 축) ──
+  if(R==='shoulder'&&oc.includes('ocOverhead'))P('국소 연부조직·과사용','회전근개 충돌·건병증(직업성)','중등','머리 위 팔 작업 반복 → 견봉하 공간이 반복 압박. Neer/Hawkins·Jobe 확인, 작업 높이 조정 병행');
+  if(R==='elbowwrist'&&oc.includes('ocRepeat'))P('국소 연부조직·과사용','반복사용 상지 장애(RSI)','중등','손·팔 반복작업 → 상과염·건초염·수근관이 겹쳐 나타나기 쉬움. 한 진단으로 안 끝나는지 확인');
+  if(R==='cervical'&&oc.includes('ocDesk'))P('국소 연부조직·과사용','경부 자세성 과부하','참고','좌식·모니터 장시간 → 상부승모근·견갑거근 지속 수축. 정렬 자체는 OPST 자세 스캔으로 확인 권장');
+  if((R==='lumbar'||R==='sij')&&(oc.includes('ocLift')||oc.includes('ocDrive')))P('퇴행성','추간판 부하 누적(직업성)','중등',`${oc.includes('ocDrive')?'장시간 운전·전신진동':'중량물 반복 취급'} → 추간판 내압 상승 누적, 퇴행 가속. 작업 부하 조정 없이는 재발`);
+  if(R==='knee'&&oc.includes('ocSquat'))P('퇴행성','슬관절 반복 굴곡 부하','참고','쪼그림·무릎 꿇기 작업 → 슬개대퇴·반월판 후각 부하 누적');
+  if(R==='shoulder'&&oc.includes('ocCarry'))P('국소 연부조직·과사용','편측 견갑대 과부하','참고','한쪽 어깨로 짐·가방 → 상부승모근·견갑거근 편측 긴장, 좌우 비대칭 확인');
+  if(oc.includes('ocInactive')&&d.onsetTime==='chronic')P('대사·기타','디컨디셔닝(활동 부족)','참고','만성 통증 + 신체활동 거의 없음 → 근력·지구력 저하와 통증이 서로를 키우는 악순환. 점진적 운동 재활을 치료에 붙이세요');
+  if(oc.includes('ocSports')&&d.onsetTrigger==='overuse')P('국소 연부조직·과사용','스포츠 과사용 손상','참고','규칙적 운동 + 과사용 발병 → 훈련량·자세·장비 점검, 완전 휴식보다 부하 조절');
+
   return out;
 }
+/* ───────── 기계적 / 비기계적 판정 ───────── */
+// 자세·동작에 따라 통증이 변하는가 = 근골격성의 가장 기본 전제.
+// 3상태: 기계적 / 염증성 / 비기계적 — 염증성은 "쉬면 악화·움직이면 완화"로 기계적과 정반대 축이라 따로 세운다
+const REL_MECH=['rest','flexRelief','extRelief','traction','heat','ice','posShift'];
+function mechanicalCall(d){
+  const rel=d.relieve||[],ag=d.aggravate||[],tm=d.timing||[];
+  if(!rel.length&&!ag.length)return null;
+  const hasReliever=rel.some(r=>REL_MECH.includes(r));
+  const inflam=rel.includes('moveWarm')&&(tm.includes('amStiffLong')||tm.includes('restNight'));
+  if(inflam)
+    return {k:'infl',t:'<b>염증성 패턴</b> — 쉬면 악화되고 움직이면 완화, 아침경직이 동반됩니다. <b>기계적 통증과 정반대 축</b>이라 도수·부하 조절만으로는 잡히지 않아요. 축성 척추관절염 등 염증성 질환을 먼저 감별하세요.'};
+  const noRelief=rel.includes('nothing')||(rel.includes('medOnly')&&!hasReliever);
+  if(noRelief&&!hasReliever&&(tm.includes('restNight')||d.trend==='worsening'))
+    return {k:'non',t:'<b>비기계적 패턴</b> — 어떤 자세·동작으로도 통증이 변하지 않고 완화 요인이 없습니다. 근골격성으로 설명되지 않는 조합이라 <b>염증·감염·종양·내장성 원인 배제를 먼저</b> 하세요.'};
+  if(ag.length&&hasReliever)
+    return {k:'mech',t:'<b>기계적 패턴</b> — 특정 동작에 악화되고 특정 자세에 완화됩니다. 근골격성 원인에 부합하는 기본 조건이에요.'};
+  if(ag.length&&!rel.length)
+    return {k:'mech',t:'<b>기계적 패턴(부분)</b> — 악화 동작은 뚜렷한데 완화 요인이 미입력입니다. 어떤 자세에서 편해지는지 확인하면 방향 선호(굴곡/신전)로 감별이 좁혀져요.'};
+  return null;
+}
+
 /* ───────── 나이 보정 회복 경향 ───────── */
-function recoveryNote(dominant,age){
+const TREND_NOTE={
+  worsening:'강도가 <b>증가 추세</b> — 예상 범위를 벗어날 수 있어요. 원인·병기 재평가와 악화 요인 확인이 먼저입니다.',
+  plateau:'강도가 <b>변화 없이 지속</b> — 예상 범위 안이라면 경과 관찰, 범위를 넘겼다면 치료 반응 재평가 시점이에요.',
+  easing:'강도가 <b>완화 추세</b> — 예상 범위 내 경과가 순조롭습니다.',
+  fluctuate:'강도의 <b>기복이 큼</b> — 총 기간이 늘어나기 쉬워요. 좋아졌을 때 부하가 다시 걸리는 재발 요인을 찾아보세요.',
+};
+function recoveryNote(dominant,age,trend){
   let mult=1,band='연령 미입력(청년 기준)';
   if(age>0){if(age<20){mult=0.6;band=`소아·청소년(${age}세)`;}else if(age<40){mult=1;band=`청년(${age}세)`;}else if(age<60){mult=1.5;band=`중년(${age}세)`;}else{mult=2.2;band=`노년(${age}세)`;}}
   const base={m:[2,4],j:[6,12],nv:[8,24]}[dominant];
   const label={m:'근·근막 — 혈류 풍부, 빠른 회복',j:'관절·관절낭/연부조직 — 지연~완고',nv:'신경근 — 재생 느림, 원인(디스크) 완고 가능'}[dominant];
   const fmt=(lo,hi)=>{lo*=mult;hi*=mult;return hi<=10?`${Math.round(lo)}~${Math.round(hi)}주`:`${Math.max(1,Math.round(lo/4.345))}~${Math.round(hi/4.345)}개월`;};
-  return {band,mult,label,range:fmt(base[0],base[1])};
+  return {band,mult,label,range:fmt(base[0],base[1]),trend:TREND_NOTE[trend]||''};
 }
 
 /* ───────── 요통 세부 감별 ───────── */
 function lumbagoDx(d){
   if(d.region!=='lumbar'&&d.region!=='sij')return [];
-  const out=[],ag=d.aggravate||[],pain=d.pain||[],nu=d.neuro||[],q=d.quality||[];
+  const out=[],ag=d.aggravate||[],pain=d.pain||[],nu=d.neuro||[],q=d.quality||[],rel=d.relieve||[];
   const flex=ag.includes('flexion'),ext=ag.includes('extension'),cough=ag.includes('coughSneeze'),posChange=ag.includes('posChange');
   const legRad=d.radiate==='lower'||q.includes('numb'),neuroSign=nu.includes('sensory')||nu.includes('motor')||nu.includes('tension');
   const acute=d.onsetTime==='acute';
+  const flexRel=rel.includes('flexRelief'),extRel=rel.includes('extRelief'),moveRel=rel.includes('moveWarm');
+
+  // ── 완화 방향 선호로 갈리는 감별 (악화 단독보다 특이도 높음) ──
+  if(ext&&flexRel)
+    out.push({w:'중등',n:'요추 척추관 협착증(신경인성 파행)',t:'신전 악화 + 숙이거나 앉으면 완화 = shopping cart sign — 카트 밀 때·자전거는 괜찮고 서서 걸으면 다리가 저린지 확인. 보행거리 문진, 고령 호발, MRI'});
+  if(legRad&&extRel)
+    out.push({w:'중등',n:'추간판성 — 신전 선호(McKenzie 중심화)',t:'엎드림·신전에서 다리 방사통이 허리 중심으로 당겨지면 예후 양호 신호. 신전 방향 반복 운동 + 굴곡 부하(앉기·숙임) 회피'});
+  if(legRad&&flexRel&&!ext)
+    out.push({w:'참고',n:'추간판 vs 협착 — 방향 선호 불일치',t:'하지 방사가 있는데 굴곡에서 편해짐 — 젊으면 후방 탈출보다 협착·외측함요부, 고령이면 협착 우선. 신전/굴곡 반복검사로 중심화 방향 재확인'});
+  if(moveRel&&(d.timing||[]).includes('amStiffLong'))
+    out.push({w:'중등',n:'염증성 요통 패턴(기계적과 반대)',t:'아침경직 30분+ · 움직이면 완화 · 쉬면 악화 — 기계적 요통과 정반대 축. 축성 척추관절염(강직성 척추염) 감별: HLA-B27·천장관절 MRI·야간통 반응'});
+  if(rel.includes('nothing')&&d.trend==='worsening')
+    out.push({w:'높음',n:'비기계적 진행성 요통',t:'완화 자세가 전혀 없음 + 강도 증가 추세 — 근골격성 조합이 아닙니다. 감염·종양·골절·내장성 배제 우선(영상·혈액검사)'});
+  // 직업성 추간판 부하 누적은 배경 조건이라 특수 감별(specialDx)에서 다룬다 — 여기 중복 금지
   if((d.onsetTrigger==='overuse'||d.onsetTrigger==='posture')&&!legRad&&!cough&&!(flex&&ext))
     out.push({w:'참고',n:'표층 근육성 요통(광배근·기립근)',t:'단순 근막성 — 3일~1주 회복 경향, 침·부항·도수로 단기 호전'});
   if(acute&&((flex&&ext)||posChange||cough)&&!legRad)
@@ -786,7 +895,8 @@ function lumbagoDx(d){
     out.push({w:'참고',n:'척추 분리·전방전위증(가능)',t:'신전 악화·불안정성(자세 변경 시 걸림) — 젊은 운동선수(협부결손)/노년 퇴행, 협착·방사 동반 가능. 기립 굴신 X-ray'});
   if(d.tender==='yes'&&!legRad)
     out.push({w:'참고',n:'근막통증증후군(트리거포인트)',t:'국소 압통점·연관통(QL·둔근·이상근 등), 저항/신장 시 재현 — 침·약침·이완'});
-  if((d.timing||[]).includes('restNight')&&!flex&&!ext&&!ag.includes('sidebend'))
+  // 움직이면 완화되면 염증성 방향이지 내장성이 아니므로 제외
+  if((d.timing||[]).includes('restNight')&&!flex&&!ext&&!ag.includes('sidebend')&&!moveRel)
     out.push({w:'중등',n:'내장성·비기계적 요통 감별',t:'자세·동작 무관·야간 지속 → 신장(결석·신우신염 CVA압통)·부인과·후복막·복부 대동맥류(박동성·고령흡연) 배제'});
   return out;
 }
@@ -797,7 +907,7 @@ function render(a){
   const d=a.d;
   document.getElementById('r-triage').innerHTML=(d.redflags||[]).length?`<div class="triage"><b>⚠ 진단 triage:</b> 레드플래그 ${d.redflags.length}건 — 근골격 감별에 앞서 <b>특이적 척추병변(감염·종양·골절·마미증후군)</b> 배제를 우선하세요.</div>`:'';
   if(a.sum===0){document.getElementById('r-title').textContent='입력 부족';document.getElementById('r-sub').innerHTML='<span class="muted">문진·진찰 항목을 채워주세요.</span>';
-    document.getElementById('r-bars').innerHTML='';document.getElementById('r-interp').innerHTML='';document.getElementById('r-struct').innerHTML='';document.getElementById('r-tests').innerHTML='';document.getElementById('r-level').innerHTML='';document.getElementById('r-chips').innerHTML='';document.getElementById('r-redflag-wrap').innerHTML='';document.getElementById('r-special-sec').style.display='none';document.getElementById('r-recovery-sec').style.display='none';document.getElementById('r-muscle-sec').style.display='none';document.getElementById('r-lumbago-sec').style.display='none';return;}
+    document.getElementById('r-bars').innerHTML='';document.getElementById('r-interp').innerHTML='';document.getElementById('r-struct').innerHTML='';document.getElementById('r-tests').innerHTML='';document.getElementById('r-level').innerHTML='';document.getElementById('r-chips').innerHTML='';document.getElementById('r-mech').innerHTML='';document.getElementById('r-redflag-wrap').innerHTML='';document.getElementById('r-special-sec').style.display='none';document.getElementById('r-recovery-sec').style.display='none';document.getElementById('r-muscle-sec').style.display='none';document.getElementById('r-lumbago-sec').style.display='none';return;}
   const domKo=CATKO[a.dominant];
   let lvl='';
   if(a.dominant==='nv'&&d.derm)lvl=' — '+LEVELKO[d.derm]+' 시사';
@@ -807,10 +917,13 @@ function render(a){
   // chips
   const chips=[];
   const REGKO={cervical:'경추',shoulder:'어깨',thoracic:'등',lumbar:'요추',sij:'천장',hip:'고관절',knee:'무릎',ankle:'발목',elbowwrist:'팔꿈치·손목'};
+  const TRENDKO={worsening:'악화 추세',plateau:'지속',easing:'완화 추세',fluctuate:'기복'};
   if(d.age>0)chips.push(`<span class="chip">${d.age}세${d.sex==='male'?'·남':d.sex==='female'?'·여':''}</span>`);
   if(d.bmi>0)chips.push(`<span class="chip">BMI ${d.bmi}</span>`);
   if(d.region)chips.push(`<span class="chip">${REGKO[d.region]}</span>`);
   if(d.derm)chips.push(`<span class="chip" style="color:var(--nerve)">${LEVELKO[d.derm]}</span>`);
+  if(d.nrs>0)chips.push(`<span class="chip">NRS ${d.nrs}/10</span>`);
+  if(d.trend)chips.push(`<span class="chip"${d.trend==='worsening'?' style="color:var(--warn)"':''}>${TRENDKO[d.trend]}</span>`);
   if(a.mixed)chips.push(`<span class="chip">혼재</span>`);
   document.getElementById('r-chips').innerHTML=chips.join('');
 
@@ -818,12 +931,18 @@ function render(a){
   const barRow=(cat,cls)=>`<div class="bar ${cls}"><div class="lb">${CATKO[cat].split('(')[0]}</div><div class="track"><div class="fill" style="width:${a.scores[cat]}%"></div></div><div class="pct">${a.scores[cat]}%</div></div>`;
   document.getElementById('r-bars').innerHTML=barRow('m','m')+barRow('j','j')+barRow('nv','nv');
 
-  // level box
-  document.getElementById('r-level').innerHTML=(a.dominant==='nv'&&d.derm)
-    ?`<div class="lvlbox"><b>신경근 레벨 추정: ${LEVELKO[d.derm]}</b><br>${LEVEL_DETAIL[d.derm]||''} — 해당 근절 근력·반사·감각 확인으로 확진.</div>`:'';
+  // level box — 신경근이 우세가 아니어도 비중이 남아 있으면 표시(협착처럼 관절 우세 + 신경근 증상인 경우)
+  const showLvl=d.derm&&(a.dominant==='nv'||a.scores.nv>=30);
+  document.getElementById('r-level').innerHTML=showLvl
+    ?`<div class="lvlbox"><b>신경근 레벨 추정: ${LEVELKO[d.derm]}</b>${a.dominant!=='nv'?` <span class="muted" style="font-size:12px">— ${CATKO[a.dominant].split('(')[0]} 우세이지만 신경근 비중 ${a.scores.nv}%</span>`:''}<br>${LEVEL_DETAIL[d.derm]||''} — 해당 근절 근력·반사·감각 확인으로 확진.</div>`:'';
+
+  // 기계적 / 비기계적
+  const mc=mechanicalCall(d);
+  document.getElementById('r-mech').innerHTML=mc?`<div class="mechbox ${mc.k}">${mc.t}</div>`:'';
 
   // 해석
   const I=[];
+  const rel=d.relieve||[],ag2=d.aggravate||[];
   if(a.dominant==='m')I.push('과사용·자세성 발병, 저항 수축/압통 우세 → <b>근·근막성</b> 통증 패턴');
   if(a.dominant==='j')I.push('아침경직·능동=수동 제한·체중부하 악화 → <b>관절·관절낭성</b> 패턴');
   if(a.dominant==='nv')I.push('피부분절 방사·저림/전기양·신경긴장검사 → <b>신경근성</b> 패턴');
@@ -831,6 +950,14 @@ function render(a){
   if(d.aggravate&&d.aggravate.includes('coughSneeze'))I.push('기침·재채기 악화 → 추간판성(경막 자극) 시사');
   if(d.aggravate&&d.aggravate.includes('extension')&&a.dominant==='j')I.push('신전 악화 → 후관절·협착 방향');
   if(d.aggravate&&d.aggravate.includes('flexion')&&a.dominant==='nv')I.push('굴곡 악화 → 추간판성 방향');
+  // 완화 방향 선호 — 악화 단독보다 감별력이 큰 축
+  if(rel.includes('flexRelief')&&ag2.includes('extension'))I.push('신전 악화 + 굴곡 완화 → <b>협착</b> 방향(shopping cart sign) — 보행거리·자전거 가능 여부 확인');
+  if(rel.includes('extRelief')&&(d.radiate==='lower'||d.radiate==='upper'))I.push('신전에서 방사통이 중심으로 당겨짐 → <b>추간판성·신전 선호(중심화)</b>, 예후 양호 신호');
+  if(rel.includes('traction')&&d.radiate==='upper')I.push('팔을 머리 위로 올리면 완화(shoulder abduction relief) → <b>경추 신경근</b> 특이 소견');
+  if(rel.includes('moveWarm'))I.push('움직이면 완화·쉬면 악화 → <b>염증성</b> 패턴, 기계적 요통과 정반대 축');
+  if(d.progression==='shrink')I.push('통증 범위가 좁아지는 중(중심화) → 신경근 자극이 물러나는 방향, 현재 관리 유지');
+  if(d.trend==='worsening'&&d.nrs>=7)I.push(`강도 증가 추세 + NRS ${d.nrs}/10 → 경과가 역행 중, 원인 재평가와 경고 소견 재확인`);
+  if((d.occupation||[]).length)I.push('직업·활동 배경 부하 입력됨 → 치료와 별개로 <b>재발 조건</b>이 남아 있는지 특수 감별에서 확인');
   if(a.mixed)I.push('상위 두 원인 점수 접근 — 확진 검사로 좁히세요');
   document.getElementById('r-interp').innerHTML=I.map(x=>`<li>${x}</li>`).join('')||'<li class="muted">부위·소견을 더 입력하면 정밀해집니다.</li>';
 
@@ -867,9 +994,9 @@ function render(a){
     document.getElementById('r-special').innerHTML=sh+`<p class="muted" style="font-size:12px;margin-top:4px">※ 연령·조건 호발 경향의 감별 가능성입니다(확진 아님). MS·ALS·길랑-바레 등 중대 신경질환 의심 시 신경과 의뢰.</p>`;
   }else ss.style.display='none';
   // 예상 회복 경향(조직·연령 매트릭스)
-  const rec=recoveryNote(a.dominant,d.age);const rs=document.getElementById('r-recovery-sec');
+  const rec=recoveryNote(a.dominant,d.age,d.trend);const rs=document.getElementById('r-recovery-sec');
   rs.style.display='';
-  document.getElementById('r-recovery').innerHTML=`<div class="recbox"><b>${rec.label}</b><br>예상 회복 <b>${rec.range}</b> · ${rec.band}${rec.mult!==1?' ×'+rec.mult:''}</div><p class="muted" style="font-size:12px;margin-top:6px">※ 조직·연령 매트릭스 기반 일반 범위(중등도). 손상 조직·병기·개인차로 달라집니다.</p>`;
+  document.getElementById('r-recovery').innerHTML=`<div class="recbox"><b>${rec.label}</b><br>예상 회복 <b>${rec.range}</b> · ${rec.band}${rec.mult!==1?' ×'+rec.mult:''}${rec.trend?`<br><span style="display:inline-block;margin-top:6px">${rec.trend}</span>`:''}</div><p class="muted" style="font-size:12px;margin-top:6px">※ 조직·연령 매트릭스 기반 일반 범위(중등도). 손상 조직·병기·개인차로 달라집니다.</p>`;
 
   // 레드플래그
   const rf=d.redflags;
@@ -881,7 +1008,7 @@ function showResult(){document.getElementById('inputScreen').style.display='none
 function showInput(){document.getElementById('result').classList.remove('show');document.getElementById('inputScreen').style.display='';window.scrollTo({top:0,behavior:'smooth'});}
 document.getElementById('run').onclick=()=>{render(analyze(collect()));showResult();};
 document.getElementById('back').onclick=showInput;document.getElementById('back2').onclick=showInput;
-document.getElementById('reset').onclick=()=>{document.querySelectorAll('input').forEach(i=>{if(i.type==='number')i.value='';else i.checked=false;});document.querySelectorAll('.opt.on').forEach(o=>o.classList.remove('on'));document.querySelectorAll('.card.filled').forEach(c=>c.classList.remove('filled'));document.getElementById('dermField').style.display='none';populateMuscleTests();showInput();};
+document.getElementById('reset').onclick=()=>{document.querySelectorAll('input').forEach(i=>{if(i.type==='number')i.value='';else if(i.type==='range'){i.value=0;}else i.checked=false;});document.getElementById('nrsVal').textContent='0';document.querySelectorAll('.opt.on').forEach(o=>o.classList.remove('on'));document.querySelectorAll('.card.filled').forEach(c=>c.classList.remove('filled'));document.getElementById('dermField').style.display='none';populateMuscleTests();showInput();};
 document.getElementById('print').onclick=()=>window.print();
 </script>
 </body>
