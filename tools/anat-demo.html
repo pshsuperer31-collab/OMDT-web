@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<title>OMDT 해부 도해 시안 — 어깨·상배부 후면</title>
+<style>
+  :root{--navy:#002D62;--navy-soft:#4A5A8C;--gold:#FFD700;--line:#e3e6ee;--ink:#1c2333;--muted:#69728a;--muscle:#1d9e75}
+  body{margin:0;background:#f5f6f8;color:var(--ink);font-family:system-ui,"Malgun Gothic",sans-serif;line-height:1.6}
+  .wrap{max-width:860px;margin:0 auto;padding:24px 18px 60px}
+  h1{font-size:18px;color:var(--navy);text-align:center;margin:0 0 4px}
+  .sub{text-align:center;color:var(--muted);font-size:12.5px;margin:0 0 18px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-bottom:14px}
+  .split{display:grid;grid-template-columns:1fr 260px;gap:18px;align-items:start}
+  @media(max-width:720px){.split{grid-template-columns:1fr}}
+  svg{width:100%;height:auto;display:block}
+  .legend{display:flex;justify-content:center;gap:16px;font-size:11.5px;color:var(--muted);margin-top:6px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+  .cand h3{margin:0 0 8px;font-size:13px;color:var(--navy);text-align:center}
+  .cand button{display:block;width:100%;text-align:left;margin-bottom:5px;padding:8px 11px;border:1.5px solid var(--line);
+    background:#fbfcfe;border-radius:10px;font:inherit;font-size:12.5px;cursor:pointer;color:#3a4260;transition:.12s}
+  .cand button:hover{border-color:var(--navy-soft)}
+  .cand button.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+  .cand button .sc{float:right;opacity:.7;font-size:11px}
+  .cand .star{color:var(--gold)}
+  .note{font-size:12px;color:var(--muted);margin-top:10px;text-align:center}
+  /* 근육 기본 / 강조 */
+  .mus{fill:#d9b4ae;stroke:#a97b74;stroke-width:1;transition:fill .18s,stroke .18s}
+  .mus.clickable:hover{fill:#c99a92;cursor:pointer}
+  .mus.hi{fill:#c0392b;stroke:#7e2318;stroke-width:1.4}
+  .mus.hi.top{fill:#a8281c;stroke:var(--gold);stroke-width:2.2}
+  .bone{fill:#eceae4;stroke:#b9b4a8;stroke-width:1}
+  .skin{fill:#f6ece8;stroke:#d8c3bc;stroke-width:1}
+  .tendon{fill:#f0e9dd;stroke:#c3b8a4;stroke-width:.8}
+  .lbl{font-size:9px;fill:#5d4540;font-weight:600;pointer-events:none}
+  .side{font-size:10px;fill:var(--navy-soft);font-weight:800;letter-spacing:.05em}
+  .mid{stroke:#c9bdb8;stroke-width:1;stroke-dasharray:4 4}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>OMDT 해부 도해 시안 — 어깨 · 상배부 후면</h1>
+  <p class="sub">좌측 = 천층(superficial) · 우측 = 심층(deep) · 근육 후보를 누르면 해당 근육이 표시됩니다</p>
+
+  <div class="card">
+    <div class="split">
+      <div>
+        <svg viewBox="0 0 420 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="어깨 상배부 후면 근육 도해">
+          <!-- 몸통 실루엣 -->
+          <path class="skin" d="M172,96 C150,104 132,116 124,132 C112,164 108,206 110,248 L116,300 C122,336 130,360 138,382 L282,382 C290,360 298,336 304,300 L310,248 C312,206 308,164 296,132 C288,116 270,104 248,96 Z"/>
+          <!-- 목·머리 -->
+          <ellipse class="skin" cx="210" cy="46" rx="33" ry="38"/>
+          <path class="skin" d="M188,72 L188,104 C196,110 224,110 232,104 L232,72 Z"/>
+          <!-- 팔 -->
+          <path class="skin" d="M124,130 C106,152 98,196 100,238 L102,286 L126,288 L130,240 C134,198 138,158 144,134 Z"/>
+          <path class="skin" d="M296,130 C314,152 322,196 320,238 L318,286 L294,288 L290,240 C286,198 282,158 276,134 Z"/>
+          <!-- 정중선 -->
+          <line class="mid" x1="210" y1="88" x2="210" y2="378"/>
+
+          <!-- ═══ 우측(그림 기준) = 심층 ═══ -->
+          <!-- 견갑골 -->
+          <path class="bone" d="M248,140 L304,152 L296,196 L266,244 L252,196 Z"/>
+          <line x1="250" y1="168" x2="302" y2="176" stroke="#b9b4a8" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- 견갑거근 -->
+          <path class="mus" data-m="견갑거근" d="M214,88 C228,100 242,122 250,142 L262,137 C252,113 236,92 220,82 Z"/>
+          <!-- 능형근 -->
+          <path class="mus" data-m="능형근" d="M214,118 L214,192 L264,210 L250,146 Z"/>
+          <!-- 극상근 -->
+          <path class="mus" data-m="극상근" d="M254,150 C272,146 292,150 304,158 L300,170 C284,162 268,160 252,161 Z"/>
+          <!-- 극하근 -->
+          <path class="mus" data-m="극하근" d="M254,178 C274,174 296,182 304,196 C298,214 276,224 258,220 L252,198 Z"/>
+          <!-- 소원근 -->
+          <path class="mus" data-m="소원근" d="M260,224 C276,224 292,218 300,208 L305,220 C297,232 279,240 263,238 Z"/>
+          <!-- 대원근 -->
+          <path class="mus" data-m="대원근" d="M264,242 C282,244 298,238 306,228 L312,242 C302,258 282,266 266,262 Z"/>
+
+          <!-- ═══ 좌측(그림 기준) = 천층 ═══ -->
+          <!-- 상부승모근 -->
+          <path class="mus" data-m="상부승모근" d="M206,86 C194,90 178,100 160,112 C144,122 132,132 124,140 L138,154 C160,142 184,126 200,112 L206,104 Z"/>
+          <!-- 중부승모근 -->
+          <path class="mus" data-m="중부승모근" d="M206,116 L206,168 L150,160 L138,148 Z"/>
+          <!-- 하부승모근 -->
+          <path class="mus" data-m="하부승모근" d="M206,172 L206,262 L154,172 L148,164 Z"/>
+          <!-- 광배근 -->
+          <path class="mus" data-m="광배근" d="M206,258 L206,320 L164,338 C150,306 140,254 138,204 L143,188 C152,222 172,246 206,258 Z"/>
+          <!-- 후삼각근 -->
+          <path class="mus" data-m="삼각근(후)" d="M128,132 C110,146 104,170 108,196 C118,206 134,206 144,196 C150,170 146,144 140,132 Z"/>
+          <!-- 흉요근막 -->
+          <path class="tendon" d="M206,262 L206,330 L168,340 C160,316 156,290 154,268 Z" opacity=".55"/>
+
+          <!-- 라벨 -->
+          <text class="side" x="118" y="26">천층 SUPERFICIAL</text>
+          <text class="side" x="248" y="26">심층 DEEP</text>
+          <text class="lbl" x="150" y="122">상부승모근</text>
+          <text class="lbl" x="160" y="146">중부승모근</text>
+          <text class="lbl" x="166" y="206">하부승모근</text>
+          <text class="lbl" x="146" y="286">광배근</text>
+          <text class="lbl" x="104" y="176">삼각근(후)</text>
+          <text class="lbl" x="222" y="112">견갑거근</text>
+          <text class="lbl" x="222" y="176">능형근</text>
+          <text class="lbl" x="278" y="146">극상근</text>
+          <text class="lbl" x="278" y="200">극하근</text>
+          <text class="lbl" x="282" y="232">소원근</text>
+          <text class="lbl" x="286" y="256">대원근</text>
+        </svg>
+        <div class="legend">
+          <span><i style="background:#d9b4ae;border:1px solid #a97b74"></i>일반</span>
+          <span><i style="background:#c0392b"></i>관여 후보</span>
+          <span><i style="background:#a8281c;border:2px solid #FFD700"></i>최다 매칭 ★</span>
+          <span><i style="background:#eceae4;border:1px solid #b9b4a8"></i>골</span>
+        </div>
+      </div>
+
+      <div class="cand">
+        <h3>관여 근육 후보</h3>
+        <p style="font-size:11.5px;color:var(--muted);margin:0 0 8px;text-align:center">
+          예시: 상완 <b>신전+내전+외회전</b>,<br>통증 위치 <b>후방·견갑하각</b>
+        </p>
+        <button data-m="대원근" class="on">대원근 <span class="star">★</span><span class="sc">3.0</span></button>
+        <button data-m="광배근" class="on">광배근 <span class="star">★</span><span class="sc">3.0</span></button>
+        <button data-m="극하근" class="on">극하근<span class="sc">2.0</span></button>
+        <button data-m="소원근" class="on">소원근<span class="sc">2.0</span></button>
+        <button data-m="삼각근(후)">삼각근(후)<span class="sc">1.5</span></button>
+        <button data-m="능형근">능형근<span class="sc">1.0</span></button>
+        <button data-m="하부승모근">하부승모근<span class="sc">1.0</span></button>
+        <p class="note">버튼을 눌러 켜고 끄기 —<br>실제로는 OMDT의 muscleCandidates<br>점수가 그대로 연결됩니다.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const TOP=['대원근','광배근'];
+function sync(){
+  document.querySelectorAll('.mus').forEach(p=>p.classList.remove('hi','top'));
+  document.querySelectorAll('.cand button.on').forEach(b=>{
+    const n=b.dataset.m;
+    document.querySelectorAll(`.mus[data-m="${n}"]`).forEach(p=>{
+      p.classList.add('hi'); if(TOP.includes(n))p.classList.add('top');
+    });
+  });
+}
+document.querySelectorAll('.cand button').forEach(b=>b.onclick=()=>{b.classList.toggle('on');sync();});
+// 후보 목록에 있는 근육만 그림에서 클릭 가능 — 없는 근육은 커서도 안 바뀌게
+document.querySelectorAll('.mus').forEach(p=>{
+  const b=document.querySelector(`.cand button[data-m="${p.dataset.m}"]`);
+  if(!b)return;
+  p.classList.add('clickable');
+  p.onclick=()=>{b.classList.toggle('on');sync();};
+});
+sync();
+</script>
+</body>
+</html>

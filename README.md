@@ -10,6 +10,20 @@ O*ST 패밀리(OMST·ODST·OFST·OGST·OPST)의 근골격 감별 트랙. 자세 
 
 별도 서버·설치 없이 동작하는 **단일 HTML 파일**. `index.html`을 브라우저에서 열면 됩니다(오프라인·무전송).
 
+## 저장소 구성
+
+```
+index.html            배포되는 앱 (단일 HTML, 자립)
+tools/                원내 작업용 도구 — 배포 제외 (.vercelignore)
+  dx-input.html         진단 데이터 입력·검수 (근육 / 신경 / 인대)
+  calib.html            해부 그림 위 근육 좌표 찍기
+  highlight-demo.html   좌표 → 표식 점등 데모
+  CAPTURE-LIST.html     Z-Anatomy 캡처 체크리스트
+img/                  해부 이미지 (로컬 캡처, git 추적 제외 · 좌표 JSON만 추적)
+```
+
+`tools/`는 `.vercelignore`로 업로드에서 빠지고, `vercel.json` 리다이렉트로도 한 번 더 막습니다.
+
 ## 진단 흐름 (문진 → 진찰 → 감별)
 
 **입력 (아코디언 스크리닝)**

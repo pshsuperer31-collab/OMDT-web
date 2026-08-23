@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<title>OMDT 근육 하이라이트 데모 — 상체 후면</title>
+<style>
+  :root{--navy:#002D62;--navy-soft:#4A5A8C;--gold:#FFD700;--line:#e3e6ee;--ink:#1c2333;--muted:#69728a;--muscle:#1d9e75}
+  body{margin:0;background:#f5f6f8;color:var(--ink);font-family:system-ui,"Malgun Gothic",sans-serif;line-height:1.6}
+  .wrap{max-width:900px;margin:0 auto;padding:22px 18px 60px}
+  h1{font-size:17px;color:var(--navy);text-align:center;margin:0 0 2px}
+  .sub{text-align:center;color:var(--muted);font-size:12px;margin:0 0 16px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+  .split{display:grid;grid-template-columns:1fr 250px;gap:20px;align-items:start}
+  @media(max-width:720px){.split{grid-template-columns:1fr}}
+  .stage{position:relative;width:100%;background:#fbfcfe;border-radius:12px;overflow:hidden}
+  .stage img{width:100%;display:block}
+  .stage svg{position:absolute;inset:0;width:100%;height:100%}
+  .layerbtns{display:flex;gap:8px;justify-content:center;margin-bottom:10px}
+  .layerbtns button{flex:1;max-width:130px;padding:8px 0;border:1.5px solid var(--line);background:#fbfcfe;border-radius:10px;
+    font:inherit;font-size:12.5px;font-weight:700;color:#3a4260;cursor:pointer;transition:.12s}
+  .layerbtns button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .cand h3{margin:0 0 4px;font-size:13px;color:var(--navy);text-align:center}
+  .cand .qz{font-size:11.5px;color:var(--muted);text-align:center;margin:0 0 10px;line-height:1.4}
+  .cand button{display:block;width:100%;text-align:left;margin-bottom:5px;padding:8px 11px;border:1.5px solid var(--line);
+    background:#fbfcfe;border-radius:10px;font:inherit;font-size:12.5px;cursor:pointer;color:#3a4260;transition:.12s}
+  .cand button:hover{border-color:var(--navy-soft)}
+  .cand button.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+  .cand button .sc{float:right;opacity:.65;font-size:11px;font-weight:400}
+  .cand button .star{color:var(--gold)}
+  .cand button.on .star{color:var(--gold)}
+  .cand button .ly{font-size:10px;opacity:.6;margin-left:5px}
+  .note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5;padding-top:10px;border-top:1px solid var(--line)}
+  .legend{display:flex;justify-content:center;gap:14px;font-size:11px;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+  /* 하이라이트 */
+  .hl{fill:#c0392b;opacity:0;mix-blend-mode:multiply;transition:opacity .22s;pointer-events:none}
+  .hl.on{opacity:.62}
+  .hl.top{fill:#a01d10}
+  .hlstroke{fill:none;stroke:var(--gold);stroke-width:0;opacity:0;transition:opacity .22s;pointer-events:none;mix-blend-mode:normal}
+  .hlstroke.on{opacity:.9;stroke-width:2.5}
+  .hit{fill:transparent;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>OMDT 근육 하이라이트 데모 — 상체 후면</h1>
+  <p class="sub">문진 결과의 관여 근육이 그림에 붉게 표시됩니다 · 천층/심층 전환</p>
+  <div class="card">
+    <div class="split">
+      <div>
+        <div class="layerbtns">
+          <button id="btnSuper" class="on">천층 (겉)</button>
+          <button id="btnDeep">심층 (속)</button>
+        </div>
+        <div class="stage">
+          <img id="bg" src="../img/back-upper-super.png" alt="상체 후면"/>
+          <svg id="ov" viewBox="0 0 772 873" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="legend">
+          <span><i style="background:#c0392b"></i>관여 근육</span>
+          <span><i style="background:#a01d10;border:2px solid #FFD700"></i>최다 매칭 ★</span>
+        </div>
+      </div>
+      <div class="cand">
+        <h3>관여 근육 후보</h3>
+        <p class="qz">예시 문진: 상완 <b>신전+내전+외회전</b>,<br>통증 <b>후방·견갑 하각</b></p>
+        <div id="list"></div>
+        <p class="note">근육 위치는 <b>1차 근사값</b>이에요. 방향 확인용이라 실제 경계와 조금 다를 수 있고, 원장님이 보시고 조정하면 정밀해집니다. 버튼을 누르면 해당 근육이 있는 층으로 자동 전환돼요.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── 이미지별 viewBox(픽셀) ── */
+const LAYER={
+  super:{img:'../img/back-upper-super.png',vb:'0 0 772 873',cx:386},
+  deep :{img:'../img/back-upper-deep.png', vb:'0 0 763 901',cx:381},
+};
+/* ── 근육 폴리곤: 좌측만 정의, 우측은 중심 반사로 자동 생성 ──
+   central:true 면 반사 안 함(정중부). 좌표는 각 이미지 픽셀 기준(1차 근사) ── */
+const MUS={
+  // 천층
+  '상부승모근':{layer:'super',pts:'365,450 250,478 150,565 285,600 372,515'},
+  '중부승모근':{layer:'super',pts:'378,532 258,560 262,635 378,645'},
+  '하부승모근':{layer:'super',pts:'380,632 305,650 385,772 466,650'},
+  '삼각근(후)':{layer:'super',pts:'150,548 55,608 78,706 168,692 172,600'},
+  '광배근':{layer:'super',pts:'262,655 130,720 156,862 384,860 384,700'},
+  // 심층
+  '견갑거근':{layer:'deep',pts:'358,300 336,342 300,472 278,536 322,530 360,432 366,342'},
+  '능형근':{layer:'deep',pts:'376,545 292,562 300,692 380,700'},
+  '극상근':{layer:'deep',pts:'332,560 236,566 250,596 336,590'},
+  '극하근':{layer:'deep',pts:'332,602 212,616 236,686 332,676'},
+  '소원근':{layer:'deep',pts:'332,676 300,700 356,712 356,686'},
+  '대원근':{layer:'deep',pts:'326,700 280,722 322,752 362,730'},
+  '두경판상근':{layer:'deep',pts:'376,286 340,300 320,462 362,456 379,320'},
+  '후두하근':{layer:'deep',central:true,pts:'350,250 336,292 381,298 426,292 412,250 381,240'},
+};
+/* ── 예시 문진 후보(어깨 후면 쿼리) ── */
+const CANDS=[
+  {n:'대원근',score:3.0,top:true},
+  {n:'광배근',score:3.0,top:true},
+  {n:'극하근',score:2.0},
+  {n:'소원근',score:2.0},
+  {n:'삼각근(후)',score:1.5},
+  {n:'능형근',score:1.0},
+  {n:'하부승모근',score:1.0},
+];
+const LAYKO={super:'천층',deep:'심층'};
+
+let cur='super';
+const on=new Set(); // 켜진 근육명
+
+function reflect(pts,cx){return pts.trim().split(/\s+/).map(p=>{const[x,y]=p.split(',').map(Number);return (2*cx-x)+','+y;}).join(' ');}
+
+function buildOverlay(){
+  const ov=document.getElementById('ov');const L=LAYER[cur];
+  ov.setAttribute('viewBox',L.vb);
+  let html='';
+  for(const[name,m] of Object.entries(MUS)){
+    if(m.layer!==cur)continue;
+    const top=CANDS.find(c=>c.n===name)?.top;
+    const cls='hl'+(top?' top':'');
+    const sides=m.central?[m.pts]:[m.pts,reflect(m.pts,L.cx)];
+    sides.forEach((p,i)=>{
+      html+=`<polygon class="${cls}" data-m="${name}" data-side="${i}" points="${p}"/>`;
+      html+=`<polygon class="hlstroke" data-ms="${name}" data-side="${i}" points="${p}"/>`;
+      html+=`<polygon class="hit" data-hit="${name}" points="${p}"/>`;
+    });
+  }
+  ov.innerHTML=html;
+  ov.querySelectorAll('.hit').forEach(h=>h.onclick=()=>toggle(h.dataset.hit));
+  syncHl();
+}
+function syncHl(){
+  document.querySelectorAll('#ov .hl').forEach(p=>p.classList.toggle('on',on.has(p.dataset.m)));
+  document.querySelectorAll('#ov .hlstroke').forEach(p=>{
+    const isTop=CANDS.find(c=>c.n===p.dataset.ms)?.top;
+    p.classList.toggle('on',!!(on.has(p.dataset.ms)&&isTop));
+  });
+}
+function setLayer(l){
+  if(cur===l)return;cur=l;
+  document.getElementById('bg').src=LAYER[l].img;
+  document.getElementById('btnSuper').classList.toggle('on',l==='super');
+  document.getElementById('btnDeep').classList.toggle('on',l==='deep');
+  buildOverlay();
+}
+function toggle(name){
+  if(on.has(name))on.delete(name);else{
+    on.add(name);
+    const need=MUS[name]?.layer;              // 해당 근육이 있는 층으로 자동 전환
+    if(need&&need!==cur){setLayer(need);return;}
+  }
+  syncHl();syncList();
+}
+function syncList(){
+  document.querySelectorAll('#list button').forEach(b=>b.classList.toggle('on',on.has(b.dataset.m)));
+}
+function buildList(){
+  document.getElementById('list').innerHTML=CANDS.map(c=>{
+    const ly=MUS[c.n]?.layer;
+    return `<button data-m="${c.n}">${c.n}${c.top?' <span class="star">★</span>':''}<span class="ly">${LAYKO[ly]||''}</span><span class="sc">${c.score.toFixed(1)}</span></button>`;
+  }).join('');
+  document.querySelectorAll('#list button').forEach(b=>b.onclick=()=>toggle(b.dataset.m));
+}
+document.getElementById('btnSuper').onclick=()=>setLayer('super');
+document.getElementById('btnDeep').onclick=()=>setLayer('deep');
+buildList();buildOverlay();
+// 시작 시 ★ 후보 자동 강조
+CANDS.filter(c=>c.top).forEach(c=>on.add(c.n));
+syncHl();syncList();
+</script>
+</body>
+</html>

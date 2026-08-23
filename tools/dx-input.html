@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>OMDT 근육 진단 데이터 입력</title>
+<style>
+  :root{--navy:#002D62;--navy-soft:#4A5A8C;--gold:#FFD700;--line:#e3e6ee;--ink:#1c2333;--muted:#69728a;--muscle:#1d9e75;--warn:#C4546B;--con:#3f7bd6;--str:#c2703a}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f5f6f8;color:var(--ink);font-family:system-ui,"Malgun Gothic",sans-serif;line-height:1.5}
+  .wrap{max-width:1060px;margin:0 auto;padding:16px 16px 60px}
+  h1{font-size:17px;color:var(--navy);text-align:center;margin:0 0 2px}
+  .sub{text-align:center;color:var(--muted);font-size:12px;margin:0 0 12px}
+  .topbar{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .topbar select{padding:8px 12px;border:1.5px solid var(--navy);border-radius:10px;font:inherit;font-size:13px;font-weight:700;color:var(--navy);background:#fff;cursor:pointer}
+  .topbar .stat{font-size:11.5px;color:var(--muted)}
+  .langsw{display:inline-flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden}
+  .langsw button{border:0;background:#fff;font:inherit;font-size:11.5px;font-weight:700;color:#3a4260;padding:6px 10px;cursor:pointer}
+  .langsw button.on{background:var(--navy);color:#fff}
+  .typesw{display:inline-flex;border:1.5px solid var(--muscle);border-radius:8px;overflow:hidden}
+  .typesw button{border:0;background:#fff;font:inherit;font-size:12.5px;font-weight:700;color:#3a4260;padding:7px 14px;cursor:pointer}
+  .typesw button.on{background:var(--muscle);color:#fff}
+  .split{display:grid;grid-template-columns:230px 1fr;gap:16px;align-items:start}
+  @media(max-width:780px){.split{grid-template-columns:1fr}}
+  .mlist{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;max-height:78vh;overflow:auto}
+  .mlist button{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;margin-bottom:4px;padding:7px 10px;border:1.5px solid var(--line);background:#fbfcfe;border-radius:9px;font:inherit;font-size:12.5px;cursor:pointer;color:#3a4260}
+  .mlist button.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+  .mlist button.done{border-color:var(--muscle)}
+  .mlist button.done .tk{color:var(--muscle)}
+  .mlist button.on.done .tk{color:var(--gold)}
+  .mlist .tk{font-size:11px;opacity:.85}
+  .form{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .form.empty{color:var(--muted);text-align:center;padding:50px 20px}
+  .form h2{margin:0 0 2px;font-size:18px;color:var(--navy)}
+  .form .reg{font-size:12px;color:var(--muted);margin-bottom:14px}
+  .fld{margin-bottom:15px}
+  .fld>label{display:block;font-weight:700;font-size:12.5px;color:#2a3350;margin-bottom:6px}
+  .fld>label .h{font-weight:400;color:var(--muted);font-size:11px}
+  .fld input[type=text],.fld textarea{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;font-size:12.5px;color:var(--ink)}
+  .fld textarea{resize:vertical;min-height:52px}
+  .fld input:focus,.fld textarea:focus{outline:none;border-color:var(--navy-soft)}
+  .moves{display:flex;flex-wrap:wrap;gap:6px}
+  .moves label{border:1.5px solid var(--line);border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer;user-select:none;color:#3a4260;background:#fbfcfe}
+  .moves label input{display:none}
+  .moves.con label.on{background:var(--con);border-color:var(--con);color:#fff;font-weight:700}
+  .moves.str label.on{background:var(--str);border-color:var(--str);color:#fff;font-weight:700}
+  .moves.seg label{min-width:34px;justify-content:center;text-align:center}
+  .moves.seg label.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:620px){.twocol{grid-template-columns:1fr}}
+  .conlab{color:var(--con)} .strlab{color:var(--str)}
+  .actions{display:flex;gap:8px;margin-top:6px}
+  .actions button{flex:1;padding:10px 0;border:0;border-radius:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+  .btn-save{background:var(--muscle);color:#fff}
+  .btn-exp{background:var(--navy);color:#fff}
+  textarea#out{width:100%;margin-top:10px;height:120px;font-family:ui-monospace,monospace;font-size:11px;display:none}
+  .muscimg-wrap{position:relative;width:100%;max-width:330px;margin:0 auto 15px;background:#fbfcfe;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .muscimg-wrap img{width:100%;display:block}
+  .muscimg-wrap svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+  .muscimg-wrap .mg-cap{position:absolute;left:0;right:0;bottom:0;background:rgba(0,45,98,.82);color:#fff;font-size:11.5px;font-weight:700;text-align:center;padding:4px}
+  .mg-glow{fill:var(--warn);opacity:.5;mix-blend-mode:multiply}
+  .mg-pin{fill:#a01d10;stroke:var(--gold);stroke-width:2.5}
+  .mg-lead{stroke:var(--warn);stroke-width:1.5;opacity:.7}
+  .mg-lb{font-size:13px;font-weight:800;fill:#8a1a10;paint-order:stroke;stroke:#fff;stroke-width:3.5px}
+  .noimg{max-width:330px;margin:0 auto 14px;padding:12px 14px;border:1px dashed var(--line);border-radius:10px;background:#fafbfc;color:var(--muted);font-size:11.5px;text-align:center;line-height:1.5}
+  .rootbox{background:#eef7fc;border:1px solid #cfe6f5;border-left:4px solid var(--con);border-radius:0 10px 10px 0;padding:10px 13px;margin-bottom:15px}
+  .rootbox .rt-h{font-weight:800;font-size:12.5px;color:#1d6b9e;margin-bottom:4px}
+  .rootbox .rt-tx{font-size:12.5px;color:#123f5e;line-height:1.5}
+  .rootbox .rt-d{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .okrow{display:flex;align-items:center;gap:7px;font-size:13px;padding:9px 11px;background:#f0f9f4;border:1px solid #cdeadb;border-radius:9px;cursor:pointer;margin-top:4px}
+  .okrow input{width:16px;height:16px}
+  .saved{font-size:11px;color:var(--muscle);text-align:center;height:14px;margin-top:4px}
+  .note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>OMDT 근육 진단 데이터 입력</h1>
+  <p class="sub">근육 고르고 → 진단 정보 입력 · 자동 저장 · 부분만 채워도 됨</p>
+  <div class="topbar">
+    <span class="typesw" id="typesw"><button data-t="muscle" class="on">근육</button><button data-t="nerve">신경</button><button data-t="lig">인대</button></span>
+    <select id="regSel"></select>
+    <span class="langsw" id="langsw"><button data-l="ko" class="on">한글</button><button data-l="en">EN</button><button data-l="ab">약어</button></span>
+    <span class="stat" id="stat"></span>
+    <button class="btn-exp" id="btnExport" style="padding:7px 12px;border-radius:9px;border:0;color:#fff;background:var(--navy);cursor:pointer;font:inherit;font-weight:700;font-size:12px">📋 복사</button>
+    <button class="btn-save" id="btnSave" style="padding:7px 12px;border-radius:9px;border:0;color:#fff;background:var(--muscle);cursor:pointer;font:inherit;font-weight:700;font-size:12px">💾 전체 저장</button>
+  </div>
+  <div class="split">
+    <div class="mlist" id="mlist"></div>
+    <div class="form empty" id="form">← 왼쪽에서 근육을 선택하세요</div>
+  </div>
+  <textarea id="out" readonly></textarea>
+  <p class="note">모든 항목 선택 입력이에요 — 아는 것부터 채우시면 됩니다. 자동 저장되고, 다 하시면 <b>💾 전체 저장</b>으로 <b>omdt-dx.json</b> 받아 채팅에 올려주세요.</p>
+</div>
+
+<script>
+/* 부위별 동작 어휘 (MDB 기준) */
+const MOVES={
+  cervical:['굴곡','신전','좌회전','우회전','좌측굴','우측굴'],
+  thoracic:['굴곡','신전','좌회전','우회전','좌측굴','우측굴'],
+  lumbar:['굴곡','신전','좌회전','우회전','좌측굴','우측굴'],
+  shoulder:['굴곡','신전','외전','내전','외회전','내회전','수평내전','견갑후인','견갑전인','견갑거상','견갑하강'],
+  elbowwrist:['손목신전','손목굴곡','팔꿈치굴곡','팔꿈치신전','회외','회내'],
+  hip:['굴곡','신전','외전','내전','외회전','내회전'],
+  sij:['고관절신전','고관절굴곡','외전','내전','외회전','내회전'],
+  knee:['신전','굴곡','경골내회전','경골외회전'],
+  ankle:['족저굴','족배굴','내번','외번'],
+};
+/* 부위별 근육 목록 (MDB·MUSCLE_TESTS 기준) */
+const MUSCLES={
+  cervical:['흉쇄유돌근(SCM)','상부승모근','견갑거근','전사각근','중사각근','후사각근','두판상근','경판상근','두반극근','경반극근','후두하근','경장근·두장근','경다열근'],
+  shoulder:['극상근','극하근','소원근','견갑하근','대원근','광배근','대흉근','삼각근(전)','삼각근(중)','삼각근(후)','상완이두','삼두(장두)','능형근','중부승모근','하부승모근','상부승모근','견갑거근','전거근','소흉근'],
+  elbowwrist:['손목신전근군','손목굴곡근군','상완이두','상완근','상완삼두','회외근','원회내근'],
+  thoracic:['흉추기립근','다열근·회선근','반극근','늑간근·늑골거근','능형근·중부승모근','전거근(후하)'],
+  lumbar:['척추기립근','다열근·회선근','요방형근','복사근','복직근','장요근'],
+  sij:['대둔근','중둔근','이상근','햄스트링 기시부','요방형근','다열근(요천추)'],
+  hip:['장요근','대퇴직근','봉공근','내전근군','중둔근','대퇴근막장근','대둔근','햄스트링','이상근·심부외회전근'],
+  knee:['대퇴사두','슬개건','햄스트링','비복근','거위발건','슬와근','장경인대','대퇴이두'],
+  ankle:['비복근·가자미근','아킬레스건','후경골근','전경골근','장·단비골근','족저근막·내재근','장무지굴근'],
+};
+const REGKO={cervical:'경추·목',shoulder:'어깨',elbowwrist:'팔꿈치·손목',thoracic:'등·흉추',lumbar:'허리·요추',sij:'둔부·천장',hip:'고관절',knee:'무릎',ankle:'발목·발'};
+/* 이름 레지스트리: 한글(내부키) → 영문(TA)·약어(통용만). 없으면 한글로 폴백 */
+const NAMES={
+ '흉쇄유돌근(SCM)':{en:'Sternocleidomastoid',ab:'SCM'},
+ '상부승모근':{en:'Trapezius (upper)',ab:'UT'},'중부승모근':{en:'Trapezius (middle)',ab:'MT'},'하부승모근':{en:'Trapezius (lower)',ab:'LT'},
+ '견갑거근':{en:'Levator scapulae',ab:'LS'},
+ '전사각근':{en:'Scalenus anterior',ab:'AS'},'중사각근':{en:'Scalenus medius',ab:'MS'},'후사각근':{en:'Scalenus posterior',ab:'PS'},
+ '두판상근':{en:'Splenius capitis',ab:''},'경판상근':{en:'Splenius cervicis',ab:''},
+ '두반극근':{en:'Semispinalis capitis',ab:''},'경반극근':{en:'Semispinalis cervicis',ab:''},
+ '후두하근':{en:'Suboccipitals',ab:''},'경장근·두장근':{en:'Longus colli / capitis',ab:''},'경다열근':{en:'Multifidus (cervical)',ab:''},
+ /* ── 신경 ── */
+ 'C5 신경근':{en:'C5 nerve root',ab:'C5'},'C6 신경근':{en:'C6 nerve root',ab:'C6'},'C7 신경근':{en:'C7 nerve root',ab:'C7'},'C8 신경근':{en:'C8 nerve root',ab:'C8'},
+ 'L3 신경근':{en:'L3 nerve root',ab:'L3'},'L4 신경근':{en:'L4 nerve root',ab:'L4'},'L5 신경근':{en:'L5 nerve root',ab:'L5'},'S1 신경근':{en:'S1 nerve root',ab:'S1'},
+ '대후두신경':{en:'Greater occipital nerve',ab:'GON'},'부신경(CN XI)':{en:'Accessory nerve (CN XI)',ab:'CN XI'},'견갑배신경':{en:'Dorsal scapular nerve',ab:'DSN'},
+ '견갑상신경':{en:'Suprascapular nerve',ab:''},'액와신경':{en:'Axillary nerve',ab:''},'근피신경':{en:'Musculocutaneous nerve',ab:''},
+ '흉배신경':{en:'Thoracodorsal nerve',ab:''},'장흉신경':{en:'Long thoracic nerve',ab:''},'상완신경총(흉곽출구)':{en:'Brachial plexus (thoracic outlet)',ab:'TOS'},
+ '요골신경':{en:'Radial nerve',ab:''},'후골간신경(PIN)':{en:'Posterior interosseous nerve',ab:'PIN'},'전골간신경(AIN)':{en:'Anterior interosseous nerve',ab:'AIN'},
+ '표재요골신경':{en:'Superficial radial nerve',ab:''},'정중신경':{en:'Median nerve',ab:''},'척골신경':{en:'Ulnar nerve',ab:''},
+ '늑간신경':{en:'Intercostal nerve',ab:''},'흉추 신경근(T2–T12)':{en:'Thoracic nerve roots (T2–T12)',ab:''},'흉추 후지 내측지':{en:'Thoracic medial branch',ab:''},
+ '배부 피신경(Notalgia)':{en:'Dorsal cutaneous branch (notalgia paresthetica)',ab:''},
+ '요추 후지 내측지':{en:'Lumbar medial branch',ab:''},'상둔피신경(SCN)':{en:'Superior cluneal nerve',ab:'SCN'},
+ '흉요추이행부 후지(Maigne)':{en:'Thoracolumbar junction dorsal ramus (Maigne)',ab:''},'마미(cauda equina)':{en:'Cauda equina',ab:''},
+ '좌골신경':{en:'Sciatic nerve',ab:''},'상둔신경':{en:'Superior gluteal nerve',ab:''},'하둔신경':{en:'Inferior gluteal nerve',ab:''},
+ '중둔피신경':{en:'Middle cluneal nerve',ab:'MCN'},'음부신경':{en:'Pudendal nerve',ab:''},
+ '대퇴신경':{en:'Femoral nerve',ab:''},'폐쇄신경':{en:'Obturator nerve',ab:''},'외측대퇴피신경':{en:'Lateral femoral cutaneous nerve',ab:'LFCN'},
+ '복재신경':{en:'Saphenous nerve',ab:''},'총비골신경':{en:'Common fibular (peroneal) nerve',ab:''},'경골신경':{en:'Tibial nerve',ab:''},
+ '심비골신경':{en:'Deep fibular nerve',ab:''},'천비골신경':{en:'Superficial fibular nerve',ab:''},'비복신경':{en:'Sural nerve',ab:''},
+ '족저신경(내·외측)':{en:'Plantar nerves (medial / lateral)',ab:''},'바터신경(외측족저 제1분지)':{en:'Baxter nerve (1st branch of lateral plantar)',ab:''},
+ '지간신경(Morton)':{en:'Interdigital nerve (Morton neuroma)',ab:''},
+ /* ── 인대 ── */
+ '항인대':{en:'Ligamentum nuchae',ab:''},'후종인대(PLL)':{en:'Posterior longitudinal ligament',ab:'PLL'},'황색인대':{en:'Ligamentum flavum',ab:''},
+ '횡인대(C1)':{en:'Transverse ligament of atlas',ab:''},'익상인대':{en:'Alar ligament',ab:''},'극간·극상인대':{en:'Interspinous / supraspinous ligaments',ab:''},
+ '경추 후관절낭':{en:'Cervical facet joint capsule',ab:''},
+ '오구견봉인대':{en:'Coracoacromial ligament',ab:'CAL'},'견봉쇄골인대':{en:'Acromioclavicular ligament',ab:'AC'},'오구쇄골인대':{en:'Coracoclavicular ligament',ab:'CC'},
+ '관절와상완인대(GHL)':{en:'Glenohumeral ligaments',ab:'GHL'},'오구상완인대·회전근개간격':{en:'Coracohumeral ligament / rotator interval',ab:''},
+ '관절와순(labrum)':{en:'Glenoid labrum',ab:''},'상완횡인대':{en:'Transverse humeral ligament',ab:''},
+ '척측측부인대(UCL)':{en:'Ulnar collateral ligament',ab:'UCL'},'요측측부인대(RCL)':{en:'Radial collateral ligament',ab:'RCL'},'윤상인대':{en:'Annular ligament',ab:''},
+ '삼각섬유연골복합체(TFCC)':{en:'Triangular fibrocartilage complex',ab:'TFCC'},'굴근지대(횡수근인대)':{en:'Flexor retinaculum (transverse carpal ligament)',ab:'TCL'},
+ '주상월상인대(SL)':{en:'Scapholunate ligament',ab:'SL'},'A1 활차(도르래)':{en:'A1 pulley',ab:''},'제1신전구획 지대':{en:'First extensor compartment retinaculum',ab:''},
+ '늑횡돌기인대':{en:'Costotransverse ligaments',ab:''},'늑골두 방사인대':{en:'Radiate ligament of rib head',ab:''},'흉추 후관절낭':{en:'Thoracic facet joint capsule',ab:''},
+ '흉추 극상·극간인대':{en:'Thoracic supraspinous / interspinous ligaments',ab:''},'흉늑관절·늑연골 결합':{en:'Sternocostal / costochondral junction',ab:''},
+ '장요인대':{en:'Iliolumbar ligament',ab:''},'요추 후종인대':{en:'Lumbar posterior longitudinal ligament',ab:'PLL'},'요추 황색인대':{en:'Lumbar ligamentum flavum',ab:''},
+ '요추 극상·극간인대':{en:'Lumbar supraspinous / interspinous ligaments',ab:''},'요추 후관절낭':{en:'Lumbar facet joint capsule',ab:''},'흉요근막':{en:'Thoracolumbar fascia',ab:'TLF'},
+ '후천장인대':{en:'Posterior sacroiliac ligament',ab:''},'골간 천장인대':{en:'Interosseous sacroiliac ligament',ab:''},'천결절인대':{en:'Sacrotuberous ligament',ab:''},
+ '천극인대':{en:'Sacrospinous ligament',ab:''},'치골결합':{en:'Pubic symphysis',ab:''},
+ '장골대퇴인대':{en:'Iliofemoral ligament',ab:''},'치골대퇴인대':{en:'Pubofemoral ligament',ab:''},'좌골대퇴인대':{en:'Ischiofemoral ligament',ab:''},
+ '고관절 관절순':{en:'Acetabular labrum',ab:''},'서혜인대':{en:'Inguinal ligament',ab:''},
+ '전십자인대(ACL)':{en:'Anterior cruciate ligament',ab:'ACL'},'후십자인대(PCL)':{en:'Posterior cruciate ligament',ab:'PCL'},
+ '내측측부인대(MCL)':{en:'Medial collateral ligament',ab:'MCL'},'외측측부인대(LCL)':{en:'Lateral collateral ligament',ab:'LCL'},
+ '내측 반월판':{en:'Medial meniscus',ab:''},'외측 반월판':{en:'Lateral meniscus',ab:''},'슬개지대':{en:'Patellar retinaculum',ab:''},
+ '전거비인대(ATFL)':{en:'Anterior talofibular ligament',ab:'ATFL'},'종비인대(CFL)':{en:'Calcaneofibular ligament',ab:'CFL'},'삼각인대':{en:'Deltoid ligament',ab:''},
+ '원위경비인대결합':{en:'Distal tibiofibular syndesmosis',ab:''},'용수철인대':{en:'Spring (plantar calcaneonavicular) ligament',ab:''},
+ '이분인대':{en:'Bifurcate ligament',ab:''},'굴근지대(족근관)':{en:'Flexor retinaculum (tarsal tunnel)',ab:''},
+};
+let lang='ko';
+function nm(ko){const n=NAMES[ko];if(lang==='en'&&n&&n.en)return n.en;if(lang==='ab')return (n&&n.ab)?n.ab:(n&&n.en?n.en:ko);return ko;}
+/* 근육별 그림 좌표(calib에서 찍은 것) — x,y=0~1, 좌우대칭 자동 미러
+   ※ 현재 상체 후면 10개. calib에서 더 찍으면 여기 추가. */
+const IMG_MID=0.5;
+/* Z-Anatomy 재작업 — calib에서 새로 찍으면 여기 채움 (경추부터) */
+const IMGDATA={
+};
+/* ═══ 신경 · 인대 (부위별) ═══ */
+const NERVES={
+ cervical:['C5 신경근','C6 신경근','C7 신경근','C8 신경근','대후두신경','부신경(CN XI)','견갑배신경'],
+ shoulder:['견갑상신경','액와신경','근피신경','흉배신경','장흉신경','견갑배신경','부신경(CN XI)','상완신경총(흉곽출구)'],
+ elbowwrist:['요골신경','후골간신경(PIN)','전골간신경(AIN)','표재요골신경','정중신경','척골신경','C6 신경근','C7 신경근','C8 신경근'],
+ thoracic:['늑간신경','흉추 신경근(T2–T12)','흉추 후지 내측지','배부 피신경(Notalgia)','장흉신경','견갑배신경'],
+ lumbar:['L3 신경근','L4 신경근','L5 신경근','S1 신경근','요추 후지 내측지','상둔피신경(SCN)','흉요추이행부 후지(Maigne)','마미(cauda equina)'],
+ sij:['좌골신경','상둔신경','하둔신경','중둔피신경','음부신경','상둔피신경(SCN)','S1 신경근'],
+ hip:['대퇴신경','폐쇄신경','외측대퇴피신경','좌골신경','상둔신경','L3 신경근'],
+ knee:['복재신경','총비골신경','경골신경','폐쇄신경','L4 신경근'],
+ ankle:['심비골신경','천비골신경','경골신경','비복신경','족저신경(내·외측)','바터신경(외측족저 제1분지)','지간신경(Morton)','L5 신경근','S1 신경근'],
+};
+const NERVE_DB={
+ /* ── 경추 ── */
+ 'C5 신경근':{kind:'root',root:'C5',origin:'C5 신경근',derm:'외측 상완·삼각근부',reflex:'이두건 반사',entrap:'C4–5 추간공(디스크·협착)',sx:'외측 상완 감각저하·삼각근/이두 위약',tests:'Spurling(신전+동측 회전), 견인 시 완화',tx:'C4/5 협척·추간공 약침, 경추 견인·정렬, 신경근 자극'},
+ 'C6 신경근':{kind:'root',root:'C6',origin:'C6 신경근',derm:'외측 전완·엄지',reflex:'상완요골근 반사',entrap:'C5–6 추간공',sx:'엄지 감각이상·손목신전/이두 위약',tests:'Spurling, 견인 완화, ULTT(정중)',tx:'C5/6 협척·추간공 약침, 견인·정렬'},
+ 'C7 신경근':{kind:'root',root:'C7',origin:'C7 신경근',derm:'중지·손등 중앙',reflex:'삼두건 반사',entrap:'C6–7 추간공(가장 흔함)',sx:'중지 감각이상·삼두/손목굴곡 위약',tests:'Spurling, 견인 완화',tx:'C6/7 협척·추간공 약침, 견인·정렬'},
+ 'C8 신경근':{kind:'root',root:'C8',origin:'C8 신경근',derm:'소지·내측 전완',reflex:'(특이 반사 없음)',entrap:'C7–T1 추간공',sx:'소지 감각이상·수지 굴곡/내재근 위약',tests:'Spurling, 척골신경 감별',tx:'C7/T1 협척·추간공 약침, 정렬'},
+ '대후두신경':{kind:'named',through:'두반극근',seg:['C2'],derm:'후두–정수리–안와',sx:'후두에서 시작하는 편측 두통(경성 두통)·후두하 압통',entrap:'두반극근 관통점·상항선',tests:'후두하·C2 압통으로 두통 재현',tx:'대후두신경 주행부(두반극근 관통점·후두하) 약침·자침, 경추 정렬'},
+ '부신경(CN XI)':{kind:'named',match:'부신경',sx:'승모근 위약·처진 어깨·SCM 약화·견갑 하방 회전',entrap:'후경삼각(경부 수술·림프절 손상 주의)',tests:'저항 견갑 거상·두부 회전 위약',tx:'후경삼각 주행부 보호, SCM·승모근 이완(직접 자극 신중)'},
+ '견갑배신경':{kind:'named',match:'견갑배',sx:'견갑 내측 둔통·능형근 위약·경미한 익상',entrap:'중사각근 관통점',tests:'능형근 저항 위약·중사각근 압통',tx:'중사각근 관통부 이완, 능형근·견갑거근 자침 + 약침'},
+ /* ── 어깨 ── */
+ '견갑상신경':{kind:'named',match:'견갑상',origin:'상완신경총 상부 줄기(C5–C6)',derm:'(피부 감각 없음 — 견관절·견봉쇄골 관절낭만 지배)',reflex:'(없음)',entrap:'견갑절흔(횡견갑인대 아래) · 극관절와절흔',sx:'후상방 견부 깊은 둔통 · 외전·외회전 위약 · 절흔 병변이면 극하근 위축이 눈에 보임',tests:'견갑절흔 압통, 저항 외회전 위약, 교차내전(cross-body) 시 통증 증가',tx:'견갑절흔·극관절와절흔 약침, 극상근·극하근 근복 자침, C5–6 협척 병행'},
+ '액와신경':{kind:'named',match:'액와',origin:'상완신경총 후속(C5–C6)',derm:'삼각근 외측(견장 부위)',reflex:'(없음)',entrap:'사각공간(quadrilateral space) · 상완골 외과경 골절 · 견관절 전방 탈구 후',sx:'삼각근 위약·위축, 견장 부위 감각저하, 외전 초반 이후 힘이 빠짐',tests:'삼각근 저항 외전 위약, 사각공간 압통, 견장 감각 좌우 비교',tx:'사각공간(소원근–대원근–삼두 장두 사이) 약침·자침, 삼각근 근복, C5–6 협척'},
+ '근피신경':{kind:'named',match:'근피',origin:'상완신경총 외측속(C5–C7)',derm:'외측 전완(외측전완피신경)',reflex:'이두건 반사',entrap:'오구완근 관통점 · 이두건막(반복 회외·굴곡 부하)',sx:'주관절 굴곡 위약 · 외측 전완 저림',tests:'저항 주관절 굴곡(회외위) 위약, 오구돌기 하방 압통',tx:'오구완근 관통부·이두 근복 약침, C5–6 협척'},
+ '흉배신경':{kind:'named',match:'흉배',origin:'상완신경총 후속(C6–C8)',derm:'(감각지 없음)',reflex:'(없음)',entrap:'액와 후벽 · 광배근 심부',sx:'광배근 위약(내전·신전·내회전 약화), 견갑 안정성 저하',tests:'저항 상완 신전·내전 위약, 기침 시 광배근 수축 좌우 비교',tx:'광배근 근복·기시(흉요근막) 자침, 액와 후벽 약침, C6–8 협척'},
+ '장흉신경':{kind:'named',match:'장흉',origin:'C5–C7 신경근(중사각근 관통)',derm:'(감각지 없음)',reflex:'(없음)',entrap:'중사각근 관통점 · 제2늑골 위 주행 · 배낭·어깨끈 압박',sx:'익상견갑(winging) · 팔 위로 올릴 때 견갑 내측이 들림 · 견갑 내측 둔통',tests:'벽 밀기(wall push-up) 시 익상 확인, 전거근 저항 위약',tx:'중사각근 관통부 이완(약침), 전거근 근복 자침, 어깨끈 압박 습관 교정'},
+ '상완신경총(흉곽출구)':{kind:'named',extra:['전사각근','중사각근','소흉근'],origin:'C5–T1 전지',derm:'주로 C8–T1 분포(내측 전완·소지)',reflex:'(대개 정상)',entrap:'사각근 삼각 · 늑쇄공간(제1늑골–쇄골) · 소흉근 아래',sx:'팔 올리면 저리고 무거움 · 손 색조 변화 · 야간 악화 · 소지측 저림 우세',tests:'Roos(EAST) 3분, Adson, Wright 과외전, 늑쇄 압박',tx:'전·중사각근 이완 약침, 소흉근 이완, 제1늑골 가동, 자세(라운드숄더) 교정'},
+ /* ── 팔꿈치·손목 ── */
+ '요골신경':{kind:'named',match:'요골신경',origin:'상완신경총 후속(C5–T1)',derm:'손등 요측·제1지간 배측',reflex:'삼두건 반사',entrap:'나선구(토요일밤 마비) · 외측 근간중격 · 회외근 아케이드',sx:'손목 하수(wrist drop) · 손등 요측 저림 · 신전근 위약',tests:'손목·수지 신전 저항 위약, 나선구 Tinel',tx:'나선구·외측 근간중격 약침, 신전근군 근복 자침, C6–7 협척 감별'},
+ '후골간신경(PIN)':{kind:'named',match:'후골간',origin:'요골신경 심부 분지(C7–C8)',derm:'(순수 운동 — 감각 정상)',reflex:'(없음)',entrap:'회외근 아케이드(Frohse) · 요골두 전방',sx:'수지 신전 위약(손목은 요측으로 신전) · 감각은 멀쩡한 것이 특징 · 외상과 원위 4cm 압통',tests:'저항 중지 신전 통증, 저항 회외 통증, 수지 신전 위약',tx:'회외근 아케이드 약침·자침(요골두 원위), 외상과염과 감별해 치료점 이동'},
+ '전골간신경(AIN)':{kind:'named',extra:['손목굴곡근군','원회내근'],origin:'정중신경 운동 분지(C7–T1)',derm:'(순수 운동 — 감각 정상)',reflex:'(없음)',entrap:'원회내근 두 갈래 사이 · 천지굴근 아케이드',sx:'엄지·검지로 OK 원을 못 만듦(끝마디가 안 굽음) · 감각 정상',tests:'OK sign(pinch) 검사, 저항 회내 통증',tx:'원회내근·천지굴근 아케이드 약침, 전완 굴곡근군 이완'},
+ '표재요골신경':{kind:'named',extra:[],origin:'요골신경 감각 분지(C6–C7)',derm:'손등 요측·엄지 배측',reflex:'(없음)',entrap:'전완 원위 1/3 상완요골근–장요측수근신근 사이(Wartenberg) · 손목시계·석고 압박',sx:'엄지 배측 저림·화끈거림 · 조이는 물건 착용 시 악화',tests:'Tinel(전완 원위 요측), 손목 척측편위+회내 시 증상 재현',tx:'상완요골근–장요측수근신근 틈 약침, 압박원(시계·밴드) 제거, 드퀘르뱅과 감별'},
+ '정중신경':{kind:'named',match:'정중',origin:'상완신경총 내·외측속(C6–T1)',derm:'엄지·검지·중지 손바닥면',reflex:'(없음)',entrap:'수근관(굴근지대 아래) · 원회내근 · Struthers 인대',sx:'야간에 손이 저려 깨고 털면 나아짐 · 무지구 위축 · 물건 놓침',tests:'Phalen, Tinel(수근관), 손목압박검사, 무지 외전 위약',tx:'굴근지대·수근관 입구 약침(신경 직자 회피), 원회내근 이완, C6–7 협척 병행'},
+ '척골신경':{kind:'named',match:'척골',origin:'상완신경총 내측속(C8–T1)',derm:'소지·약지 척측',reflex:'(없음)',entrap:'주관터널(팔꿈치, 가장 흔함) · Guyon관(손목)',sx:'팔꿈치 굽히고 자면 4·5지 저림 · 내재근 위약·갈퀴손 · 손가락 벌리는 힘 약함',tests:'팔꿈치 굴곡 검사, Tinel(주관), Froment sign, Guyon관 압통',tx:'주관터널 주변 약침(신경 직자 회피), 척측수근굴근 두 갈래 이완, 팔꿈치 굴곡 수면 자세 교정'},
+ /* ── 등·흉추 ── */
+ '늑간신경':{kind:'named',match:'늑간',origin:'T1–T11 전지',derm:'해당 늑간을 따라 띠 모양',reflex:'(복벽 반사)',entrap:'늑골각·늑간근 사이 · 늑골 골절·개흉술 후 · 대상포진 후',sx:'띠 모양으로 도는 찌르는 통증 · 기침·심호흡 악화 · 피부 이질통',tests:'늑간 압통, 해당 늑골 압박 시 재현, 피부 감각 띠 확인',tx:'늑간 주행부 약침(기흉 주의 — 늑골 상연 따라 천자), 늑간근 이완, 대상포진 후면 항바이러스 협진'},
+ '흉추 신경근(T2–T12)':{kind:'named',extra:['흉추기립근','다열근·회선근','늑간근·늑골거근','복직근','복사근'],origin:'T2–T12 신경근',derm:'T4 유두선 · T6 검상돌기 · T10 배꼽 기준 띠',reflex:'복벽 반사(T8–T12)',entrap:'흉추 추간공(흉추 디스크는 드묾) · 흉추 압박골절 · 전이암',sx:'등에서 앞으로 띠처럼 도는 통증 · 체간 감각 띠 저하',tests:'분절 압통, 감각 띠 지도화, 압박골절이면 극돌기 타진통',tx:'해당 분절 협척·방척추근 약침 / ⚠ 새로 생긴 흉추 신경근통은 압박골절·전이 배제 먼저'},
+ '흉추 후지 내측지':{kind:'named',extra:['다열근·회선근','반극근','흉추기립근'],origin:'흉추 척수신경 후지 내측지',derm:'(후지 피부지 — 극돌기 외측 방척추대)',reflex:'(없음)',entrap:'후관절 관절낭 옆 주행부 · 방척추근 관통점',sx:'극돌기 옆 2–3cm 국소 압통 · 신전·회전 시 악화 · 방사는 어깨뼈 안쪽까지만',tests:'분절 후관절 압통, 신전+회전 유발, 진단적 차단 반응',tx:'후관절 옆 내측지 주행부 약침·자침(협척), 다열근 안정화'},
+ '배부 피신경(Notalgia)':{kind:'named',extra:[],origin:'T2–T6 척수신경 후지 피부지',derm:'견갑골 내측 아래 손바닥만 한 구역',reflex:'(없음)',entrap:'다열근·기립근 관통점(90도로 근육을 뚫고 나옴)',sx:'견갑 내측이 가렵고 화끈거림 · 긁어서 색소침착 · 통증보다 소양·감각이상이 주',tests:'해당 구역 감각이상·색소침착 확인, 흉추 분절 압통',tx:'T2–T6 협척·근막 관통점 약침, 흉추 신전 가동 / 근육통과 혼동 말 것(가려움이 단서)'},
+ /* ── 허리·요추 ── */
+ 'L3 신경근':{kind:'root',root:'L3',origin:'L3 신경근',derm:'대퇴 전하부·무릎 내측',reflex:'슬개건 반사(L3–L4)',entrap:'L2–3 추간공 · 고령 협착',sx:'대퇴 앞쪽 통증 · 무릎 신전 위약 · 계단 오를 때 힘 빠짐',tests:'대퇴신경 신장검사(엎드려 무릎 굴곡), 슬개건 반사 저하',tx:'L2/3 협척·추간공 약침, 장요근·대퇴사두 병행, 고령이면 협착 평가'},
+ 'L4 신경근':{kind:'root',root:'L4',origin:'L4 신경근',derm:'무릎 내측·정강이 내측·내과',reflex:'슬개건 반사',entrap:'L3–4 추간공',sx:'정강이 안쪽 저림 · 발목 배굴(전경골근) 위약 · 발뒤꿈치 걷기 곤란',tests:'대퇴신경 신장검사, SLR(양성일 수도), 슬개건 반사 저하',tx:'L3/4 협척·추간공 약침, 전경골근·다열근 병행'},
+ 'L5 신경근':{kind:'root',root:'L5',origin:'L5 신경근',derm:'정강이 외측·족배·엄지발가락',reflex:'(특이 반사 없음 — 내측 슬건 반사)',entrap:'L4–5 추간공·외측함요부(가장 흔함)',sx:'정강이 바깥–발등–엄지 저림 · 엄지 신전(EHL) 위약 · 중둔근 위약(Trendelenburg)',tests:'SLR, 엄지 신전 저항 위약, 발뒤꿈치 보행',tx:'L4/5 협척·추간공 약침, 중둔근·전경골근 병행, 이상근·좌골신경 주행 감별'},
+ 'S1 신경근':{kind:'root',root:'S1',origin:'S1 신경근',derm:'발 외측·발바닥·종아리 후면',reflex:'아킬레스건 반사',entrap:'L5–S1 추간공(가장 흔함)',sx:'종아리 뒤–발 바깥 저림 · 발끝 서기 곤란 · 아킬레스 반사 소실',tests:'SLR, 발끝 보행, 아킬레스건 반사 좌우 비교',tx:'L5/S1 협척·추간공 약침, 비복근·대둔근 병행 / ⚠ 양측 + 배뇨장애면 마미 배제'},
+ '요추 후지 내측지':{kind:'named',extra:['다열근·회선근','척추기립근'],origin:'요추 척수신경 후지 내측지',derm:'(후지 피부지 — 요부·상둔부)',reflex:'(없음)',entrap:'유두관절–부돌기 사이 골섬유터널 · 후관절 옆',sx:'허리 국소통이 신전·회전에서 악화 · 무릎 위까지만 방사 · 다리 저림은 없음',tests:'후관절 압통, Kemp(신전+회전), 진단적 내측지 차단 반응',tx:'유두관절–부돌기부(협척 심자) 약침, 다열근 안정화 / 디스크성 방사통과 구분'},
+ '상둔피신경(SCN)':{kind:'named',extra:[],origin:'T11–L3 후지 외측 피부지',derm:'장골능 위–상둔부',reflex:'(없음)',entrap:'장골능 후방 정중선 옆 약 7cm 흉요근막 관통 터널',sx:'장골능 바로 위 콕 집히는 통증 · 앉았다 일어날 때·허리 젖힐 때 악화 · 대퇴 후면까지 연관통',tests:'장골능 후방 7cm 지점 압통으로 증상 재현(가장 중요), 국소 차단 반응',tx:'관통점 정확히 짚어 약침·자침 / 천장관절·TLJ와 감별 — 놓치면 만성 요통으로 오래 감'},
+ '흉요추이행부 후지(Maigne)':{kind:'named',extra:['요방형근','흉추기립근'],origin:'T12–L1 척수신경 후지',derm:'장골능·서혜부·대전자 외측(세 갈래)',reflex:'(없음)',entrap:'T12–L1 후관절 · 장골능 넘는 지점',sx:'허리 아래가 아픈데 실제 병소는 흉요추 이행부 · 서혜부·고환/음순부 연관통이 단서',tests:'T12–L1 극돌기 측방 압통·pinch-roll(피부 집어 굴리기) 양성',tx:'T12/L1 협척·후관절 약침 — 아픈 자리가 아니라 이행부를 다루는 것이 핵심'},
+ '마미(cauda equina)':{kind:'named',extra:[],origin:'L2 이하 신경근 다발',derm:'안장부(회음·항문 주위)',reflex:'항문 괄약근 긴장도·구해면체 반사',entrap:'거대 중심성 추간판 탈출 · 종양 · 혈종 · 척추관 협착 급성 악화',sx:'⚠ 안장부 감각저하 · 배뇨/배변 장애 · 양측 하지 위약 — 응급',tests:'안장부 감각, 항문 긴장도, 잔뇨 확인',tx:'⚠ 도수·자침보다 즉시 영상·신경외과 응급 의뢰(48시간 내 감압이 예후를 가름)'},
+ /* ── 둔부·천장 ── */
+ '좌골신경':{kind:'named',match:'좌골',origin:'L4–S3 천골신경총',derm:'대퇴 후면–하퇴–발(분지에 따라)',reflex:'아킬레스건 반사(S1)',entrap:'이상근 아래(또는 관통) · 좌골결절–대전자 사이 · 오래 앉기',sx:'둔부 깊은 통증이 다리로 내려감 · 앉아 있으면 악화(디스크도 같으므로 감별 근거는 못 됨 — 좌골절흔 직접 압통·FAIR 양성이 갈림길)',tests:'FAIR(굴곡-내전-내회전), Freiberg, Pace, 좌골절흔 압통',tx:'이상근·심부외회전근 이완 약침(신경 주행 피해), 대둔근 이완, L4–S1 협척 병행'},
+ '상둔신경':{kind:'named',match:'상둔',origin:'L4–S1',derm:'(감각지 없음)',reflex:'(없음)',entrap:'대좌골공 이상근 상방',sx:'중둔근·대퇴근막장근 위약 → 한 발 서기에서 골반 처짐(Trendelenburg) · 측면 둔부통',tests:'Trendelenburg, 저항 외전 위약, 이상근 상방 압통',tx:'좌골절흔 상방 약침, 중둔근 근복·기시 자침, 골반 안정화 운동'},
+ '하둔신경':{kind:'named',match:'하둔',origin:'L5–S2',derm:'(감각지 없음)',reflex:'(없음)',entrap:'대좌골공 이상근 하방',sx:'대둔근 위약 → 계단·의자에서 일어서기 곤란 · 둔부 편평화',tests:'엎드려 저항 고관절 신전 위약',tx:'좌골절흔 하방 약침, 대둔근 근복 자침, 신전 근력 재활'},
+ '중둔피신경':{kind:'named',extra:[],origin:'S1–S3 후지 피부지',derm:'천장관절 위–내측 둔부',reflex:'(없음)',entrap:'후천장인대 관통점(장골후상극 부근)',sx:'천장관절 부위 국소통 · 앉거나 누울 때 눌리면 악화 · 다리로 잘 안 내려감',tests:'장골후상극 아래·내측 압통으로 재현, 국소 차단 반응',tx:'후천장인대 관통부 약침 / 천장관절 기능장애·SCN과 감별'},
+ '음부신경':{kind:'named',extra:[],origin:'S2–S4',derm:'회음·항문 주위·외음부',reflex:'구해면체 반사',entrap:'좌골극(천극–천결절인대 사이 집게) · Alcock관',sx:'앉으면 심해지는 회음부 작열통 · 서거나 누우면 완화 · 배뇨·성기능 불편 동반',tests:'앉기 유발, 좌골극 압통, Nantes 기준',tx:'좌골극 주변 약침(숙련 필요), 천결절·천극인대 이완, 앉는 자세·좌욕 관리, 난치 시 협진'},
+ /* ── 고관절 ── */
+ '대퇴신경':{kind:'named',match:'대퇴신경',origin:'L2–L4 요신경총',derm:'대퇴 전면·(복재신경 통해) 하퇴 내측',reflex:'슬개건 반사',entrap:'서혜인대 아래 · 장요근 혈종·농양 · 골반 수술 후',sx:'대퇴 앞 통증·무릎 신전 위약 · 계단 내려갈 때 무릎이 꺾임',tests:'대퇴신경 신장검사(엎드려 무릎 굴곡), 슬개건 반사 저하, 사두 위약',tx:'서혜인대 하방·장요근 주행부 약침(대퇴동맥 외측 주의), L2–4 협척'},
+ '폐쇄신경':{kind:'named',match:'폐쇄',origin:'L2–L4',derm:'대퇴 내측',reflex:'내전근 반사',entrap:'폐쇄관 · 골반강 내 종괴 · 출산 후',sx:'서혜–대퇴 내측 통증 · 내전 위약 · 무릎 내측 연관통(고관절 병변이 무릎으로 오는 통로)',tests:'저항 내전 위약, 폐쇄관 압통, Howship-Romberg 징후',tx:'내전근군 기시부·폐쇄공 주변 약침, 고관절 병변 동시 평가'},
+ '외측대퇴피신경':{kind:'named',extra:[],origin:'L2–L3',derm:'대퇴 외측(손바닥만 한 타원)',reflex:'(없음)',entrap:'전상장골극 내측 서혜인대 아래 · 벨트·꽉 끼는 바지·비만·임신',sx:'감각이상성 대퇴신경통 — 대퇴 바깥이 저리고 화끈 · 순수 감각(근력 정상)이 결정적 단서',tests:'전상장골극 내하방 Tinel, 신전 시 악화·굴곡 시 완화, 근력 정상 확인',tx:'전상장골극 내측 서혜인대 하방 약침, 압박원(벨트·복대) 제거, 체중·자세 관리'},
+ /* ── 무릎 ── */
+ '복재신경':{kind:'named',extra:[],origin:'대퇴신경 감각 종말지(L3–L4)',derm:'무릎 내측–하퇴 내측–내과',reflex:'(없음)',entrap:'내전근관(Hunter관) 출구 · 거위발 부위 · 무릎 수술 후',sx:'무릎 안쪽이 시리고 저림 · 근력은 정상 · 밤에 이불 스침도 불편',tests:'내전근관 Tinel, 무릎 내측 감각 좌우 비교, 근력 정상 확인',tx:'내전근관 출구·슬개하지 주행부 약침 / 거위발 건염·내측반월판과 감별(감각 이상이 단서)'},
+ '총비골신경':{kind:'named',match:'비골신경',origin:'좌골신경 분지(L4–S2)',derm:'하퇴 외측·족배',reflex:'(없음)',entrap:'비골두 목 부위(가장 얕은 곳) · 다리 꼬기·석고·쪼그려 앉기',sx:'족하수(foot drop) · 발등 저림 · 발끝이 걸려 넘어짐',tests:'비골두 Tinel, 발목 배굴·외번 위약, L5 신경근과 감별(둔부통·SLR 여부)',tx:'비골두 주변 약침(신경 직자 회피), 전경골근·비골근 자침, 다리 꼬기 습관 교정, L4/5 협척 감별 병행'},
+ '경골신경':{kind:'named',match:'경골신경',origin:'좌골신경 분지(L4–S3)',derm:'종아리 후면·발바닥',reflex:'아킬레스건 반사',entrap:'슬와부 · 가자미근 아케이드 · 족근관(내과 후방)',sx:'종아리 뒤 당김·발바닥 저림 · 오래 서 있으면 악화',tests:'슬와·족근관 Tinel, 발끝 서기, 발바닥 감각',tx:'가자미근 아케이드·족근관 굴근지대 약침, 비복근·후경골근 이완, S1 협척 병행'},
+ /* ── 발목·발 ── */
+ '심비골신경':{kind:'named',match:'심비골',origin:'총비골신경 분지(L4–L5)',derm:'제1–2지 사이 물갈퀴 공간',reflex:'(없음)',entrap:'전족근관(하신근지대 아래) · 꽉 조이는 신발끈·등산화',sx:'발등 앞쪽 저림 · 제1–2지 사이 감각저하 · 신발 조일 때 악화',tests:'하신근지대 Tinel, 제1지간 감각, 족배굴 위약',tx:'하신근지대 하방 약침, 신발끈·발등 압박 제거, 전경골근 이완'},
+ '천비골신경':{kind:'named',match:'천비골',origin:'총비골신경 분지(L5–S1)',derm:'발등 대부분(제1–2지 사이 제외)',reflex:'(없음)',entrap:'하퇴 외측 원위 1/3 근막 관통점 · 반복 발목 염좌',sx:'발등이 넓게 저림 · 발목 접질린 뒤 남는 저림 · 외번 위약',tests:'근막 관통점 Tinel, 족저굴+내번 시 증상 재현',tx:'하퇴 외측 원위 근막 관통부 약침, 비골근 이완, 만성 발목 불안정 동시 관리'},
+ '비복신경':{kind:'named',extra:[],origin:'경골·비골신경 합류 감각지(S1–S2)',derm:'하퇴 후외측–발 외측연–소지',reflex:'(없음)',entrap:'아킬레스 외측 주행부 · 발목 수술·염좌 후 유착',sx:'발 바깥 가장자리 저림·작열 · 순수 감각',tests:'아킬레스 외측 Tinel, 발 외측 감각 비교',tx:'아킬레스 외측 주행부 약침·유착 이완, 수술 반흔 관리'},
+ '족저신경(내·외측)':{kind:'named',match:'족저',origin:'경골신경 종말지(S1–S3)',derm:'발바닥(내측=엄지쪽 3.5지, 외측=소지쪽 1.5지)',reflex:'(없음)',entrap:'족근관 내부 분지부 · 무지외전근 심부',sx:'발바닥 저림·화끈거림 · 서 있을수록 악화 · 밤에도 지속되면 신경성 시사',tests:'족근관 Tinel, 발바닥 감각 내·외측 구분, Dorsiflexion-eversion 검사',tx:'족근관·무지외전근 심부 약침, 후경골근 이완, 아치 지지 / 족저근막염과 감별'},
+ '바터신경(외측족저 제1분지)':{kind:'named',extra:['족저근막·내재근'],origin:'외측족저신경 제1분지(Baxter)',derm:'(운동 우세 — 소지외전근 지배)',reflex:'(없음)',entrap:'무지외전근 심부근막과 족저방형근 사이',sx:'만성 발뒤꿈치 통증인데 아침 첫걸음 통증 패턴이 약함 · 종골 내측 앞쪽 압통 · 저림 동반',tests:'종골 내측 결절 앞·아래 압통, 소지외전근 위약(EMG)',tx:'무지외전근 심부 약침 / 난치성 족저근막염의 상당수가 이것 — 압통점 위치가 갈림길'},
+ '지간신경(Morton)':{kind:'named',extra:[],origin:'족저신경 총지신경(주로 제3–4 중족골 사이)',derm:'인접 두 발가락 마주보는 면',reflex:'(없음)',entrap:'심횡중족인대 아래 신경종 · 좁은 앞코 신발·하이힐',sx:'발볼에 돌 밟은 느낌 · 발가락 저림 · 신발 벗고 발 주무르면 완화',tests:'Mulder click(전후 압박), 중족골간 압통, 발가락 감각',tx:'중족골간 약침·신경종 주변 이완, 앞코 넓은 신발·중족골 패드, 재발 시 협진'},
+};
+const LIGS={
+ cervical:['항인대','후종인대(PLL)','황색인대','횡인대(C1)','익상인대','극간·극상인대','경추 후관절낭'],
+ shoulder:['오구견봉인대','견봉쇄골인대','오구쇄골인대','관절와상완인대(GHL)','오구상완인대·회전근개간격','관절와순(labrum)','상완횡인대'],
+ elbowwrist:['척측측부인대(UCL)','요측측부인대(RCL)','윤상인대','삼각섬유연골복합체(TFCC)','굴근지대(횡수근인대)','주상월상인대(SL)','A1 활차(도르래)','제1신전구획 지대'],
+ thoracic:['늑횡돌기인대','늑골두 방사인대','흉추 후관절낭','흉추 극상·극간인대','흉늑관절·늑연골 결합'],
+ lumbar:['장요인대','요추 후종인대','요추 황색인대','요추 극상·극간인대','요추 후관절낭','흉요근막'],
+ sij:['후천장인대','골간 천장인대','천결절인대','천극인대','장요인대','치골결합'],
+ hip:['장골대퇴인대','치골대퇴인대','좌골대퇴인대','고관절 관절순','서혜인대'],
+ knee:['전십자인대(ACL)','후십자인대(PCL)','내측측부인대(MCL)','외측측부인대(LCL)','내측 반월판','외측 반월판','슬개지대'],
+ ankle:['전거비인대(ATFL)','종비인대(CFL)','삼각인대','원위경비인대결합','용수철인대','이분인대','굴근지대(족근관)'],
+};
+const LIG_DB={
+ /* ── 경추 ── */
+ '항인대':{link:'후두골 ~ C7 극돌기',fn:'경부 후방 지지·과굴곡 제한',sx:'편타성 후 후경통·극돌기간 압통',tests:'굴곡 시 극돌기간 압통 재현',tx:'부착부(극돌기·후두) 약침·프롤로, 심부굴곡근 안정화 운동'},
+ '후종인대(PLL)':{link:'추체 후면(척주관 전벽)',fn:'과굴곡 제한·척수 보호',sx:'골화(OPLL) 시 척수증 — 보행장애·손 정교함 저하',tests:'Hoffman·병적반사(척수증 선별)',tx:'⚠ OPLL/척수증 의심 시 영상·정형 협진 우선, 보존적 감압'},
+ '황색인대':{link:'인접 후궁 사이',fn:'신전 시 좌굴 방지',sx:'비후 → 척추관 협착·신경인성 증상',tests:'신전 시 증상 악화',tx:'협착 관리, 신전 부하 감소·굴곡 선호'},
+ '횡인대(C1)':{link:'환추 전궁 ~ 치돌기',fn:'환축 관절 안정(치돌기 고정)',sx:'손상 시 환축 불안정 — 류마·외상 레드플래그',tests:'Sharp-Purser(신중)·영상',tx:'⚠ 불안정 의심 시 상부경추 도수 금기 · 영상·정형 의뢰'},
+ '익상인대':{link:'치돌기 ~ 후두과',fn:'환추후두 회전 제한',sx:'편타성 후 회전 불안정·두통',tests:'회전 안정성 검사(신중)',tx:'⚠ 상부경추 도수 신중 · 안정화 운동'},
+ '극간·극상인대':{link:'인접 극돌기 사이 / 끝',fn:'과굴곡 제한',sx:'굴곡 손상·극돌기간 국소 압통',tx:'부착부 약침·프롤로, 안정화'},
+ '경추 후관절낭':{link:'상·하 관절돌기(후관절)',fn:'후관절 안정',sx:'편타성·후관절 증후군 — 신전·회전 시 국소통',tests:'신전+회전 유발(Kemp 유사)',tx:'후관절 약침·자침, 가동·안정화'},
+ /* ── 어깨 ── */
+ '오구견봉인대':{link:'오구돌기 ~ 견봉',fn:'견봉하 공간의 지붕 — 상완골두 상방 이탈 제한',sx:'견봉하 충돌 — 팔 올릴 때 60–120도 통증호 · 어깨 앞·옆 통증',tests:'Neer, Hawkins-Kennedy, 통증호',tx:'견봉하 공간 약침, 극상근 부착부·오구견봉 아치 자침, 견갑 하방 안정화 운동'},
+ '견봉쇄골인대':{link:'쇄골 원위 ~ 견봉',fn:'견봉쇄골 관절 수평 안정',sx:'어깨 짚고 넘어진 뒤 견봉쇄골 관절 국소통 · 팔 교차 시 통증 · 계단 변형',tests:'교차내전(cross-body) 통증, 관절 직상방 압통',tx:'견봉쇄골 관절 약침·프롤로, 급성기 삼각건, 교차내전 부하 회피'},
+ '오구쇄골인대':{link:'오구돌기 ~ 쇄골 하면(원추·능형)',fn:'견봉쇄골 관절 수직 안정 — 쇄골이 위로 뜨는 것을 막음',sx:'견봉쇄골 분리 3형 이상에서 파열 → 쇄골 원위부 융기',tests:'피아노키 징후, 하방 견인 시 간격 벌어짐, 영상 비교',tx:'2형까지 보존(약침·프롤로·안정화), ⚠ 3형 이상 변형은 정형 협진'},
+ '관절와상완인대(GHL)':{link:'관절와 앞테두리 ~ 상완골 해부경(상·중·하)',fn:'외전·외회전 끝범위에서 전방 탈구 방지',sx:'탈구·아탈구 병력 · 팔 벌려 외회전할 때 빠질 것 같은 불안감',tests:'Apprehension, Relocation, Sulcus(하방 불안정)',tx:'⚠ 도수 견인 신중 · 견갑하근·회전근개 강화 우선, 만성 이완은 프롤로 고려'},
+ '오구상완인대·회전근개간격':{link:'오구돌기 외측 ~ 대·소결절(극상–견갑하근 사이 틈)',fn:'하방 아탈구 방지·외회전 제한',sx:'동결견의 핵심 병소 — 외회전이 가장 먼저·가장 심하게 막힘',tests:'수동 외회전 제한(능동·수동 모두 제한되면 관절성), 회전근개간격 압통',tx:'회전근개간격·오구상완인대 약침, 외회전 신장, 동결견 단계별(동통기는 진통 우선)'},
+ '관절와순(labrum)':{link:'관절와 테두리 섬유연골 고리(이두 장두 부착)',fn:'관절와 깊이 보강·흡착 안정',sx:'딸깍거림·깊은 곳이 걸리는 느낌 · 머리 위 동작·던지기에서 통증(SLAP)',tests:'능동압박(O-Brien), Crank, 이두 장두 압통',tx:'보존적 — 견갑·회전근개 안정화, 이두 장두구 약침 / 걸림·잠김 반복은 영상 협진'},
+ '상완횡인대':{link:'대결절 ~ 소결절(결절간구 지붕)',fn:'이두 장두건을 홈에 잡아둠',sx:'파열 시 이두건 아탈구 — 팔 돌릴 때 어깨 앞에서 딸깍 · 결절간구 압통',tests:'Speed, Yergason, 결절간구 압통·회전 시 탄발',tx:'결절간구 주변 약침(건 직자 회피), 이두 부하 감소, 회전근개 균형 회복'},
+ /* ── 팔꿈치·손목 ── */
+ '척측측부인대(UCL)':{link:'내상과 ~ 척골 구상돌기(전방속이 주력)',fn:'외반 스트레스 저항 — 던지기 동작의 주 안정자',sx:'던지기·라켓 동작에서 팔꿈치 안쪽 통증 · 척골신경 저림 동반 가능',tests:'외반 스트레스(30도 굴곡), Milking maneuver, Moving valgus',tx:'내상과 부착부 약침·프롤로, 굴곡회내근군 강화, 던지기 부하 조절'},
+ '요측측부인대(RCL)':{link:'외상과 ~ 윤상인대·척골 회외근릉',fn:'내반·후외측 회전 안정',sx:'외상과염이 오래가는데 불안정감·걸림 동반 시 의심 · 짚고 일어설 때 불안',tests:'내반 스트레스, 후외측 회전 불안정(lateral pivot shift), 의자에서 밀기',tx:'외상과 부착부 프롤로·약침, 신전근군 편심성 운동 / 반복 스테로이드는 인대 약화'},
+ '윤상인대':{link:'척골 요골절흔을 둘러 요골두를 감쌈',fn:'요골두를 척골에 고정하며 회내·회외 회전 허용',sx:'소아 팔꿈치 아탈구(팔 잡아당긴 뒤 팔을 안 씀) · 성인은 요골두 주변 통증',tests:'요골두 압통, 수동 회외 통증, 소아는 병력이 결정적',tx:'소아 아탈구는 정복(회외-굴곡 또는 과회내), 성인은 요골두 주변 약침·회외근 이완'},
+ '삼각섬유연골복합체(TFCC)':{link:'척골두 ~ 척골측 수근골(원위요척관절 완충)',fn:'척측 하중 전달·원위요척관절 안정',sx:'손목 새끼손가락쪽 통증 · 문고리 돌리기·짚고 일어나기에서 악화 · 딸깍음',tests:'Fovea sign(척골와 압통), TFCC 압박(척측편위+축압박), 피아노키(DRUJ)',tx:'척골와 주변 약침·프롤로, 손목 보조기·척측 부하 제한 / 지속되면 영상(MRI) 협진'},
+ '굴근지대(횡수근인대)':{link:'주상골·대능형골 ~ 두상골·유구골 갈고리(수근관 지붕)',fn:'수근관 천장 — 굴곡건·정중신경을 감쌈',sx:'비후·부종 시 수근관 증후군 — 야간 저림·손 털면 완화·무지구 위축',tests:'Phalen, Tinel, 손목압박검사',tx:'지대 근위·원위연 약침(정중신경 직자 회피), 야간 중립 부목, 반복 손목 굴곡 작업 조절'},
+ '주상월상인대(SL)':{link:'주상골 ~ 월상골',fn:'근위 수근열 정렬 유지',sx:'손 짚고 넘어진 뒤 손목 배측 요측 통증 · 힘 줄 때 딸깍·불안정',tests:'Watson shift 검사, 주상월상 간격 압통, 영상(간격 벌어짐)',tx:'급성은 고정·부하 제한, 만성은 프롤로·고유수용 훈련 / ⚠ 해리 보이면 정형 협진'},
+ 'A1 활차(도르래)':{link:'중수지관절부 굴곡건초 입구',fn:'굴곡건을 뼈에 밀착시켜 활시위 방지',sx:'방아쇠수지 — 아침에 손가락이 굽은 채 안 펴지다 딸깍 튕김 · A1 부위 결절 촉지',tests:'수동 신전 시 탄발, 중수골두 손바닥면 압통·결절',tx:'A1 활차부 약침·자침, 야간 신전 부목, 파지 부하 조절 / 당뇨 동반 시 재발 잦음'},
+ '제1신전구획 지대':{link:'요골 경상돌기 위 신전지대(장무지외전건·단무지신근건)',fn:'두 건을 홈에 고정',sx:'드퀘르뱅 — 엄지 벌릴 때 손목 요측 통증 · 아기 안는 동작에서 악화',tests:'Finkelstein/Eichhoff, 경상돌기 위 부종·압통·염발음',tx:'제1구획 건초 주변 약침, 엄지 스파이카 부목, 표재요골신경통과 감별'},
+ /* ── 등·흉추 ── */
+ '늑횡돌기인대':{link:'늑골 결절 ~ 같은 번호 횡돌기',fn:'늑횡돌기 관절 안정 — 호흡 시 늑골 회전축 유지',sx:'등 한 지점이 콕 결림 · 깊게 숨 쉬거나 돌아누울 때 악화 · 늑횡돌기 관절 국소 압통',tests:'횡돌기 외측 2–3cm 압통, 늑골 스프링 테스트, 심호흡 재현',tx:'늑횡돌기 관절 약침·자침, 늑골 가동(스프링), 흉추 신전 회복'},
+ '늑골두 방사인대':{link:'늑골두 ~ 상·하 추체와 추간판',fn:'늑추관절 안정',sx:'흉추 분절 심부 통증 · 앞가슴으로 도는 연관통 · 흉추 회전에서 악화',tests:'늑골두 부위 심부 압통, 흉추 회전 유발',tx:'해당 분절 협척 심부 약침, 흉추 회전 가동 / ⚠ 심장·폐 원인 배제 후'},
+ '흉추 후관절낭':{link:'흉추 상·하 관절돌기',fn:'후관절 안정·회전 제한',sx:'등 결림이 신전·회전에서 악화 · 견갑 내측까지 연관통 · 오래 앉으면 심해짐',tests:'후관절 압통, 신전+회전 유발, 분절 가동성 저하',tx:'후관절 약침·자침(협척), 흉추 신전 가동, 라운드숄더 교정'},
+ '흉추 극상·극간인대':{link:'흉추 극돌기 사이·끝',fn:'과굴곡 제한',sx:'오래 구부린 자세 후 극돌기 사이 국소 압통 · 굴곡에서 악화',tests:'극돌기간 압통, 굴곡 유발',tx:'부착부 약침·프롤로, 흉추 신전 운동·자세 교정'},
+ '흉늑관절·늑연골 결합':{link:'흉골 ~ 늑연골 ~ 늑골',fn:'전방 흉곽 안정',sx:'앞가슴 통증(Tietze는 부종 동반, 늑연골염은 부종 없음) · 눌러서 재현되면 근골격성',tests:'흉늑 접합부 압통으로 재현, 몸통 회전·심호흡 악화',tx:'⚠ 심장 원인 먼저 배제 · 접합부 약침, 흉추·늑골 가동으로 앞쪽 부하 감소'},
+ /* ── 허리·요추 ── */
+ '장요인대':{link:'L4·L5 횡돌기 ~ 장골능 내측',fn:'요천추 이행부 안정 — 골반 위에서 L5가 미끄러지지 않게 붙듦',sx:'장골능 안쪽·천장관절 위쪽 깊은 통증 · 앉았다 일어설 때·한쪽으로 기울일 때 악화 · 서혜부 연관통',tests:'L4–5 횡돌기–장골능 사이 심부 압통, 반대측 측굴 유발',tx:'장요인대 부착부 약침·프롤로(가장 흔히 놓치는 만성 요통 병소), 요방형근 이완 병행'},
+ '요추 후종인대':{link:'요추 추체 후면(척주관 전벽)',fn:'과굴곡 제한 · 추간판 후방 탈출 1차 방벽',sx:'중심성 요통(정중선 깊은 통증) · 굴곡·기침에서 악화 · 파열 시 수핵 탈출로 진행',tests:'굴곡 유발, 기침·발살바 악화, SLR로 신경근 침범 확인',tx:'굴곡 부하 제한·McKenzie 신전 선호, 협척 약침 / 방사통 진행 시 영상'},
+ '요추 황색인대':{link:'인접 후궁 사이',fn:'신전 시 좌굴 방지·척주관 후벽',sx:'비후 시 척추관 협착 — 걸으면 다리 저려 쉬어야 하고, 앞으로 굽히면 편함(shopping cart)',tests:'신전 유발·굴곡 완화, 보행 부하 검사, 자전거는 괜찮음',tx:'굴곡 선호 관리·신전 부하 감소, 협척 약침·다열근 안정화, 진행 시 영상·감압 협진'},
+ '요추 극상·극간인대':{link:'요추 극돌기 사이·끝',fn:'과굴곡 제한',sx:'정중선 극돌기 사이 콕 집히는 압통 · 오래 굽혀 일한 뒤·굴곡에서 악화 · 다리 저림 없음',tests:'극돌기간 국소 압통, 굴곡 유발·신전 완화',tx:'부착부 약침·프롤로, 굴곡 작업 자세 교정, 심부 안정화 운동'},
+ '요추 후관절낭':{link:'요추 상·하 관절돌기',fn:'후관절 안정·회전 제한',sx:'신전·회전에서 악화되고 굴곡에서 편한 요통 · 무릎 위까지만 방사 · 아침보다 오래 서 있을 때 심함',tests:'Kemp(신전+회전), 후관절 압통, 신전 유발',tx:'후관절·내측지 약침(협척 심자), 굴곡 방향 가동, 다열근 안정화'},
+ '흉요근막':{link:'요추 극돌기·장골능 ~ 복횡근·광배근·대둔근 연결망',fn:'체간 힘 전달의 중심 — 상지·하지 부하를 허리에서 이어줌',sx:'넓게 뻐근한 요통 · 자세 유지에서 악화 · 특정 한 점보다 면으로 아픔 · 광배근·대둔근 긴장 동반',tests:'근막 활주 제한(피부 집어 굴리기), 광배–대둔 사선 사슬 부하 검사',tx:'근막층 약침·자락, 광배근–반대측 대둔근 사슬 동시 치료, 복횡근 활성 운동'},
+ /* ── 둔부·천장 ── */
+ '후천장인대':{link:'천골 후면 ~ 장골후상극·장골능',fn:'천장관절 후방 안정',sx:'장골후상극 바로 아래 손가락 하나로 짚히는 통증 · 앉거나 한 다리에 체중 실을 때 악화',tests:'장골후상극 하방 압통(Fortin 부위), 천장관절 유발검사 3개 이상 양성',tx:'후천장인대 부착부 약침·프롤로, 중둔피신경 관통점 동시 확인, 골반 안정화'},
+ '골간 천장인대':{link:'천골 ~ 장골 관절면 뒤 깊은 공간',fn:'천장관절의 주 하중 전달 구조 — 체중을 척추에서 골반으로 넘김',sx:'천장관절 깊은 곳 통증 · 계단·한 발 서기에서 악화 · 임신·산후 이완 시 불안정감',tests:'Gaenslen, Thigh thrust, Compression, Distraction 조합',tx:'심부 약침·프롤로(숙련 필요), 골반 벨트, 대둔근·중둔근 강화'},
+ '천결절인대':{link:'천골 외측연 ~ 좌골결절',fn:'천골 전방 회전(nutation) 제한 · 골반 후방 사슬 연결',sx:'좌골결절 부위 통증 · 오래 앉기 악화 · 햄스트링 기시부 통증과 겹침 · 음부신경 자극 동반 가능',tests:'좌골결절 압통, 천결절인대 촉진(긴장도 좌우 비교), 햄스트링 신장 유발',tx:'천결절인대·햄스트링 기시부 약침·프롤로, 앉는 자세·방석 조절'},
+ '천극인대':{link:'천골·미골 외측 ~ 좌골극',fn:'대·소좌골공을 나눔 · 천골 안정',sx:'깊은 둔부통 · 앉으면 악화 · 음부신경 포착(천극–천결절 집게)과 직결',tests:'좌골극 압통(심부 촉진), 앉기 유발',tx:'좌골극 주변 약침(숙련 필요), 음부신경 포착 동반 시 함께 관리'},
+ '치골결합':{link:'좌·우 치골(섬유연골 원판)',fn:'전방 골반환 안정',sx:'임신·산후·격한 운동 후 치골 부위 통증 · 다리 벌리기·계단·돌아눕기 악화 · 오리걸음',tests:'치골결합 직접 압통, 한 발 서기, 저항 내전 통증',tx:'골반 벨트, 내전근·복횡근 균형 회복, 치골 부착부 약침 / 급성 분리는 안정 우선'},
+ /* ── 고관절 ── */
+ '장골대퇴인대':{link:'전하장골극 ~ 전자간선(Y자, Bigelow)',fn:'인체에서 가장 강한 인대 — 고관절 신전·외회전 제한, 선 자세를 근육 없이 버티게 함',sx:'구축되면 고관절 신전 제한 → 골반 전방경사·보상성 요통 · 앞쪽 서혜부 조임',tests:'Thomas 검사(신전 제한), 수동 신전·외회전 끝범위 통증',tx:'전방 관절낭 신장·가동, 장요근 이완 병행, 골반 전방경사 교정 운동'},
+ '치골대퇴인대':{link:'치골 상지 ~ 대퇴 전내측 관절낭',fn:'과도한 외전·외회전 제한',sx:'다리 벌리고 돌릴 때 서혜부 앞안쪽 통증 · 내전근 문제와 혼동됨',tests:'FABER(Patrick), 수동 외전+외회전 끝범위 통증',tx:'전내측 관절낭 가동, 내전근군 이완 병행, 관절순 병변 동반 여부 확인'},
+ '좌골대퇴인대':{link:'좌골 관절와 후면 ~ 대퇴경부 나선 주행',fn:'고관절 내회전·굴곡 시 안정',sx:'구축되면 내회전 제한 · 앉을 때 뒤쪽 깊은 통증 · 이상근 증후군과 감별 필요',tests:'수동 내회전 제한(FADIR), 후방 관절낭 압통',tx:'후방 관절낭 가동·심부외회전근 이완, 내회전 가동 운동'},
+ '고관절 관절순':{link:'비구 테두리 섬유연골 고리',fn:'관절 흡착·하중 분산·관절액 봉인',sx:'서혜부가 C자로 아픔(C sign) · 쪼그려 앉기·차 타고 내릴 때 걸림·딸깍 · 대퇴비구충돌(FAI) 동반',tests:'FADIR(전방충돌), FABER, 저항 직거상 통증',tx:'보존적 — 심부 회전근 조절·굴곡 끝범위 회피, 관절 주변 약침 / 잠김 반복 시 영상 협진'},
+ '서혜인대':{link:'전상장골극 ~ 치골결절',fn:'서혜관 바닥 · 대퇴 신경·혈관·외측대퇴피신경 통로의 지붕',sx:'서혜부 통증 · 아래로 외측대퇴피신경 눌리면 대퇴 바깥 저림(감각이상성 대퇴신경통)',tests:'전상장골극 내하방 Tinel, 서혜부 압통, 탈장 감별',tx:'전상장골극 내측 인대 하방 약침, 벨트·복대 압박 제거 / ⚠ 서혜부 탈장·고관절 병변 배제'},
+ /* ── 무릎 ── */
+ '전십자인대(ACL)':{link:'대퇴 외과 내면 ~ 경골 전방 융기간',fn:'경골 전방 전위·과도한 내회전 제한',sx:'방향 전환·착지 때 뚝 소리 후 부종 · 무릎이 빠질 것 같은 불안정(giving way)',tests:'Lachman(가장 민감), 전방 서랍, Pivot shift',tx:'급성 부종·통증 관리 후 사두·햄스트링 균형 재활 / ⚠ 완전 파열 + 불안정 반복은 정형 협진'},
+ '후십자인대(PCL)':{link:'대퇴 내과 외면 ~ 경골 후방 융기간',fn:'경골 후방 전위 제한',sx:'무릎 굽힌 채 정강이 앞을 부딪친 뒤(대시보드 손상) 후방 통증 · 계단 내려갈 때 불안',tests:'후방 서랍, Sag sign(무릎 90도에서 경골이 처짐), Quadriceps active',tx:'대퇴사두 강화가 핵심(사두가 경골을 앞으로 당겨 보상), 보조기·부하 조절'},
+ '내측측부인대(MCL)':{link:'대퇴 내상과 ~ 경골 내측(표층·심층, 심층은 내측반월판과 붙음)',fn:'외반 스트레스 저항',sx:'무릎 바깥에서 안쪽으로 꺾인 뒤 내측 통증 · 계단·회전에서 악화 · 관절선 위쪽 압통이 단서',tests:'외반 스트레스(0도·30도 굴곡), 내상과 부착부 압통',tx:'부착부 약침·프롤로(치유가 잘 되는 인대), 보조기·부하 조절, 사두 유지 운동'},
+ '외측측부인대(LCL)':{link:'대퇴 외상과 ~ 비골두',fn:'내반 스트레스 저항 · 후외측 모서리 안정',sx:'무릎 바깥 통증 · 내반 부하에서 벌어짐 · 총비골신경 증상(족하수) 동반 가능',tests:'내반 스트레스(30도 굴곡), Dial test(후외측 회전), 비골두 압통',tx:'비골두 부착부 약침·프롤로(총비골신경 회피), 후외측 모서리 손상 동반 시 협진'},
+ '내측 반월판':{link:'경골 내측 관절면 위 C자 섬유연골(MCL 심층과 유착)',fn:'하중 분산·관절 적합성·충격 흡수',sx:'쪼그려 앉기·비틀기에서 내측 관절선 통증 · 걸림·잠김(locking) · 계단 내려갈 때 악화',tests:'McMurray, Apley 압박, 내측 관절선 압통, Thessaly',tx:'퇴행성은 보존(사두 강화·관절선 약침·부하 조절), ⚠ 반복 잠김·차단은 영상 협진'},
+ '외측 반월판':{link:'경골 외측 관절면 위 O자에 가까운 섬유연골(가동성 큼)',fn:'하중 분산·충격 흡수',sx:'외측 관절선 통증 · 원판형 반월판이면 젊은 나이에 딸깍임 · 내측보다 손상 빈도 낮음',tests:'McMurray(외측), 외측 관절선 압통, 쪼그려 앉기 유발',tx:'보존적 관리·관절선 약침, 원판형 의심(젊은 층 반복 탄발)은 영상 확인'},
+ '슬개지대':{link:'슬개골 내·외측 ~ 대퇴·경골(사두건막 연장)',fn:'슬개골의 좌우 활주 궤도 유지',sx:'슬개대퇴 통증증후군 — 계단·오래 앉기 후 무릎 앞 통증 · 외측 지대 구축이면 슬개골이 바깥으로 치우침',tests:'슬개골 활주·경사 검사, 슬개 압박 통증, 외측 지대 긴장도',tx:'외측 지대 이완(약침·근막), 내측광근 활성 강화, 발 아치·고관절 외전근 동시 교정'},
+ /* ── 발목·발 ── */
+ '전거비인대(ATFL)':{link:'외과 전연 ~ 거골 경부',fn:'족저굴 상태에서 거골 전방 전위·내번 제한',sx:'발목 염좌에서 가장 먼저 다치는 인대 — 외과 앞 부종·압통 · 만성 불안정으로 이어짐',tests:'전방 전위 검사(anterior drawer), 외과 전방 압통, Ottawa 규칙으로 골절 배제',tx:'급성 보호·조기 가동, 부착부 약침·프롤로, ★고유수용 훈련(재발 방지의 핵심)'},
+ '종비인대(CFL)':{link:'외과 첨부 ~ 종골 외측',fn:'중립·배굴 위에서 내번 제한',sx:'ATFL보다 강한 내번 손상에서 동반 파열 · 외과 아래쪽 압통 · 거골하 관절 불안정',tests:'거골 경사(talar tilt) 검사, 외과 하방 압통',tx:'부착부 약침·프롤로, 비골근 강화(외번 근력이 인대를 대신함), 균형 훈련'},
+ '삼각인대':{link:'내과 ~ 거골·종골·주상골(부채꼴 4갈래)',fn:'외번·거골 외측 전위 제한 — 가장 강한 발목 인대',sx:'외번 손상에서 내과 아래 통증 · 단독 손상은 드물어 동반 골절·경비인대결합 손상 의심',tests:'외번 스트레스, 내과 하방 압통, 영상(내측 간격 확대)',tx:'⚠ 단독 삼각인대 손상은 드묾 — 골절·결합 손상 배제 먼저, 이후 부착부 약침·후경골근 강화'},
+ '원위경비인대결합':{link:'경골 ~ 비골 원위(전하·후하 경비인대·골간막)',fn:'발목 격자(mortise) 폭 유지 — 체중 부하에서 벌어지지 않게 붙듦',sx:'high ankle sprain — 발목 위쪽 통증 · 회복이 유난히 오래 걸림 · 밀고 나가는 동작에서 악화',tests:'Squeeze 검사, 외회전 스트레스, 결합부 압통 범위(내과 위 몇 cm까지)',tx:'⚠ 일반 염좌보다 장기 보호·부하 제한 필요, 벌어짐 있으면 정형 협진 · 이후 점진 부하'},
+ '용수철인대':{link:'종골 재거돌기 ~ 주상골(거골두를 아래에서 받침)',fn:'내측 세로 아치의 바닥 해먹 — 후경골근과 함께 아치 유지',sx:'후천성 편평족 진행 시 아치 무너짐·내측 통증 · 오래 서 있으면 악화 · 후경골근 기능부전 동반',tests:'Too many toes sign, 한 발 뒤꿈치 들기 실패, 재거돌기–주상골 사이 압통',tx:'후경골근 강화가 근본, 아치 지지 인솔, 인대 부착부 약침·프롤로'},
+ '이분인대':{link:'종골 전상방 ~ 주상골·입방골(Y자)',fn:'중족부 안정',sx:'내번 염좌 후 발등 바깥이 계속 아플 때 — ATFL만 보고 놓치는 자리 · 종골 전방 돌기 압통',tests:'종골 전방 돌기 압통, 내번+족저굴 유발, 견열 골절 감별 영상',tx:'부착부 약침, 중족부 보호·부하 조절 / 만성 외측 발등 통증의 숨은 원인'},
+ '굴근지대(족근관)':{link:'내과 ~ 종골 내측(족근관 지붕)',fn:'경골신경·후경골근건·굴곡건 통로 덮개',sx:'족근관 증후군 — 발바닥 저림·화끈 · 오래 서거나 걸으면 악화 · 밤에도 지속',tests:'족근관 Tinel, Dorsiflexion-eversion 검사, 발바닥 감각 구분',tx:'지대 근위·원위연 약침(경골신경 직자 회피), 후경골근 이완, 아치 지지 / 족저근막염과 감별'},
+};
+/* 신경근 분절(myotome) 칩 — 말초↔중추 연쇄의 열쇠 */
+const SEG_C=['C1','C2','C3','C4','C5','C6','C7','C8','T1'];
+const SEG_T=['T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'];
+const SEG_L=['L1','L2','L3','L4','L5','S1','S2','S3'];
+/* 표준 분절 제안(원장님 검수용) — 클릭해 적용 */
+const SUGGEST_MYO={
+ '흉쇄유돌근(SCM)':['C2','C3'],'견갑거근':['C3','C4','C5'],'상부승모근':['C3','C4'],'후두하근':['C1'],
+ '전사각근':['C5','C6'],'중사각근':['C3','C4','C5','C6'],'후사각근':['C6','C7','C8'],
+ '두판상근':['C3','C4','C5'],'경판상근':['C4','C5','C6'],'두반극근':['C1','C2','C3','C4','C5'],'경반극근':['C3','C4','C5','C6'],'경장근·두장근':['C1','C2','C3','C4','C5','C6'],'경다열근':['C3','C4','C5','C6','C7'],
+ '극상근':['C5','C6'],'극하근':['C5','C6'],'소원근':['C5','C6'],'견갑하근':['C5','C6'],'대원근':['C5','C6'],'광배근':['C6','C7','C8'],'대흉근':['C5','C6','C7','C8','T1'],'삼각근(전)':['C5','C6'],'삼각근(중)':['C5','C6'],'삼각근(후)':['C5','C6'],'상완이두':['C5','C6'],'삼두(장두)':['C6','C7','C8'],'능형근':['C4','C5'],'중부승모근':['C3','C4'],'하부승모근':['C3','C4'],'전거근':['C5','C6','C7'],'소흉근':['C8','T1'],
+ '손목신전근군':['C6','C7'],'손목굴곡근군':['C7','C8'],'상완근':['C5','C6'],'상완삼두':['C7','C8'],'회외근':['C6','C7'],'원회내근':['C6','C7'],
+ '요방형근':['L1','L2','L3'],'복사근':['T7','T8','T9','T10','T11','T12'],'복직근':['T7','T8','T9','T10','T11','T12'],'장요근':['L1','L2','L3'],'척추기립근':['L1','L2','L3','L4','L5'],'다열근·회선근':['L1','L2','L3','L4','L5','S1'],
+ '흉추기립근':['T7','T8','T9','T10','T11','T12'],'반극근':['C3','C4','C5'],'능형근·중부승모근':['C4','C5'],'전거근(후하)':['T9','T10','T11','T12'],
+ '대둔근':['L5','S1','S2'],'중둔근':['L4','L5','S1'],'이상근':['S1','S2'],'햄스트링 기시부':['L5','S1','S2'],'다열근(요천추)':['L4','L5','S1'],
+ '대퇴직근':['L2','L3','L4'],'봉공근':['L2','L3'],'내전근군':['L2','L3','L4'],'대퇴근막장근':['L4','L5'],'햄스트링':['L5','S1','S2'],'이상근·심부외회전근':['S1','S2'],
+ '대퇴사두':['L2','L3','L4'],'슬개건':['L2','L3','L4'],'비복근':['S1','S2'],'거위발건':['L2','L3','L4'],'슬와근':['L4','L5','S1'],'장경인대':['L4','L5'],'대퇴이두':['L5','S1','S2'],
+ '비복근·가자미근':['S1','S2'],'아킬레스건':['S1','S2'],'후경골근':['L4','L5'],'전경골근':['L4','L5'],'장·단비골근':['L5','S1'],'족저근막·내재근':['S1','S2'],'장무지굴근':['L5','S1','S2'],
+};
+/* 근육별 주요 작용 신경(표준, 원장님 검수용) */
+const SUGGEST_NERVE={
+ '흉쇄유돌근(SCM)':'부신경(CN XI)','견갑거근':'견갑배신경·경신경','상부승모근':'부신경(CN XI)','후두하근':'후두하신경(C1)',
+ '전사각근':'경신경 전지(C5–C6)','중사각근':'경신경 전지(C3–C6)','후사각근':'경신경 전지(C6–C8)',
+ '두판상근':'경신경 후지','경판상근':'경신경 후지','두반극근':'경신경 후지(대후두신경 C2)','경반극근':'경신경 후지','경장근·두장근':'경신경 전지(C1–C6)','경다열근':'경신경 후지',
+ '극상근':'견갑상신경','극하근':'견갑상신경','소원근':'액와신경','견갑하근':'견갑하신경','대원근':'하견갑하신경','광배근':'흉배신경','대흉근':'내·외측 흉근신경','삼각근(전)':'액와신경','삼각근(중)':'액와신경','삼각근(후)':'액와신경','상완이두':'근피신경','삼두(장두)':'요골신경','능형근':'견갑배신경','중부승모근':'부신경(CN XI)','하부승모근':'부신경(CN XI)','전거근':'장흉신경','소흉근':'내측 흉근신경',
+ '손목신전근군':'요골신경(후골간)','손목굴곡근군':'정중·척골신경','상완근':'근피신경','상완삼두':'요골신경','회외근':'요골신경(후골간)','원회내근':'정중신경',
+ '흉추기립근':'척수신경 후지','다열근·회선근':'척수신경 후지','반극근':'척수신경 후지','늑간근·늑골거근':'늑간신경','능형근·중부승모근':'견갑배·부신경','전거근(후하)':'늑간신경',
+ '척추기립근':'요신경 후지','요방형근':'요신경총(T12–L3)','복사근':'늑간·장골하복신경','복직근':'늑간신경(T7–T12)','장요근':'대퇴신경·요신경총',
+ '대둔근':'하둔신경','중둔근':'상둔신경','이상근':'천골신경총','햄스트링 기시부':'좌골신경','다열근(요천추)':'척수신경 후지',
+ '대퇴직근':'대퇴신경','봉공근':'대퇴신경','내전근군':'폐쇄신경','대퇴근막장근':'상둔신경','햄스트링':'좌골신경','이상근·심부외회전근':'천골신경총',
+ '대퇴사두':'대퇴신경','슬개건':'대퇴신경(사두 연장)','비복근':'경골신경','거위발건':'대퇴·폐쇄·좌골(복합)','슬와근':'경골신경','장경인대':'상둔신경(TFL)','대퇴이두':'좌골신경',
+ '비복근·가자미근':'경골신경','아킬레스건':'경골신경','후경골근':'경골신경','전경골근':'심비골신경','장·단비골근':'천비골신경','족저근막·내재근':'내·외측 족저신경','장무지굴근':'경골신경',
+};
+/* 표준 진단·치료 초안 (원장님 검수용) — con:수축통 동작, tests:이학검사, ploc:연관통, tx:치료(근복부·기시·종지 자침+약침)
+   ※ 어깨·발목 먼저(파일럿). 형식 확정되면 전 부위 확장. */
+const SEED_DB={
+ // ── 어깨 ──
+ '극상근':{con:['외전'],tests:'Empty can(Jobe) 저항 외전+내회전 시 통증·근력저하; 통증호 60–120°',ploc:'견봉 외측·삼각근부',tx:'극상와(기시) 근복부·상완골 대결절(종지) 자침, 견봉하 약침 병행'},
+ '극하근':{con:['외회전'],tests:'저항 외회전 통증; 후방 통증호',ploc:'견갑 후면·상완 외측',tx:'극하와(기시) 근복부·대결절 후면(종지) 자침 + 약침'},
+ '소원근':{con:['외회전'],tests:'저항 외회전; Hornblower',ploc:'후방 삼각근부',tx:'견갑 외측연(기시)·대결절 하부(종지) 자침 + 약침'},
+ '견갑하근':{con:['내회전'],tests:'Lift-off/Belly-press 저항 내회전 약화',ploc:'견갑 전면·상완 후면',tx:'견갑하와(기시) 근복부·소결절(종지) 자침 + 약침'},
+ '대원근':{con:['내전','내회전','신전'],tests:'저항 내전·내회전 통증',ploc:'견갑 하각·후방',tx:'견갑 하각(기시)·결절간구 내측(종지) 자침 + 약침'},
+ '광배근':{con:['내전','내회전','신전'],tests:'저항 내전·신전; 광배근 단축(어깨 굴곡 제한)',ploc:'견갑 하각·측흉·요부',tx:'흉요근막(기시)·결절간구(종지)·근복부 자침 + 약침'},
+ '대흉근':{con:['내전','내회전','수평내전'],tests:'저항 수평내전 통증',ploc:'전흉부·상완 내측',tx:'흉골·쇄골(기시)·대결절능(종지)·근복부 자침 + 약침'},
+ '삼각근(전)':{con:['굴곡','수평내전'],tests:'저항 어깨 굴곡 통증',ploc:'전방 삼각근',tx:'쇄골 외측(기시)·삼각근조면(종지)·근복부 자침 + 약침'},
+ '삼각근(중)':{con:['외전'],tests:'저항 외전 통증',ploc:'외측 삼각근',tx:'견봉(기시)·삼각근조면(종지)·근복부 자침 + 약침'},
+ '삼각근(후)':{con:['신전','외회전'],tests:'저항 신전·외회전 통증',ploc:'후방 삼각근',tx:'견갑극(기시)·삼각근조면(종지)·근복부 자침 + 약침'},
+ '상완이두':{con:['굴곡'],tests:'Speed/Yergason 저항 굴곡·회외 통증',ploc:'전상완·주와',tx:'결절간구(장두건)·근복부·요골조면(종지) 자침 + 약침'},
+ '삼두(장두)':{con:['신전'],tests:'저항 주관절 신전 통증',ploc:'후상완',tx:'관절하결절(기시)·주두(종지)·근복부 자침 + 약침'},
+ '능형근':{con:['견갑후인','견갑거상'],tests:'저항 견갑 후인 통증·견갑간 압통',ploc:'견갑 내측연·척추 사이',tx:'C7–T5 극돌기(기시)·견갑 내측연(종지) 자침 + 약침'},
+ '중부승모근':{con:['견갑후인'],tests:'저항 견갑 후인',ploc:'견갑간부',tx:'흉추 극돌기(기시)·견갑극(종지)·근복부 자침 + 약침'},
+ '하부승모근':{con:['견갑하강','견갑후인'],tests:'저항 견갑 하강',ploc:'견갑 하방·중배부',tx:'하위 흉추 극돌기(기시)·견갑극 내측(종지) 자침 + 약침'},
+ '상부승모근':{con:['견갑거상'],tests:'저항 견갑 거상·압통',ploc:'상부 견갑·측경·측두(연관 두통)',tx:'후두·항인대(기시)·쇄골 외측(종지)·근복부 자침 + 약침'},
+ '견갑거근':{con:['견갑거상'],tests:'견갑 상내측 압통·경부 회전 제한',ploc:'견갑 상각·측경',tx:'C1–C4 횡돌기(기시)·견갑 상각(종지) 자침 + 약침'},
+ '전거근':{con:['견갑전인'],tests:'익상견갑(팔 뻗기 약화)',ploc:'측흉·견갑 하각',tx:'1–8 늑골(기시)·견갑 내측연 전면(종지) 자침 + 약침(늑막 주의)'},
+ '소흉근':{con:['견갑전인','견갑하강'],tests:'오구돌기 하방 압통; 흉곽출구 유발',ploc:'전흉·상완 내측(TOS 방사)',tx:'3–5 늑골(기시)·오구돌기(종지)·근복부 자침 + 약침'},
+ // ── 발목·발 ──
+ '비복근·가자미근':{con:['족저굴'],tests:'저항 족저굴·까치발 통증; Thompson(파열 배제)',ploc:'종아리 후면·발바닥',tx:'대퇴골과/경비골 후면(기시)·종골(아킬레스, 종지)·근복부 압통점 자침 + 약침'},
+ '아킬레스건':{con:['족저굴'],tests:'Thompson; 건 부착부·근건이행부 압통',ploc:'뒤꿈치 위 건',tx:'근건이행부·종골 부착부 약침(건 직자 신중) + 자침'},
+ '후경골근':{con:['내번','족저굴'],tests:'저항 내번 통증; 편평족 연관',ploc:'내과 후하방·족저 내측',tx:'경비골 후면·골간막(기시)·주상/설상골(종지)·근복부 자침 + 약침'},
+ '전경골근':{con:['족배굴','내번'],tests:'저항 배굴 통증; 족하수 감별',ploc:'전경부·족배 내측',tx:'경골 외측·골간막(기시)·내측설상/제1중족골(종지) 자침 + 약침'},
+ '장·단비골근':{con:['외번'],tests:'저항 외번 통증; 외측 불안정 연관',ploc:'외과 후방·외측 하퇴',tx:'비골 외측(기시)·제1/제5중족골저(종지)·근복부 자침 + 약침'},
+ '족저근막·내재근':{con:[],tests:'아침 첫발 뒤꿈치 통증; Windlass',ploc:'뒤꿈치·족저',tx:'종골(기시)·족저 근막·내재근 압통점 자침 + 약침'},
+ '장무지굴근':{con:['족저굴'],tests:'저항 무지 굴곡 통증',ploc:'족저·무지',tx:'비골 후면(기시)·무지 말절골(종지)·근복부 자침 + 약침'},
+ // ── 경추 ──
+ '흉쇄유돌근(SCM)':{con:['굴곡'],tests:'저항 경부 굴곡; 회전 시 통증',ploc:'측두·전두·안와(연관 두통)·귀 뒤',tx:'유양돌기(기시)·흉골/쇄골(종지)·근복부 자침 + 약침(경동맥·경정맥 주의)'},
+ '사각근':{con:[],tests:'경부 저항 측굴; 상지 저림(흉곽출구 유발)',ploc:'견갑 내측·상완 외측·전흉·엄지(방사)',tx:'경추 횡돌기(기시)·제1·2 늑골(종지)·근복부 자침 + 약침(신경총·늑막 주의)'},
+ '두·경판상근':{con:['신전'],tests:'저항 경부 신전·동측 회전; 후두 압통',ploc:'후두·정수리·안와(연관 두통)',tx:'항인대·상위 흉추 극돌기(기시)·유양돌기/경추 횡돌기(종지) 자침 + 약침'},
+ '후두하근':{con:['신전'],tests:'후두하 압통; 안구 피로성 두통',ploc:'후두–측두–안와 방사(연관 두통)',tx:'후두골·C1·C2(기시·종지)·후두하 근복부 자침 + 약침(심부 신중)'},
+ '전사각근':{con:[],tests:'경부 저항 측굴; Adson/상지 저림(TOS) — 전·중사각근 사이 신경혈관 압박',ploc:'견갑 내측·상완 외측·전흉·엄지(방사)',tx:'경추 횡돌기 전결절(기시)·제1늑골(종지)·근복부 자침 + 약침(신경총·늑막·경동맥 주의)'},
+ '중사각근':{con:[],tests:'저항 측굴; TOS 유발(전사각근과 사이 신경혈관 통로)',ploc:'견갑 내측·상완 외측',tx:'경추 횡돌기 후결절(기시)·제1늑골(종지)·근복부 자침 + 약침(신경총·늑막 주의)'},
+ '후사각근':{con:[],tests:'저항 측굴; 하부 신경근(C8) 방사 감별',ploc:'견갑 내측·측흉',tx:'하위 경추 횡돌기(기시)·제2늑골(종지)·근복부 자침 + 약침(늑막 주의)'},
+ '두판상근':{con:['신전'],tests:'저항 경부 신전·동측 회전; 후두 압통',ploc:'후두·정수리·안와(연관 두통)',tx:'항인대·상위 흉추 극돌기(기시)·유양돌기(종지) 자침 + 약침'},
+ '경판상근':{con:['신전'],tests:'저항 신전·회전; 상부 견갑 방사',ploc:'후경·견갑 상각',tx:'상위 흉추 극돌기(기시)·상위 경추 횡돌기(종지) 자침 + 약침'},
+ '두반극근':{con:['신전'],tests:'저항 경부 신전; 대후두신경 압통(경성 두통)',ploc:'후두–측두–안와(대후두신경 방사)',tx:'경·흉추 횡돌기(기시)·후두골(종지)·근복부 자침 + 약침(대후두신경 연관)'},
+ '경반극근':{con:['신전'],tests:'신전·회전 시 후경 심부통',ploc:'후경 심부·상배',tx:'상위 흉추 횡돌기(기시)·경추 극돌기(종지) 자침 + 약침'},
+ '경장근·두장근':{con:['굴곡'],tests:'CCFT 두부 끄덕임 약화; 경장근 지구력 저하',ploc:'전경부·인후 이물감',tx:'경추 전면 심부(직자 신중)·재활(끄덕임 운동) 병행'},
+ '경다열근':{con:['신전'],tests:'분절 압통·신전/회전 통증',ploc:'분절 국소·후경',tx:'경추 극돌기·횡돌기 사이(협척) 심부 자침 + 약침 — 분절 신경근 자극'},
+ // ── 팔꿈치·손목 ──
+ '손목신전근군':{con:['손목신전','회외'],tests:'Cozen/Mill 저항 손목 신전 시 외측상과 통증',ploc:'외측상과·전완 후면·손등',tx:'외측상과 총신전건(기시)·근복부·수근/중수골(종지) 자침 + 약침'},
+ '손목굴곡근군':{con:['손목굴곡','회내'],tests:'저항 손목 굴곡 시 내측상과 통증(골퍼)',ploc:'내측상과·전완 전면',tx:'내측상과 총굴곡건(기시)·근복부 자침 + 약침'},
+ '상완근':{con:['팔꿈치굴곡'],tests:'저항 주관절 굴곡(회내 상태)',ploc:'전주와·상완 전면',tx:'상완골 원위 전면(기시)·척골 구상돌기(종지)·근복부 자침 + 약침'},
+ '상완삼두':{con:['팔꿈치신전'],tests:'저항 주관절 신전',ploc:'후상완·주두',tx:'관절하결절/상완골 후면(기시)·주두(종지)·근복부 자침 + 약침'},
+ '회외근':{con:['회외'],tests:'저항 회외 시 통증; 후골간신경 포착 감별',ploc:'외측상과 원위·전완 후면',tx:'외측상과·척골(기시)·요골 근위(종지)·근복부 자침 + 약침(후골간신경 주의)'},
+ '원회내근':{con:['회내'],tests:'저항 회내 시 통증; 정중신경 포착 감별',ploc:'전완 전면 근위·정중신경 분포',tx:'내측상과·구상돌기(기시)·요골 중간 외측(종지)·근복부 자침 + 약침(정중신경 주의)'},
+ // ── 등·흉추 ──
+ '흉추기립근':{con:['신전'],tests:'저항 흉추 신전; 방척추 압통',ploc:'방척추·늑골각 방사',tx:'천골·장골능·늑골각(기시)·늑골/횡돌기(종지)·근복부 자침 + 약침'},
+ '다열근·회선근':{con:['신전'],tests:'분절 압통·신전/회전 시 통증',ploc:'분절 국소·둔부 방사(요천추)',tx:'횡돌기(기시)·상위 극돌기(종지) 협척 심부 자침 + 약침 — 분절 신경근 자극 핵심'},
+ '반극근':{con:['신전'],tests:'경흉추 신전 통증',ploc:'후경·상배',tx:'흉추 횡돌기(기시)·경추 극돌기·후두골(종지) 자침 + 약침'},
+ '늑간근·늑골거근':{con:[],tests:'호흡·회전 시 늑간 통증',ploc:'늑간 따라 대상',tx:'늑간·늑골(자침 신중, 늑막) + 약침'},
+ '능형근·중부승모근':{con:[],tests:'저항 견갑 후인·견갑간 압통',ploc:'견갑 내측·척추 사이',tx:'흉추 극돌기(기시)·견갑 내측연(종지)·근복부 자침 + 약침'},
+ '전거근(후하)':{con:[],tests:'하위 늑골 호흡통',ploc:'하배·늑골',tx:'하위 흉·요추 극돌기(기시)·하위 늑골(종지) 자침 + 약침'},
+ // ── 허리·요추 ──
+ '척추기립근':{con:['신전'],tests:'저항 기립·신전 통증; 방척추 압통',ploc:'요부·둔부 상방',tx:'천골·장골능(기시)·늑골/횡돌기(종지)·근복부 자침 + 약침'},
+ '요방형근':{con:['신전','좌측굴','우측굴'],tests:'측굴·기립 시 측방 요통; 기침 시 통증',ploc:'장골능 상방·측복·서혜(방사)',tx:'제12늑골·요추 횡돌기(기시)·장골능(종지)·근복부 자침 + 약침'},
+ '복사근':{con:['굴곡','좌회전','우회전'],tests:'회전·측굴 저항 시 통증',ploc:'측복·서혜',tx:'장골능·흉요근막·늑골(기시·종지)·근복부 자침 + 약침'},
+ '복직근':{con:['굴곡'],tests:'저항 체간 굴곡(윗몸)',ploc:'전복·검상돌기·치골',tx:'치골능(기시)·5–7 늑연골·검상돌기(종지)·근복부 자침 + 약침'},
+ '장요근':{con:['굴곡'],tests:'Thomas 굴곡근 구축; 저항 고관절 굴곡',ploc:'전서혜·요부 심부·대퇴 전면',tx:'요추 횡돌기·장골와(기시)·대퇴골 소전자(종지)·근복부 자침 + 약침(혈관·심부 주의)'},
+ // ── 둔부·천장 ──
+ '대둔근':{con:['신전','외회전'],tests:'저항 고관절 신전(엎드려 무릎 굽힘)',ploc:'둔부·천장',tx:'장골·천골·흉요근막(기시)·둔근조면/장경인대(종지)·근복부 자침 + 약침'},
+ '중둔근':{con:['외전','내회전'],tests:'저항 외전; Trendelenburg',ploc:'외측 둔부·대전자·측대퇴',tx:'장골 외면(기시)·대전자(종지)·근복부 자침 + 약침'},
+ '이상근':{con:['외회전','외전'],tests:'FAIR/앉을 때 좌골신경 방사; 이상근 신장통',ploc:'둔부 심부·후대퇴(좌골신경 유사 방사)',tx:'천골 전면(기시)·대전자(종지)·근복부 자침 + 약침(좌골신경 주의)'},
+ '햄스트링 기시부':{con:['고관절신전'],tests:'좌골결절 압통(앉을 때); 저항 슬굴곡',ploc:'좌골결절·후대퇴',tx:'좌골결절(기시)·근건이행부 자침 + 약침(좌골신경 주의)'},
+ '다열근(요천추)':{con:[],tests:'천장·요천추 분절 압통·신전통',ploc:'천장·둔부 국소',tx:'요천추 극돌기·천골(협척) 심부 자침 + 약침 — 신경근 분절 자극 핵심'},
+ // ── 고관절 ──
+ '대퇴직근':{con:['굴곡'],tests:'저항 고관절 굴곡·슬 신전; Ely(단축)',ploc:'전대퇴·서혜',tx:'AIIS(기시)·슬개골→경골조면(종지)·근복부 자침 + 약침'},
+ '봉공근':{con:['굴곡','외전','외회전'],tests:'저항 굴곡+외전+외회전',ploc:'전내측 대퇴 사선',tx:'ASIS(기시)·경골 근위 내측(거위발, 종지)·근복부 자침 + 약침'},
+ '내전근군':{con:['내전'],tests:'저항 내전·서혜 통증; 기침통',ploc:'서혜·내측 대퇴',tx:'치골·좌골(기시)·대퇴골 조선(종지)·근복부 자침 + 약침'},
+ '대퇴근막장근':{con:['외전','굴곡','내회전'],tests:'Ober 장경인대 단축; 저항 외전',ploc:'외측 고관절·장경인대 따라 무릎 외측',tx:'ASIS·장골능(기시)·장경인대(종지)·근복부 자침 + 약침'},
+ '햄스트링':{con:[],tests:'저항 슬굴곡; 좌골결절 압통',ploc:'후대퇴·슬와',tx:'좌골결절(기시)·경비골 근위(종지)·근복부 자침 + 약침(좌골신경 주의)'},
+ '이상근·심부외회전근':{con:['외회전','외전'],tests:'저항 외회전; 앉을 때 둔부 심부통',ploc:'둔부 심부·후대퇴',tx:'천골·좌골(기시)·대전자(종지)·근복부 자침 + 약침(좌골신경 주의)'},
+ // ── 무릎 ──
+ '대퇴사두':{con:['신전'],tests:'저항 슬 신전; 슬개건 압통',ploc:'전대퇴·슬개 주위',tx:'AIIS/대퇴골(기시)·슬개골→경골조면(종지)·근복부 자침 + 약침'},
+ '슬개건':{con:['신전'],tests:'슬개건 하극 압통(점프)',ploc:'슬개 하부',tx:'슬개첨(기시)·경골조면(종지) 부착부 약침 + 자침'},
+ '비복근':{con:['굴곡','족저굴'],tests:'저항 족저굴·까치발; 슬굴곡 보조',ploc:'종아리 후면·슬와',tx:'대퇴골 내·외과(기시)·종골(아킬레스, 종지)·근복부 자침 + 약침'},
+ '거위발건':{con:['굴곡'],tests:'내측 관절선 하방 압통(거위발)',ploc:'무릎 내측 하방',tx:'경골 근위 내측(거위발 종지)·봉공·박·반건양 근복부 자침 + 약침'},
+ '슬와근':{con:['굴곡','경골내회전'],tests:'슬와 압통·경골 내회전 시 통증',ploc:'슬와·후외측',tx:'대퇴골 외과(기시)·경골 후면(종지) 자침 + 약침'},
+ '장경인대':{con:[],tests:'Ober; 무릎 외측 마찰통(러너)',ploc:'무릎 외측·외측 대퇴',tx:'장경인대 원위·대퇴근막장근 근복부 약침 + 자침(밴드 이완)'},
+ '대퇴이두':{con:['굴곡','경골외회전'],tests:'저항 슬굴곡·외측 후대퇴',ploc:'후외측 대퇴·비골두',tx:'좌골결절/대퇴골(기시)·비골두(종지)·근복부 자침 + 약침(비골신경 주의)'},
+};
+/* 분절 참조표: 피부분절(derm) — 신경피부분절 표준 */
+const SEG_REF={
+ C1:'후두 상부',C2:'후두–정수리',C3:'후경부·하악각',C4:'쇄골 상부·견봉',C5:'외측 상완·삼각근부',C6:'외측 전완·엄지',C7:'중지·손등 중앙',C8:'소지·내측 전완',T1:'내측 상완',
+ T2:'액와·내측 상완',T4:'유두선',T6:'검상돌기',T7:'검상돌기 아래',T10:'배꼽',T12:'서혜부 상방',
+ L1:'서혜부',L2:'대퇴 전상부',L3:'대퇴 전하부·무릎 내측',L4:'무릎 내측·정강이 내측·내과',L5:'정강이 외측·족배·무지',S1:'발 외측·발바닥·종아리 후면',S2:'대퇴 후면',S3:'좌골·둔부 내측',
+};
+/* 근육의 분절 태그 → 근본(신경근) 치료 대상 자동 도출 */
+function rootTarget(seg){
+ if(!seg||!seg.length)return null;
+ const cerv=seg.filter(s=>/^C/.test(s)||s==='T1');
+ const lumbo=seg.filter(s=>/^[LS]/.test(s));
+ const thor=seg.filter(s=>/^T([2-9]|1[0-2])$/.test(s));
+ const P=[];
+ if(cerv.length)P.push(`경추 ${cerv[0]}–${cerv[cerv.length-1]} 방척추근(경다열근·반극근·회선근)·협척혈, 추간공 확인`);
+ if(thor.length)P.push(`흉추 ${thor[0]}–${thor[thor.length-1]} 방척추근·늑간`);
+ if(lumbo.length)P.push(`요천추 ${lumbo[0]}–${lumbo[lumbo.length-1]} 방척추근(다열근·척추기립근·회선근)·협척혈, 신경근 출구 확인`);
+ const derm=seg.map(s=>SEG_REF[s]?`${s}(${SEG_REF[s]})`:'').filter(Boolean).join(' · ');
+ return {tx:P.join(' / '),derm};
+}
+
+const $=id=>document.getElementById(id);
+const LISTS={muscle:MUSCLES,nerve:NERVES,lig:LIGS};
+const TYPEKO={muscle:'근육',nerve:'신경',lig:'인대'};
+let reg=Object.keys(MUSCLES)[0], type='muscle', cur=null;
+function items(){return (LISTS[type][reg]||[]);}
+const KEY=(m,t)=>'omdt-dx:'+(t||type)+'::'+m;
+const esc=s=>(s||'').replace(/"/g,'&quot;');
+const v=id=>$(id)?.value||'';
+function defRec(t){
+  if(t==='nerve')return {origin:'',derm:'',reflex:'',entrap:'',sx:'',tests:'',tx:'',ddx:'',ok:false};
+  if(t==='lig')return {link:'',fn:'',sx:'',tests:'',tx:'',ddx:'',ok:false};
+  return {nerve:'',seg:[],con:[],str:[],ploc:'',tests:'',tx:'',ddx:'',ok:false};
+}
+const load=(m,t)=>{const r=localStorage.getItem(KEY(m,t));return r?JSON.parse(r):defRec(t||type);};
+const save=(m,d,t)=>localStorage.setItem(KEY(m,t),JSON.stringify(d));
+/* 신경 → 지배 근육 자동 도출 (근육 데이터 기반) */
+function nerveMuscles(nn){
+  const info=NERVE_DB[nn];if(!info)return [];
+  const out=[];
+  Object.values(MUSCLES).flat().forEach(m=>{
+    if(info.kind==='root'){ if((SUGGEST_MYO[m]||[]).includes(info.root))out.push(m); }
+    else { const nv=SUGGEST_NERVE[m]||''; if(info.match&&nv.includes(info.match))out.push(m); }
+  });
+  if(info.through&&!out.includes(info.through))out.push(info.through);
+  (info.extra||[]).forEach(m=>{if(!out.includes(m))out.push(m);});
+  return [...new Set(out)];
+}
+/* 최초 1회: 근육·신경·인대 표준 씨앗 (검수 전 ok:false, 빈 항목만 채움) */
+function seedAll(){
+  Object.values(MUSCLES).flat().forEach(m=>{
+    const e=SEED_DB[m]||{},raw=localStorage.getItem(KEY(m,'muscle'));
+    if(!raw){save(m,{nerve:SUGGEST_NERVE[m]||'',seg:(SUGGEST_MYO[m]||[]).slice(),con:e.con?e.con.slice():[],str:[],ploc:e.ploc||'',tests:e.tests||'',tx:e.tx||'',ddx:'',ok:false},'muscle');return;}
+    const d=JSON.parse(raw);let ch=false;
+    if(!d.nerve&&SUGGEST_NERVE[m]){d.nerve=SUGGEST_NERVE[m];ch=true;}
+    if((!d.seg||!d.seg.length)&&SUGGEST_MYO[m]){d.seg=SUGGEST_MYO[m].slice();ch=true;}
+    if((!d.con||!d.con.length)&&e.con&&e.con.length){d.con=e.con.slice();ch=true;}
+    if(!d.ploc&&e.ploc){d.ploc=e.ploc;ch=true;}
+    if(!d.tests&&e.tests){d.tests=e.tests;ch=true;}
+    if(!d.tx&&e.tx){d.tx=e.tx;ch=true;}
+    if(d.str==null){d.str=[];ch=true;}
+    if(d.ok==null){d.ok=false;ch=true;}
+    if(ch)save(m,d,'muscle');
+  });
+  Object.values(NERVES).flat().forEach(n=>{
+    const e=NERVE_DB[n]||{},raw=localStorage.getItem(KEY(n,'nerve'));
+    if(!raw){save(n,{origin:e.origin||'',derm:e.derm||'',reflex:e.reflex||'',entrap:e.entrap||'',sx:e.sx||'',tests:e.tests||'',tx:e.tx||'',ddx:'',ok:false},'nerve');return;}
+    const d=JSON.parse(raw);let ch=false;['origin','derm','reflex','entrap','sx','tests','tx'].forEach(k=>{if(!d[k]&&e[k]){d[k]=e[k];ch=true;}});if(d.ok==null){d.ok=false;ch=true;}if(ch)save(n,d,'nerve');
+  });
+  Object.values(LIGS).flat().forEach(l=>{
+    const e=LIG_DB[l]||{},raw=localStorage.getItem(KEY(l,'lig'));
+    if(!raw){save(l,{link:e.link||'',fn:e.fn||'',sx:e.sx||'',tests:e.tests||'',tx:e.tx||'',ddx:'',ok:false},'lig');return;}
+    const d=JSON.parse(raw);let ch=false;['link','fn','sx','tests','tx'].forEach(k=>{if(!d[k]&&e[k]){d[k]=e[k];ch=true;}});if(d.ok==null){d.ok=false;ch=true;}if(ch)save(l,d,'lig');
+  });
+}
+const isSeeded=(m,t)=>!!localStorage.getItem(KEY(m,t));
+const isOk=(m,t)=>{const r=localStorage.getItem(KEY(m,t));return r&&JSON.parse(r).ok;};
+
+function buildReg(){
+  $('regSel').innerHTML=Object.keys(MUSCLES).map(k=>{
+    const list=LISTS[type][k]||[];const ok=list.filter(m=>isOk(m)).length;
+    return `<option value="${k}">${REGKO[k]} (${TYPEKO[type]} ${ok}/${list.length})</option>`;
+  }).join('');
+  $('regSel').value=reg;
+}
+function buildList(){
+  const list=items();
+  if(!list.length){$('mlist').innerHTML=`<p style="color:var(--muted);font-size:12px;text-align:center;padding:16px 8px;line-height:1.5">이 부위 ${TYPEKO[type]} 항목은<br>아직 정하지 않았어요</p>`;return;}
+  $('mlist').innerHTML=list.map(m=>`<button data-m="${m}" class="${cur===m?'on':''} ${isOk(m)?'done':''}"><span>${nm(m)}</span><span class="tk">${isOk(m)?'●':'◐'}</span></button>`).join('');
+  $('mlist').querySelectorAll('button').forEach(b=>b.onclick=()=>{cur=b.dataset.m;renderForm();buildList();});
+}
+function moveChips(kind,sel){
+  return MOVES[reg].map(mv=>`<label class="${sel.includes(mv)?'on':''}"><input type="checkbox" data-k="${kind}" value="${mv}" ${sel.includes(mv)?'checked':''}>${mv}</label>`).join('');
+}
+function segChips(sel){
+  const row=arr=>arr.map(s=>`<label class="${sel.includes(s)?'on':''}"><input type="checkbox" data-k="seg" value="${s}" ${sel.includes(s)?'checked':''}>${s}</label>`).join('');
+  return `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:5px">${row(SEG_C)}</div>`
+    +`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:5px">${row(SEG_T)}</div>`
+    +`<div style="display:flex;flex-wrap:wrap;gap:6px">${row(SEG_L)}</div>`;
+}
+function segHint(m,sel){
+  const sug=SUGGEST_MYO[m];if(!sug)return '';
+  const same=sug.length===sel.length&&sug.every(s=>sel.includes(s));
+  if(same)return ` <span class="h" style="color:var(--muscle)">✓ 표준 적용됨</span>`;
+  return ` <span class="h">표준: ${sug.join('·')} <button type="button" id="applyMyo" style="border:0;background:#fff4e0;color:#a15c00;border-radius:6px;padding:1px 7px;font:inherit;font-size:11px;font-weight:700;cursor:pointer">적용</button></span>`;
+}
+function renderForm(){
+  if(!cur){$('form').className='form empty';$('form').textContent='← 왼쪽에서 '+TYPEKO[type]+' 선택';return;}
+  if(type==='nerve')return renderNerveForm();
+  if(type==='lig')return renderLigForm();
+  renderMuscleForm();
+}
+function flashSaved(){const s=$('saved');if(!s)return;s.textContent='✓ 저장됨';setTimeout(()=>{if($('saved'))$('saved').textContent='';},900);}
+function renderNerveForm(){
+  const d=load(cur,'nerve'),musc=nerveMuscles(cur);
+  $('form').className='form';
+  $('form').innerHTML=`
+    <h2>${nm(cur)}</h2><div class="reg">신경 · ${REGKO[reg]}</div>
+    <div class="fld"><label>기원 / 신경근</label><input type="text" id="n-origin" value="${esc(d.origin)}" placeholder="예: C5 신경근"></div>
+    <div class="rootbox"><div class="rt-h">🔗 지배 근육 <span class="h">— 근육 데이터에서 자동</span></div><div class="rt-tx">${musc.length?musc.map(nm).join(', '):'—'}</div></div>
+    <div class="fld"><label>피부분절 (감각)</label><input type="text" id="n-derm" value="${esc(d.derm)}"></div>
+    <div class="fld"><label>반사</label><input type="text" id="n-reflex" value="${esc(d.reflex)}"></div>
+    <div class="fld"><label>포착 · 주행 부위</label><input type="text" id="n-entrap" value="${esc(d.entrap)}"></div>
+    <div class="fld"><label>증상 <span class="h">감각·운동·방사</span></label><textarea id="n-sx">${d.sx||''}</textarea></div>
+    <div class="fld"><label>이학적 검사</label><textarea id="n-tests">${d.tests||''}</textarea></div>
+    <div class="fld"><label>치료 포인트</label><textarea id="n-tx">${d.tx||''}</textarea></div>
+    <div class="fld"><label>감별·메모</label><textarea id="n-ddx">${d.ddx||''}</textarea></div>
+    <label class="okrow"><input type="checkbox" id="f-ok" ${d.ok?'checked':''}> <b>이 항목 검수 완료</b></label>
+    <div class="saved" id="saved"></div>`;
+  bindForm(()=>({origin:v('n-origin'),derm:v('n-derm'),reflex:v('n-reflex'),entrap:v('n-entrap'),sx:v('n-sx'),tests:v('n-tests'),tx:v('n-tx'),ddx:v('n-ddx'),ok:$('f-ok').checked}),'nerve');
+}
+function renderLigForm(){
+  const d=load(cur,'lig');
+  $('form').className='form';
+  $('form').innerHTML=`
+    <h2>${nm(cur)}</h2><div class="reg">인대 · ${REGKO[reg]}</div>
+    <div class="fld"><label>연결 부위</label><input type="text" id="l-link" value="${esc(d.link)}" placeholder="예: 후두골 ~ C7 극돌기"></div>
+    <div class="fld"><label>기능</label><input type="text" id="l-fn" value="${esc(d.fn)}" placeholder="예: 경부 후방 지지·과굴곡 제한"></div>
+    <div class="fld"><label>증상 <span class="h">손상·불안정</span></label><textarea id="l-sx">${d.sx||''}</textarea></div>
+    <div class="fld"><label>불안정 · 손상 검사</label><textarea id="l-tests">${d.tests||''}</textarea></div>
+    <div class="fld"><label>치료 포인트 <span class="h">약침·프롤로·안정화</span></label><textarea id="l-tx">${d.tx||''}</textarea></div>
+    <div class="fld"><label>감별·메모</label><textarea id="l-ddx">${d.ddx||''}</textarea></div>
+    <label class="okrow"><input type="checkbox" id="f-ok" ${d.ok?'checked':''}> <b>이 항목 검수 완료</b></label>
+    <div class="saved" id="saved"></div>`;
+  bindForm(()=>({link:v('l-link'),fn:v('l-fn'),sx:v('l-sx'),tests:v('l-tests'),tx:v('l-tx'),ddx:v('l-ddx'),ok:$('f-ok').checked}),'lig');
+}
+function bindForm(collect,t){
+  const flush=()=>{save(cur,collect(),t);flashSaved();buildReg();markDone();updateStat();};
+  $('form').querySelectorAll('input[type=text],textarea').forEach(el=>el.addEventListener('input',flush));
+  $('f-ok').addEventListener('change',()=>{flush();buildList();});
+}
+function renderMuscleForm(){
+  const d=load(cur,'muscle');
+  $('form').className='form';
+  $('form').innerHTML=`
+    <div id="muscImg"></div>
+    <h2>${nm(cur)}</h2><div class="reg">${nm(cur)!==cur?cur+' · ':''}${REGKO[reg]}${NAMES[cur]&&NAMES[cur].en&&lang!=='en'?' · '+NAMES[cur].en:''}</div>
+    <div class="fld"><label>신경 지배 <span class="h">신경명</span></label>
+      <input type="text" id="f-nerve" value="${(d.nerve||'').replace(/"/g,'&quot;')}" placeholder="예: 견갑상신경"></div>
+    <div class="fld"><label>🧬 신경근 분절 <span class="h">myotome — 말초↔중추 연쇄의 열쇠</span>${segHint(cur,d.seg||[])}</label>
+      <div class="moves seg" data-k="seg">${segChips(d.seg||[])}</div></div>
+    <div id="rootBox"></div>
+    <div class="twocol">
+      <div class="fld"><label class="conlab">🔵 수축통 유발 동작 <span class="h">저항 수축 시 아픔</span></label><div class="moves con" data-k="con">${moveChips('con',d.con||[])}</div></div>
+      <div class="fld"><label class="strlab">🟠 신장통 유발 동작 <span class="h">늘일 때 아픔</span></label><div class="moves str" data-k="str">${moveChips('str',d.str||[])}</div></div>
+    </div>
+    <div class="fld"><label>통증·연관통 위치</label>
+      <input type="text" id="f-ploc" value="${(d.ploc||'').replace(/"/g,'&quot;')}" placeholder="예: 견갑 내측연, 상완 후외측 방사"></div>
+    <div class="fld"><label>이학적 검사 <span class="h">검사명 → 양성 소견</span></label>
+      <textarea id="f-tests" placeholder="예: Empty can(Jobe) 저항 외전+내회전 시 통증·근력저하">${d.tests||''}</textarea></div>
+    <div class="fld"><label>치료 포인트 <span class="h">자침·약침점, 도수 방향, 우선순위</span></label>
+      <textarea id="f-tx" placeholder="예: 극상근 압통점 자침, 견봉하 약침. 상부승모근 이완 병행">${d.tx||''}</textarea></div>
+    <div class="fld"><label>감별·메모</label>
+      <textarea id="f-ddx" placeholder="예: 경추 C5 신경근병증과 감별 — 방사·감각저하 동반 여부">${d.ddx||''}</textarea></div>
+    <label class="okrow"><input type="checkbox" id="f-ok" ${d.ok?'checked':''}> <b>이 근육 검수 완료</b> <span class="h">표준값 확인함</span></label>
+    <div class="saved" id="saved"></div>`;
+  renderRoot();renderImg();
+  // 입력 바인딩
+  const collect=()=>{
+    const g=id=>$(id)?.value||'';
+    return {nerve:g('f-nerve'),ploc:g('f-ploc'),tests:g('f-tests'),tx:g('f-tx'),ddx:g('f-ddx'),ok:$('f-ok')?.checked||false,
+      seg:[...$('form').querySelectorAll('[data-k="seg"] input:checked')].map(i=>i.value),
+      con:[...$('form').querySelectorAll('[data-k="con"] input:checked')].map(i=>i.value),
+      str:[...$('form').querySelectorAll('[data-k="str"] input:checked')].map(i=>i.value)};
+  };
+  const flush=()=>{save(cur,collect());$('saved').textContent='✓ 저장됨';setTimeout(()=>{if($('saved'))$('saved').textContent='';},900);buildReg();markDone();updateStat();renderRoot();};
+  $('form').querySelectorAll('input[type=text],textarea').forEach(el=>el.addEventListener('input',flush));
+  $('form').querySelectorAll('.moves input').forEach(el=>el.addEventListener('change',e=>{e.target.closest('label').classList.toggle('on',e.target.checked);flush();}));
+  $('f-ok').addEventListener('change',()=>{flush();buildList();});
+  const am=$('applyMyo');if(am)am.onclick=()=>{const d2=load(cur);d2.seg=(SUGGEST_MYO[cur]||[]).slice();save(cur,d2);renderForm();buildList();};
+  updateStat();
+}
+function renderImg(){
+  const box=$('muscImg');if(!box)return;
+  const d=IMGDATA[cur];
+  if(!d){box.innerHTML=`<div class="noimg">🖼 그림 좌표 미보정 — <b>calib.html</b>에서 이 근육을 찍으면 여기 표시됩니다</div>`;return;}
+  const X=d.x*1000,Y=d.y*1000, MX=(2*IMG_MID-d.x)*1000, lx=X<500?X+28:X-28, anc=X<500?'start':'end';
+  box.innerHTML=`<div class="muscimg-wrap">
+    <img src="${d.img}" alt="${cur}"/>
+    <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">
+      <circle class="mg-glow" cx="${X}" cy="${Y}" r="60"/>
+      <circle class="mg-glow" cx="${MX}" cy="${Y}" r="60"/>
+      <circle class="mg-pin" cx="${MX}" cy="${Y}" r="12"/>
+      <circle class="mg-pin" cx="${X}" cy="${Y}" r="13"/>
+      <line class="mg-lead" x1="${X}" y1="${Y}" x2="${lx}" y2="${Y-4}"/>
+      <text class="mg-lb" x="${lx}" y="${Y+4}" text-anchor="${anc}">${cur}</text>
+    </svg>
+    <div class="mg-cap">${cur} · 치료 부위</div>
+  </div>`;
+}
+function renderRoot(){
+  const box=$('rootBox');if(!box)return;
+  const seg=[...$('form').querySelectorAll('[data-k="seg"] input:checked')].map(i=>i.value);
+  const rt=rootTarget(seg);
+  box.innerHTML=rt?`<div class="rootbox"><div class="rt-h">🎯 근본(신경근) 치료 대상 <span class="h">— 이 분절 자동 도출</span></div><div class="rt-tx">${rt.tx}</div><div class="rt-d">피부분절: ${rt.derm}</div></div>`:'';
+}
+function markDone(){const b=$('mlist').querySelector(`button[data-m="${cur}"]`);if(b){b.classList.toggle('done',isOk(cur));b.querySelector('.tk').textContent=isOk(cur)?'●':'◐';}}
+function updateStat(){
+  let tot=0,ok=0;Object.values(LISTS[type]).flat().forEach(m=>{tot++;if(isOk(m))ok++;});
+  $('stat').textContent=`${TYPEKO[type]} 검수 ${ok}/${tot}`;
+}
+function collectAll(){
+  const all={muscle:{},nerve:{},lig:{}};
+  Object.entries(MUSCLES).forEach(([r,ms])=>ms.forEach(m=>{if(isSeeded(m,'muscle'))all.muscle[m]={region:r,...load(m,'muscle')};}));
+  Object.entries(NERVES).forEach(([r,ns])=>ns.forEach(n=>{if(isSeeded(n,'nerve'))all.nerve[n]={region:r,...load(n,'nerve')};}));
+  Object.entries(LIGS).forEach(([r,ls])=>ls.forEach(l=>{if(isSeeded(l,'lig'))all.lig[l]={region:r,...load(l,'lig')};}));
+  return all;
+}
+$('regSel').onchange=e=>{reg=e.target.value;cur=null;buildList();renderForm();updateStat();};
+$('typesw').querySelectorAll('button').forEach(b=>b.onclick=()=>{type=b.dataset.t;cur=null;$('typesw').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));buildReg();buildList();renderForm();updateStat();});
+$('langsw').querySelectorAll('button').forEach(b=>b.onclick=()=>{lang=b.dataset.l;$('langsw').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));buildList();renderForm();});
+$('btnExport').onclick=()=>{const t=$('out');t.style.display='block';t.value=JSON.stringify(collectAll(),null,1);t.focus();t.select();try{navigator.clipboard.writeText(t.value);}catch(e){}};
+$('btnSave').onclick=()=>{const blob=new Blob([JSON.stringify(collectAll(),null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='omdt-dx.json';document.body.appendChild(a);a.click();a.remove();};
+seedAll();buildReg();buildList();renderForm();updateStat();
+</script>
+</body>
+</html>

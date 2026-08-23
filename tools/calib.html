@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>OMDT 근육 위치 보정</title>
+<style>
+  :root{--navy:#002D62;--navy-soft:#4A5A8C;--gold:#FFD700;--line:#e3e6ee;--ink:#1c2333;--muted:#69728a;--muscle:#1d9e75;--warn:#C4546B}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f5f6f8;color:var(--ink);font-family:system-ui,"Malgun Gothic",sans-serif;line-height:1.55}
+  .wrap{max-width:1000px;margin:0 auto;padding:16px 16px 50px}
+  h1{font-size:17px;color:var(--navy);text-align:center;margin:0 0 2px}
+  .sub{text-align:center;color:var(--muted);font-size:12px;margin:0 0 12px}
+  .viewbar{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .viewbar select{padding:8px 12px;border:1.5px solid var(--navy);border-radius:10px;font:inherit;font-size:13px;font-weight:700;color:var(--navy);background:#fff;cursor:pointer}
+  .viewbar .st{font-size:11.5px;color:var(--muted)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+  .split{display:grid;grid-template-columns:1fr 270px;gap:18px;align-items:start}
+  @media(max-width:760px){.split{grid-template-columns:1fr}}
+  .toolbar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;min-height:34px}
+  .toolbar button{padding:7px 12px;border:1.5px solid var(--line);background:#fbfcfe;border-radius:9px;font:inherit;font-size:12px;font-weight:700;color:#3a4260;cursor:pointer}
+  .toolbar button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .toolbar .sep{width:1px;background:var(--line);margin:2px 2px}
+  .stage{position:relative;width:100%;user-select:none;touch-action:none}
+  .stage img{width:100%;display:block;border-radius:10px;pointer-events:none}
+  .stage svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .mid{stroke:#3f7bd6;stroke-width:1.5;stroke-dasharray:5 4;cursor:ew-resize}
+  .midhit{stroke:transparent;stroke-width:16;cursor:ew-resize}
+  .dot{fill:var(--warn);stroke:#fff;stroke-width:2;cursor:grab}
+  .dot.mir{fill:#c99;opacity:.75}
+  .dlabel{font-size:12px;font-weight:700;fill:var(--navy);paint-order:stroke;stroke:#fff;stroke-width:3px}
+  .lead{stroke:var(--navy);stroke-width:1;opacity:.5}
+  .pal h3{margin:0 0 6px;font-size:12.5px;color:var(--navy);text-align:center}
+  .pal .hint{font-size:11px;color:var(--muted);text-align:center;margin:0 0 8px;line-height:1.4}
+  .pal button.mus{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;margin-bottom:4px;padding:7px 10px;border:1.5px solid var(--line);background:#fbfcfe;border-radius:9px;font:inherit;font-size:12px;cursor:pointer;color:#3a4260}
+  .pal button.mus.armed{background:#fff4e0;border-color:var(--gold);color:#a15c00;font-weight:800}
+  .pal button.mus.done{border-color:var(--muscle)}
+  .pal button.mus.done .tick{color:var(--muscle);font-weight:800}
+  .pal button.mus .tick{font-size:11px;opacity:.8}
+  .row{display:flex;align-items:center;gap:6px;justify-content:center;font-size:12px;margin:8px 0}
+  .actions{display:flex;gap:8px;margin-top:12px}
+  .actions button{flex:1;padding:9px 0;border:0;border-radius:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+  .btn-exp{background:var(--navy);color:#fff}
+  .btn-save{background:var(--muscle);color:#fff}
+  .btn-clr{background:#fff;color:var(--warn);border:1.5px solid var(--warn)}
+  textarea{width:100%;margin-top:10px;height:110px;border:1px solid var(--line);border-radius:8px;padding:8px;font-family:ui-monospace,monospace;font-size:11px;display:none}
+  .note{font-size:11px;color:var(--muted);margin-top:10px;padding-top:9px;border-top:1px solid var(--line);line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>OMDT 근육 위치 보정</h1>
+  <p class="sub">뷰 고르고 → 근육 이름 클릭 → 그림의 <b>근복부(제일 두툼한 곳)</b> 클릭</p>
+  <div class="viewbar">
+    <select id="viewSel"></select>
+    <span class="st" id="viewStat"></span>
+  </div>
+  <div class="card">
+    <div class="split">
+      <div>
+        <div class="toolbar" id="toolbar"></div>
+        <div class="stage" id="stage">
+          <img id="bg" alt="근육 도해"/>
+          <svg id="ov" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+      <div class="pal">
+        <h3 id="palTitle">근육</h3>
+        <p class="hint">이름 누르고 → 그림에서 근복부 클릭.<br>점은 끌어서 옮기고, 다시 누르면 지워져요.</p>
+        <div id="palList"></div>
+        <div class="row"><span class="muted" id="prog"></span></div>
+        <div class="actions">
+          <button class="btn-exp" id="btnExport">📋 복사</button>
+          <button class="btn-clr" id="btnClear">이 뷰 초기화</button>
+        </div>
+        <div class="actions" style="margin-top:8px">
+          <button class="btn-save" id="btnSave">💾 전체 저장 (파일)</button>
+        </div>
+        <textarea id="out" readonly></textarea>
+        <p class="note">작업은 자동 저장돼요. 다 찍으면 <b>💾 전체 저장</b> 눌러 다운로드된 <b>calib-all.json</b>을 채팅에 올려주세요 — 모든 뷰가 한 파일에 담깁니다.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── 뷰 정의: 각 뷰 = 이미지 + 근육목록 + 미러여부 ──
+   layers 키가 여러 개면 층 토글 버튼이 뜸. 단일이면 'one'. ── */
+/* Z-Anatomy 캡처로 새로 시작 · 경추부터 · 부위 완료할 때마다 뷰 추가 */
+const VIEWS={
+ 'neck-post':{label:'경추 후면 (천층/심층)', mirror:true, layers:{
+    super:{n:'천층',img:'../img/neck-post-super.png',muscles:['상부승모근']},
+    deep:{n:'심층',img:'../img/neck-post-deep.png',muscles:['견갑거근','두판상근','경판상근','두반극근','경반극근','후두하근','경다열근']}}},
+ 'neck-lateral':{label:'경추 측면', mirror:false, layers:{
+    one:{n:'',img:'../img/neck-lateral.png',muscles:['흉쇄유돌근(SCM)','전사각근','중사각근','후사각근','견갑거근']}}},
+ 'neck-ant':{label:'경추 전면 (심부)', mirror:false, layers:{
+    one:{n:'',img:'../img/neck-ant-deep.png',muscles:['경장근·두장근']}}},
+};
+
+const $=id=>document.getElementById(id);
+const stage=$('stage'), ov=$('ov'), bg=$('bg');
+let viewId=Object.keys(VIEWS)[0], curLayer=null, armed=null, dragging=null;
+let mirror=true, midX=0.5;
+let store={}; // 현재 뷰 데이터: {points:{muscle:{layer,x,y}}, midX}
+
+function skey(v){return 'omdt-calib-'+v;}
+function loadView(v){
+  const raw=localStorage.getItem(skey(v));
+  store=raw?JSON.parse(raw):{points:{},midX:0.5};
+  if(store.midX==null)store.midX=0.5;
+  midX=store.midX; mirror=VIEWS[v].mirror;
+  curLayer=Object.keys(VIEWS[v].layers)[0];
+}
+function save(){store.midX=midX;localStorage.setItem(skey(viewId),JSON.stringify(store));}
+
+function toNorm(ev){const r=bg.getBoundingClientRect();return {x:Math.max(0,Math.min(1,(ev.clientX-r.left)/r.width)),y:Math.max(0,Math.min(1,(ev.clientY-r.top)/r.height))};}
+
+function renderToolbar(){
+  const layers=VIEWS[viewId].layers, keys=Object.keys(layers);
+  let h='';
+  if(keys.length>1){
+    keys.forEach(k=>h+=`<button data-layer="${k}" class="${k===curLayer?'on':''}">${layers[k].n}</button>`);
+    h+='<span class="sep"></span>';
+  }
+  if(VIEWS[viewId].mirror)
+    h+=`<button id="btnMirror" class="${mirror?'on':''}">↔ 자동 미러 ${mirror?'ON':'OFF'}</button>`;
+  else h+=`<span class="st">단일 부위 · 미러 없음</span>`;
+  $('toolbar').innerHTML=h;
+  $('toolbar').querySelectorAll('[data-layer]').forEach(b=>b.onclick=()=>{curLayer=b.dataset.layer;armed=null;render();});
+  const mb=$('btnMirror');if(mb)mb.onclick=()=>{mirror=!mirror;render();};
+}
+function render(){
+  const layers=VIEWS[viewId].layers;
+  bg.src=layers[curLayer].img;
+  renderToolbar();
+  let h='';
+  if(VIEWS[viewId].mirror){
+    const mx=midX*1000;
+    h+=`<line class="mid" x1="${mx}" y1="0" x2="${mx}" y2="1000"/><line class="midhit" data-mid="1" x1="${mx}" y1="0" x2="${mx}" y2="1000"/>`;
+  }
+  for(const[name,p] of Object.entries(store.points)){
+    if(p.layer!==curLayer)continue;
+    const X=p.x*1000,Y=p.y*1000, lx=X<500?X+34:X-34;
+    h+=`<line class="lead" x1="${X}" y1="${Y}" x2="${lx}" y2="${Y-4}"/>`;
+    h+=`<text class="dlabel" x="${lx}" y="${Y}" text-anchor="${X<500?'start':'end'}">${name}</text>`;
+    if(mirror){const MX=(2*midX-p.x)*1000;h+=`<circle class="dot mir" cx="${MX}" cy="${Y}" r="9"/>`;}
+    h+=`<circle class="dot" data-m="${name}" cx="${X}" cy="${Y}" r="11"/>`;
+  }
+  ov.innerHTML=h;
+  ov.querySelectorAll('.dot[data-m]').forEach(c=>c.addEventListener('pointerdown',e=>{e.stopPropagation();dragging=c.dataset.m;}));
+  ov.querySelector('[data-mid]')?.addEventListener('pointerdown',e=>{e.stopPropagation();dragging='__mid';});
+  renderPal();
+}
+function renderPal(){
+  const layers=VIEWS[viewId].layers, ms=layers[curLayer].muscles;
+  $('palTitle').textContent=(layers[curLayer].n?layers[curLayer].n+' ':'')+'근육';
+  $('palList').innerHTML=ms.map(n=>{
+    const done=store.points[n]&&store.points[n].layer===curLayer;
+    return `<button class="mus ${armed===n?'armed':''} ${done?'done':''}" data-arm="${n}"><span>${n}</span><span class="tick">${done?'● 배치됨':'○'}</span></button>`;
+  }).join('');
+  $('palList').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    const n=b.dataset.arm;
+    if(store.points[n]&&store.points[n].layer===curLayer){delete store.points[n];save();armed=null;render();return;}
+    armed=(armed===n?null:n);renderPal();
+  });
+  const total=Object.values(store.points).filter(p=>p.layer===curLayer).length;
+  $('prog').textContent=`${total} / ${ms.length} 배치됨 (이 층)`;
+}
+stage.addEventListener('pointerdown',e=>{if(dragging||!armed)return;const{x,y}=toNorm(e);store.points[armed]={layer:curLayer,x,y};save();armed=null;render();});
+stage.addEventListener('pointermove',e=>{if(!dragging)return;const{x,y}=toNorm(e);if(dragging==='__mid'){midX=x;save();render();}else if(store.points[dragging]){store.points[dragging].x=x;store.points[dragging].y=y;render();}});
+window.addEventListener('pointerup',()=>{if(dragging&&dragging!=='__mid')save();dragging=null;});
+
+function buildViewSel(){
+  $('viewSel').innerHTML=Object.entries(VIEWS).map(([id,v])=>{
+    const raw=localStorage.getItem(skey(id));const done=raw?Object.keys(JSON.parse(raw).points||{}).length:0;
+    return `<option value="${id}">${v.label}${done?'  ✓'+done:''}</option>`;
+  }).join('');
+  $('viewSel').value=viewId;
+}
+function updateStat(){
+  let totV=0,totP=0;Object.keys(VIEWS).forEach(id=>{const raw=localStorage.getItem(skey(id));if(raw){const n=Object.keys(JSON.parse(raw).points||{}).length;if(n){totV++;totP+=n;}}});
+  $('viewStat').textContent=`전체 ${totV}뷰 · ${totP}근육 배치됨`;
+}
+$('viewSel').onchange=e=>{viewId=e.target.value;loadView(viewId);render();updateStat();};
+$('btnClear').onclick=()=>{if(confirm('이 뷰의 좌표를 모두 지울까요?')){store={points:{},midX:0.5};midX=0.5;save();buildViewSel();render();updateStat();$('out').style.display='none';}};
+function collectAll(){
+  const all={};Object.keys(VIEWS).forEach(id=>{const raw=localStorage.getItem(skey(id));if(raw){const d=JSON.parse(raw);if(d.points&&Object.keys(d.points).length)all[id]={midX:d.midX,mirror:VIEWS[id].mirror,points:d.points};}});
+  return all;
+}
+$('btnExport').onclick=()=>{const t=$('out');t.style.display='block';t.value=JSON.stringify(collectAll(),null,1);t.focus();t.select();try{navigator.clipboard.writeText(t.value);}catch(e){}};
+$('btnSave').onclick=()=>{const blob=new Blob([JSON.stringify(collectAll(),null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='calib-all.json';document.body.appendChild(a);a.click();a.remove();};
+
+bg.onload=()=>{if(ov.innerHTML==='')renderPal();};
+loadView(viewId);buildViewSel();render();updateStat();
+</script>
+</body>
+</html>

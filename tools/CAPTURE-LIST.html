@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>OMDT 전신 캡처 목록 (Z-Anatomy)</title>
+<style>
+  :root{--navy:#002D62;--gold:#FFD700;--line:#e3e6ee;--ink:#1c2333;--muted:#69728a;--muscle:#1d9e75;--nerve:#d4694a;--lig:#7a5aa8}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f5f6f8;color:var(--ink);font-family:system-ui,"Malgun Gothic",sans-serif;line-height:1.5;font-size:14px}
+  .wrap{max-width:900px;margin:0 auto;padding:22px 18px 60px}
+  h1{font-size:20px;color:var(--navy);text-align:center;margin:0 0 2px}
+  .sub{text-align:center;color:var(--muted);font-size:12.5px;margin:0 0 18px}
+  .recipe{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:20px;font-size:13px}
+  .recipe b{color:var(--navy)}
+  .recipe ol{margin:6px 0 0;padding-left:20px} .recipe li{margin-bottom:3px}
+  h2{font-size:16px;color:#fff;background:var(--navy);border-radius:9px;padding:8px 14px;margin:26px 0 10px}
+  h2.nrv{background:var(--nerve)} h2.lg{background:var(--lig)}
+  h3{font-size:14px;color:var(--navy);margin:16px 0 6px;padding-left:2px}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:8px}
+  th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#f0f2f7;color:var(--navy);font-size:12px;font-weight:700}
+  td.v{white-space:nowrap;font-weight:700;color:#2a3350;font-size:12.5px}
+  td.f{white-space:nowrap;font-family:ui-monospace,monospace;font-size:12px;color:var(--muscle)}
+  td.m{font-size:12.5px;color:#3a4260}
+  .chk{width:22px;text-align:center}
+  .chk input{width:15px;height:15px}
+  .cnt{font-size:11.5px;color:var(--muted);margin:0 0 4px;padding-left:2px}
+  .note{background:#fff8e6;border:1px solid #f0e0b8;border-radius:9px;padding:10px 14px;font-size:12.5px;color:#6b5320;margin:8px 0 4px}
+  .tip{font-size:11.5px;color:var(--muted);margin:2px 0 0;padding-left:2px}
+  @media print{body{background:#fff}.recipe,.note{break-inside:avoid}table{break-inside:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>OMDT 전신 캡처 목록</h1>
+  <p class="sub">z-anatomy.com → 근육/신경/인대 켜고 각도 맞춰 스크린샷 · 파일명대로 <b>C:\project\OMDT\img\</b> 에 저장</p>
+
+  <div class="recipe">
+    <b>공통 순서</b>
+    <ol>
+      <li>z-anatomy.com → 오른쪽 목록에서 <b>Muscular system 눈아이콘(👁)</b> 켜기 → 전신 근육</li>
+      <li>드래그(또는 왼쪽 아래 좌표공)로 <b>각도</b> 맞추고, 휠로 <b>부위 크게</b></li>
+      <li><b>심층</b>: 덮는 근육(승모근·삼각근 등) 눈아이콘 끄기 — <b>카메라는 그대로</b>(천/심 정합)</li>
+      <li>오른쪽 목록 패널 <b>X로 닫기</b> → <b>Win+Shift+S</b> 영역 캡처 → 크롭 → 파일명대로 저장</li>
+      <li><b>색은 균일하게</b>(알록달록하면 표식이 묻힘)</li>
+    </ol>
+    <p style="margin:8px 0 0;color:var(--muted);font-size:11.5px">※ 신경 캡처 = <b>Nervous system</b> 켜기 · 인대 캡처 = 근육 끄고 <b>Skeletal + Ligaments</b> 켜기</p>
+  </div>
+
+  <!-- ══════════ 근육 ══════════ -->
+  <h2>① 근육 (Muscles)</h2>
+  <p class="note">겹치는 근육(상부승모근·견갑거근·광배근·중둔근·요방형근·햄스트링·비복근·능형근·중부승모근·다열근·장요근·대둔근)은 <b>제일 잘 보이는 뷰 한 곳에서만</b> 찍으면 됩니다.</p>
+
+  <h3>경추 · Cervical (13근)</h3>
+  <table>
+    <tr><th class="chk">✓</th><th>뷰</th><th>파일명</th><th>근육</th></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면 천층</td><td class="f">neck-post-super.png</td><td class="m">상부승모근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면 심층<br><span class="tip">승모근 제거</span></td><td class="f">neck-post-deep.png</td><td class="m">견갑거근 · 두판상근 · 경판상근 · 두반극근 · 경반극근 · 후두하근군 · 경다열근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">측면</td><td class="f">neck-lateral.png</td><td class="m">흉쇄유돌근(SCM) · 전사각근 · 중사각근 · 후사각근 · 견갑거근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">전면 심부</td><td class="f">neck-ant-deep.png</td><td class="m">경장근 · 두장근</td></tr>
+  </table>
+
+  <h3>어깨 · Shoulder (19근)</h3>
+  <table>
+    <tr><th class="chk">✓</th><th>뷰</th><th>파일명</th><th>근육</th></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면 천층</td><td class="f">shoulder-post-super.png</td><td class="m">상부·중부·하부승모근 · 삼각근(후) · 광배근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면 심층<br><span class="tip">승모근·삼각근 제거</span></td><td class="f">shoulder-post-deep.png</td><td class="m">극상근 · 극하근 · 소원근 · 대원근 · 능형근 · 견갑거근 · 삼두(장두)</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">전면 천층</td><td class="f">shoulder-ant-super.png</td><td class="m">대흉근 · 삼각근(전) · 상완이두</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">전면 심층<br><span class="tip">대흉근 제거</span></td><td class="f">shoulder-ant-deep.png</td><td class="m">소흉근 · 견갑하근 · 전거근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">측면</td><td class="f">shoulder-lateral.png</td><td class="m">삼각근(중)</td></tr>
+  </table>
+
+  <h3>팔꿈치 · 손목 · Elbow/Wrist (7근)</h3>
+  <table>
+    <tr><th class="chk">✓</th><th>뷰</th><th>파일명</th><th>근육</th></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">상완 전면</td><td class="f">arm-ant.png</td><td class="m">상완이두 · 상완근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">상완 후면</td><td class="f">arm-post.png</td><td class="m">상완삼두</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">아래팔 신전측</td><td class="f">forearm-ext.png</td><td class="m">손목신전근군 · 회외근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">아래팔 굴곡측</td><td class="f">forearm-flex.png</td><td class="m">손목굴곡근군 · 원회내근</td></tr>
+  </table>
+
+  <h3>등 · 흉추 · Thoracic (6근)</h3>
+  <table>
+    <tr><th class="chk">✓</th><th>뷰</th><th>파일명</th><th>근육</th></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면 천층</td><td class="f">thoracic-post-super.png</td><td class="m">능형근 · 중부승모근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면 심층</td><td class="f">thoracic-post-deep.png</td><td class="m">흉추기립근 · 다열근·회선근 · 반극근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">측면 · 늑간</td><td class="f">thoracic-lateral.png</td><td class="m">늑간근·늑골거근 · 전거근(후하)</td></tr>
+  </table>
+
+  <h3>허리 · 요추 · Lumbar (6근)</h3>
+  <table>
+    <tr><th class="chk">✓</th><th>뷰</th><th>파일명</th><th>근육</th></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면 천층</td><td class="f">lumbar-post-super.png</td><td class="m">척추기립근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면 심층</td><td class="f">lumbar-post-deep.png</td><td class="m">다열근·회선근 · 요방형근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">전면 · 복부</td><td class="f">abdomen-ant.png</td><td class="m">복직근 · 복사근 · 장요근</td></tr>
+  </table>
+
+  <h3>둔부 · 천장 · Gluteal/SIJ (6근)</h3>
+  <table>
+    <tr><th class="chk">✓</th><th>뷰</th><th>파일명</th><th>근육</th></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면 천층</td><td class="f">glute-post-super.png</td><td class="m">대둔근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면 심층<br><span class="tip">대둔근 제거</span></td><td class="f">glute-post-deep.png</td><td class="m">중둔근 · 이상근 · 햄스트링 기시부 · 요방형근 · 다열근(요천추)</td></tr>
+  </table>
+
+  <h3>고관절 · Hip (9근)</h3>
+  <table>
+    <tr><th class="chk">✓</th><th>뷰</th><th>파일명</th><th>근육</th></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">전면</td><td class="f">hip-ant.png</td><td class="m">장요근 · 대퇴직근 · 봉공근 · 내전근군</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">측면</td><td class="f">hip-lateral.png</td><td class="m">중둔근 · 대퇴근막장근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면</td><td class="f">hip-post.png</td><td class="m">대둔근 · 햄스트링 · 이상근·심부외회전근</td></tr>
+  </table>
+
+  <h3>무릎 · Knee (8근)</h3>
+  <table>
+    <tr><th class="chk">✓</th><th>뷰</th><th>파일명</th><th>근육</th></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">전면</td><td class="f">knee-ant.png</td><td class="m">대퇴사두 · 슬개건</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면</td><td class="f">knee-post.png</td><td class="m">햄스트링 · 비복근 · 슬와근 · 대퇴이두</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">내측</td><td class="f">knee-med.png</td><td class="m">거위발건</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">외측</td><td class="f">knee-lat.png</td><td class="m">장경인대</td></tr>
+  </table>
+
+  <h3>발목 · 발 · Ankle/Foot (7근)</h3>
+  <table>
+    <tr><th class="chk">✓</th><th>뷰</th><th>파일명</th><th>근육</th></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">후면</td><td class="f">leg-post.png</td><td class="m">비복근·가자미근 · 아킬레스건</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">전·외측</td><td class="f">leg-ant-lat.png</td><td class="m">전경골근 · 장·단비골근</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">내측 · 족저</td><td class="f">foot-med-plantar.png</td><td class="m">후경골근 · 족저근막·내재근 · 장무지굴근</td></tr>
+  </table>
+
+  <!-- ══════════ 신경 ══════════ -->
+  <h2 class="nrv">② 신경 (Nerves)</h2>
+  <p class="note">Z-Anatomy에서 <b>Nervous system</b>을 켜고 캡처. 지금은 <b>경추 신경만 확정</b>됐어요 — 다른 부위는 그 부위 작업할 때 목록 드릴게요. 그래도 아래 <b>참고 캡처</b>는 미리 찍어두면 나중에 씀.</p>
+  <table>
+    <tr><th class="chk">✓</th><th>부위</th><th>파일명</th><th>담을 신경</th></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">경추 (확정)</td><td class="f">neck-nerve.png</td><td class="m">C5~C8 신경근 · 대후두신경 · 부신경 · 견갑배신경 (경·완신경총)</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">상지 (참고)</td><td class="f">arm-nerve.png</td><td class="m">정중·척골·요골신경 (완신경총 말초)</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">요천추 (참고)</td><td class="f">lumbosacral-nerve.png</td><td class="m">좌골·대퇴·폐쇄신경 · L2~S1 신경근 (요천추신경총)</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">하지 (참고)</td><td class="f">leg-nerve.png</td><td class="m">경골·비골신경 · 족부 분지</td></tr>
+  </table>
+
+  <!-- ══════════ 인대 ══════════ -->
+  <h2 class="lg">③ 인대 (Ligaments)</h2>
+  <p class="note">근육 끄고 <b>Skeletal + Ligaments</b>를 켜서 캡처. 지금은 <b>경추 인대만 확정</b> — 다른 관절은 그 부위 작업 시. 참고 캡처는 미리 찍어두면 좋아요.</p>
+  <table>
+    <tr><th class="chk">✓</th><th>부위</th><th>파일명</th><th>담을 인대</th></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">경추 (확정)</td><td class="f">neck-ligament.png</td><td class="m">항인대 · 후종인대 · 황색인대 · 횡인대(C1) · 익상인대 · 극간·극상인대 · 후관절낭</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">요추 (참고)</td><td class="f">lumbar-ligament.png</td><td class="m">전·후종인대 · 황색인대 · 극상·극간 · 장요인대</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">무릎 (참고)</td><td class="f">knee-ligament.png</td><td class="m">ACL · PCL · MCL · LCL · 반월판</td></tr>
+    <tr><td class="chk"><input type="checkbox"></td><td class="v">발목 (참고)</td><td class="f">ankle-ligament.png</td><td class="m">전거비·종비·후거비인대 · 삼각인대</td></tr>
+  </table>
+
+  <div class="note" style="background:#eef7fc;border-color:#cfe6f5;color:#123f5e;margin-top:20px">
+    <b>우선순위</b> — 다 못 찍어도 됩니다. <b>경추(①②③) 먼저</b> 완성하면 그걸로 흐름을 끝까지 확인해요. 그다음 어깨·요추·무릎처럼 진료 빈도 높은 순으로.
+    <br>파일명 규칙: 위 표 그대로. 같은 이름으로 저장하면 calib·dx-input이 자동으로 이어받습니다.
+  </div>
+</div>
+</body>
+</html>

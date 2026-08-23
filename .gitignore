@@ -2,3 +2,9 @@
 *.tmp
 .DS_Store
 node_modules/
+
+# 해부 이미지 = 로컬 캡처 작업물 (Z-Anatomy · 용량) — 좌표 JSON은 추적함
+img/*.png
+img/*.jpg
+img/*.jpeg
+img/_gemini_old/

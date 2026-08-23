@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>OMDT 근육 표식 데모 — 상체 후면 (원장님 보정 좌표)</title>
+<style>
+  :root{--navy:#002D62;--navy-soft:#4A5A8C;--gold:#FFD700;--line:#e3e6ee;--ink:#1c2333;--muted:#69728a;--muscle:#1d9e75;--warn:#C4546B}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f5f6f8;color:var(--ink);font-family:system-ui,"Malgun Gothic",sans-serif;line-height:1.55}
+  .wrap{max-width:920px;margin:0 auto;padding:20px 16px 50px}
+  h1{font-size:17px;color:var(--navy);text-align:center;margin:0 0 2px}
+  .sub{text-align:center;color:var(--muted);font-size:12px;margin:0 0 14px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+  .split{display:grid;grid-template-columns:1fr 250px;gap:18px;align-items:start}
+  @media(max-width:740px){.split{grid-template-columns:1fr}}
+  .layerbtns{display:flex;gap:8px;justify-content:center;margin-bottom:10px}
+  .layerbtns button{flex:1;max-width:130px;padding:8px 0;border:1.5px solid var(--line);background:#fbfcfe;border-radius:10px;font:inherit;font-size:12.5px;font-weight:700;color:#3a4260;cursor:pointer}
+  .layerbtns button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .stage{position:relative;width:100%}
+  .stage img{width:100%;display:block;border-radius:10px}
+  .stage svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+  .glow{fill:var(--warn);opacity:0;mix-blend-mode:multiply;transition:opacity .25s}
+  .glow.on{opacity:.55}
+  .glow.top{fill:#c0392b}
+  .pin{fill:var(--warn);stroke:#fff;stroke-width:2;opacity:0;transition:opacity .25s}
+  .pin.on{opacity:1}
+  .pin.top{fill:#a01d10;stroke:var(--gold);stroke-width:2.5}
+  .plabel{font-size:13px;font-weight:800;opacity:0;transition:opacity .25s;paint-order:stroke;stroke:#fff;stroke-width:3.5px;fill:var(--warn)}
+  .plabel.on{opacity:1}
+  .plabel.top{fill:#8a1a10}
+  .plead{stroke:var(--warn);stroke-width:1.5;opacity:0;transition:opacity .25s}
+  .plead.on{opacity:.6}
+  .cand h3{margin:0 0 4px;font-size:13px;color:var(--navy);text-align:center}
+  .cand .qz{font-size:11.5px;color:var(--muted);text-align:center;margin:0 0 10px;line-height:1.4}
+  .cand button{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;margin-bottom:5px;padding:8px 11px;border:1.5px solid var(--line);background:#fbfcfe;border-radius:10px;font:inherit;font-size:12.5px;cursor:pointer;color:#3a4260}
+  .cand button:hover{border-color:var(--navy-soft)}
+  .cand button.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+  .cand button .r{opacity:.7;font-size:11px}
+  .cand button .star{color:var(--gold)}
+  .cand button .ly{font-size:10px;opacity:.6;margin-left:6px}
+  .cand button.miss{opacity:.5}
+  .note{font-size:11px;color:var(--muted);margin-top:12px;padding-top:10px;border-top:1px solid var(--line);line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>OMDT 근육 표식 — 상체 후면</h1>
+  <p class="sub">원장님이 보정한 좌표로 표시 · 문진 후보 근육에 표식 점등</p>
+  <div class="card">
+    <div class="split">
+      <div>
+        <div class="layerbtns">
+          <button id="btnSuper" class="on">천층 (겉)</button>
+          <button id="btnDeep">심층 (속)</button>
+        </div>
+        <div class="stage">
+          <img id="bg" src="../img/back-upper-super.png" alt="상체 후면"/>
+          <svg id="ov" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+      <div class="cand">
+        <h3>관여 근육 후보</h3>
+        <p class="qz">예시 문진: 어깨 <b>후방·견갑 통증</b></p>
+        <div id="list"></div>
+        <p class="note">후보를 누르면 그 근육 위치에 표식이 켜져요. 다른 층 근육은 자동으로 층이 바뀝니다. <b>회색(미보정)</b>은 아직 좌표를 안 찍은 근육이에요.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* 원장님 보정 좌표 (calib-back-upper.json) */
+const CALIB={
+ midX:0.5, mirror:true,
+ central:['후두하근'],
+ points:{
+  "상부승모근":{layer:"super",x:0.5415,y:0.4194},
+  "중부승모근":{layer:"super",x:0.6203,y:0.5680},
+  "하부승모근":{layer:"super",x:0.5871,y:0.7827},
+  "광배근":{layer:"super",x:0.6857,y:0.9469},
+  "삼각근(후)":{layer:"super",x:0.8423,y:0.6928},
+  "견갑거근":{layer:"deep",x:0.6193,y:0.5861},
+  "능형근":{layer:"deep",x:0.4170,y:0.7047},
+  "극상근":{layer:"deep",x:0.6867,y:0.6467},
+  "극하근":{layer:"deep",x:0.6992,y:0.7328},
+  "두·경판상근":{layer:"deep",x:0.5373,y:0.3103},
+ }
+};
+const LAYER={super:'../img/back-upper-super.png',deep:'../img/back-upper-deep.png'};
+const LAYKO={super:'천층',deep:'심층'};
+/* 예시 문진 후보 (어깨 후방·견갑) */
+const CANDS=[
+  {n:'극하근',score:3.0,top:true},
+  {n:'능형근',score:2.0},
+  {n:'견갑거근',score:1.5},
+  {n:'하부승모근',score:1.5},
+  {n:'광배근',score:1.0},
+  {n:'상부승모근',score:1.0},
+];
+
+let cur='super';
+const on=new Set();
+const $=id=>document.getElementById(id);
+const ov=$('ov'), bg=$('bg');
+
+function buildOverlay(){
+  let h='';
+  for(const[name,p] of Object.entries(CALIB.points)){
+    if(p.layer!==cur)continue;
+    const top=CANDS.find(c=>c.n===name)?.top;
+    const X=p.x*1000, Y=p.y*1000;
+    const sides=[[X,Y,false]];
+    if(CALIB.mirror&&!CALIB.central.includes(name))sides.push([(2*CALIB.midX-p.x)*1000,Y,true]);
+    sides.forEach(([cx,cy,isMir])=>{
+      h+=`<circle class="glow${top?' top':''}" data-m="${name}" cx="${cx}" cy="${cy}" r="52"/>`;
+      h+=`<circle class="pin${top?' top':''}" data-m="${name}" cx="${cx}" cy="${cy}" r="11"/>`;
+      if(!isMir){ // 라벨은 본점에만
+        const lx=cx<500?cx+30:cx-30, anc=cx<500?'start':'end';
+        h+=`<line class="plead" data-m="${name}" x1="${cx}" y1="${cy}" x2="${lx}" y2="${cy-3}"/>`;
+        h+=`<text class="plabel${top?' top':''}" data-m="${name}" x="${lx}" y="${cy+4}" text-anchor="${anc}">${name}</text>`;
+      }
+    });
+  }
+  ov.innerHTML=h;
+  syncHl();
+}
+function syncHl(){
+  ['glow','pin','plabel','plead'].forEach(cls=>{
+    document.querySelectorAll('#ov .'+cls).forEach(el=>el.classList.toggle('on',on.has(el.dataset.m)));
+  });
+}
+function setLayer(l){
+  cur=l;bg.src=LAYER[l];
+  $('btnSuper').classList.toggle('on',l==='super');
+  $('btnDeep').classList.toggle('on',l==='deep');
+  buildOverlay();
+}
+function toggle(name){
+  if(!CALIB.points[name])return; // 미보정
+  if(on.has(name))on.delete(name);
+  else{on.add(name);const need=CALIB.points[name].layer;if(need!==cur){setLayer(need);return;}}
+  syncHl();syncList();
+}
+function syncList(){document.querySelectorAll('#list button').forEach(b=>b.classList.toggle('on',on.has(b.dataset.m)));}
+function buildList(){
+  $('list').innerHTML=CANDS.map(c=>{
+    const p=CALIB.points[c.n];const miss=!p;
+    return `<button data-m="${c.n}" class="${miss?'miss':''}">
+      <span>${c.n}${c.top?' <span class="star">★</span>':''}${miss?'':`<span class="ly">${LAYKO[p.layer]}</span>`}</span>
+      <span class="r">${miss?'미보정':c.score.toFixed(1)}</span></button>`;
+  }).join('');
+  document.querySelectorAll('#list button').forEach(b=>b.onclick=()=>toggle(b.dataset.m));
+}
+$('btnSuper').onclick=()=>setLayer('super');
+$('btnDeep').onclick=()=>setLayer('deep');
+buildList();buildOverlay();
+// 시작 시 ★ 자동 강조
+CANDS.filter(c=>c.top&&CALIB.points[c.n]).forEach(c=>on.add(c.n));
+const topLayer=CANDS.find(c=>c.top&&CALIB.points[c.n]);
+if(topLayer)setLayer(CALIB.points[topLayer.n].layer);
+syncList();
+</script>
+</body>
+</html>
